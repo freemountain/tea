@@ -12,6 +12,8 @@ pipeline:
   build:
     image: golang:1.12
     pull: true
+    environment:
+      GOPROXY: https://goproxy.cn
     commands:
       - make clean
       - make vet
