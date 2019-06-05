@@ -54,15 +54,6 @@ pipeline:
     when:
       event: [ tag ]
 
-  coverage:
-    image: robertstettner/drone-codecov
-    secrets: [ codecov_token ]
-    files:
-      - coverage.out
-    when:
-      event: [ push, pull_request ]
-      branch: [ master ]
-
   static:
     image: techknowlogick/xgo:latest
     pull: true
