@@ -12,6 +12,8 @@ pipeline:
   build:
     image: golang:1.12
     pull: true
+    environment:
+      GOPROXY: https://goproxy.cn
     commands:
       - make clean
       - make vet
@@ -51,15 +53,6 @@ pipeline:
       - make test
     when:
       event: [ tag ]
-
-  coverage:
-    image: robertstettner/drone-codecov
-    secrets: [ codecov_token ]
-    files:
-      - coverage.out
-    when:
-      event: [ push, pull_request ]
-      branch: [ master ]
 
   static:
     image: techknowlogick/xgo:latest
