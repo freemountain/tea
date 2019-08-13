@@ -40,6 +40,7 @@ func main() {
 		cmd.CmdPulls,
 		cmd.CmdReleases,
 	}
+	app.EnableBashCompletion = true
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(4, "Failed to run app with %s: %v", os.Args, err)
