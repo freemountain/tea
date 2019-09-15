@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -33,6 +32,11 @@ var CmdReleases = cli.Command{
 			Name:  "repo, r",
 			Usage: "Indicate one repository, optional when inside a gitea repository",
 		},
+		cli.StringFlag{
+			Name:        "output, o",
+			Usage:       outputUsage,
+			Destination: &output,
+		},
 	},
 }
 
@@ -44,17 +48,32 @@ func runReleases(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
+	headers := []string{
+		"Tag-Name",
+		"Title",
+		"Published At",
+		"Tar URL",
+	}
+
+	var values [][]string
+
 	if len(releases) == 0 {
-		fmt.Println("No Releases")
+		Output(output, headers, values)
 		return nil
 	}
 
 	for _, release := range releases {
-		fmt.Printf("#%s\t%s\t%s\t%s\n", release.TagName,
-			release.Title,
-			release.PublishedAt.Format("2006-01-02 15:04:05"),
-			release.TarURL)
+		values = append(
+			values,
+			[]string{
+				release.TagName,
+				release.Title,
+				release.PublishedAt.Format("2006-01-02 15:04:05"),
+				release.TarURL,
+			},
+		)
 	}
+	Output(output, headers, values)
 
 	return nil
 }

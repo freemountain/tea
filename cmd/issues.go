@@ -35,6 +35,11 @@ var CmdIssues = cli.Command{
 			Name:  "repo, r",
 			Usage: "Indicate one repository, optional when inside a gitea repository",
 		},
+		cli.StringFlag{
+			Name:        "output, o",
+			Usage:       outputUsage,
+			Destination: &output,
+		},
 	},
 }
 
@@ -91,8 +96,17 @@ func runIssuesList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
+	headers := []string{
+		"Index",
+		"Name",
+		"Updated",
+		"Title",
+	}
+
+	var values [][]string
+
 	if len(issues) == 0 {
-		fmt.Println("No issues left")
+		Output(output, headers, values)
 		return nil
 	}
 
@@ -101,8 +115,17 @@ func runIssuesList(ctx *cli.Context) error {
 		if len(name) == 0 {
 			name = issue.Poster.UserName
 		}
-		fmt.Printf("#%d\t%s\t%s\t%s\n", issue.Index, name, issue.Updated.Format("2006-01-02 15:04:05"), issue.Title)
+		values = append(
+			values,
+			[]string{
+				strconv.FormatInt(issue.Index, 10),
+				name,
+				issue.Updated.Format("2006-01-02 15:04:05"),
+				issue.Title,
+			},
+		)
 	}
+	Output(output, headers, values)
 
 	return nil
 }
