@@ -11,6 +11,15 @@ import (
 	"time"
 )
 
+// PRBranchInfo information about a branch
+type PRBranchInfo struct {
+	Name       string      `json:"label"`
+	Ref        string      `json:"ref"`
+	Sha        string      `json:"sha"`
+	RepoID     int64       `json:"repo_id"`
+	Repository *Repository `json:"repo"`
+}
+
 // PullRequest represents a pull request
 type PullRequest struct {
 	ID        int64      `json:"id"`
@@ -30,9 +39,8 @@ type PullRequest struct {
 	DiffURL  string `json:"diff_url"`
 	PatchURL string `json:"patch_url"`
 
-	Mergeable bool `json:"mergeable"`
-	HasMerged bool `json:"merged"`
-	// swagger:strfmt date-time
+	Mergeable      bool       `json:"mergeable"`
+	HasMerged      bool       `json:"merged"`
 	Merged         *time.Time `json:"merged_at"`
 	MergedCommitID *string    `json:"merge_commit_sha"`
 	MergedBy       *User      `json:"merged_by"`
@@ -41,24 +49,10 @@ type PullRequest struct {
 	Head      *PRBranchInfo `json:"head"`
 	MergeBase string        `json:"merge_base"`
 
-	// swagger:strfmt date-time
 	Deadline *time.Time `json:"due_date"`
-
-	// swagger:strfmt date-time
-	Created *time.Time `json:"created_at"`
-	// swagger:strfmt date-time
-	Updated *time.Time `json:"updated_at"`
-	// swagger:strfmt date-time
-	Closed *time.Time `json:"closed_at"`
-}
-
-// PRBranchInfo information about a branch
-type PRBranchInfo struct {
-	Name       string      `json:"label"`
-	Ref        string      `json:"ref"`
-	Sha        string      `json:"sha"`
-	RepoID     int64       `json:"repo_id"`
-	Repository *Repository `json:"repo"`
+	Created  *time.Time `json:"created_at"`
+	Updated  *time.Time `json:"updated_at"`
+	Closed   *time.Time `json:"closed_at"`
 }
 
 // ListPullRequestsOptions options for listing pull requests
@@ -85,16 +79,15 @@ func (c *Client) GetPullRequest(owner, repo string, index int64) (*PullRequest, 
 
 // CreatePullRequestOption options when creating a pull request
 type CreatePullRequestOption struct {
-	Head      string   `json:"head" binding:"Required"`
-	Base      string   `json:"base" binding:"Required"`
-	Title     string   `json:"title" binding:"Required"`
-	Body      string   `json:"body"`
-	Assignee  string   `json:"assignee"`
-	Assignees []string `json:"assignees"`
-	Milestone int64    `json:"milestone"`
-	Labels    []int64  `json:"labels"`
-	// swagger:strfmt date-time
-	Deadline *time.Time `json:"due_date"`
+	Head      string     `json:"head"`
+	Base      string     `json:"base"`
+	Title     string     `json:"title"`
+	Body      string     `json:"body"`
+	Assignee  string     `json:"assignee"`
+	Assignees []string   `json:"assignees"`
+	Milestone int64      `json:"milestone"`
+	Labels    []int64    `json:"labels"`
+	Deadline  *time.Time `json:"due_date"`
 }
 
 // CreatePullRequest create pull request with options
@@ -110,15 +103,14 @@ func (c *Client) CreatePullRequest(owner, repo string, opt CreatePullRequestOpti
 
 // EditPullRequestOption options when modify pull request
 type EditPullRequestOption struct {
-	Title     string   `json:"title"`
-	Body      string   `json:"body"`
-	Assignee  string   `json:"assignee"`
-	Assignees []string `json:"assignees"`
-	Milestone int64    `json:"milestone"`
-	Labels    []int64  `json:"labels"`
-	State     *string  `json:"state"`
-	// swagger:strfmt date-time
-	Deadline *time.Time `json:"due_date"`
+	Title     string     `json:"title"`
+	Body      string     `json:"body"`
+	Assignee  string     `json:"assignee"`
+	Assignees []string   `json:"assignees"`
+	Milestone int64      `json:"milestone"`
+	Labels    []int64    `json:"labels"`
+	State     *string    `json:"state"`
+	Deadline  *time.Time `json:"due_date"`
 }
 
 // EditPullRequest modify pull request with PR id and options
@@ -128,7 +120,7 @@ func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRe
 		return nil, err
 	}
 	pr := new(PullRequest)
-	return pr, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/issues/%d", owner, repo, index),
+	return pr, c.getParsedResponse("PATCH", fmt.Sprintf("/repos/%s/%s/pulls/%d", owner, repo, index),
 		jsonHeader, bytes.NewReader(body), pr)
 }
 
@@ -147,5 +139,4 @@ func (c *Client) IsPullRequestMerged(owner, repo string, index int64) (bool, err
 	}
 
 	return statusCode == 204, nil
-
 }

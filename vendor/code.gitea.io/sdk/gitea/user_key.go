@@ -13,16 +13,15 @@ import (
 
 // PublicKey publickey is a user key to push code to repository
 type PublicKey struct {
-	ID          int64  `json:"id"`
-	Key         string `json:"key"`
-	URL         string `json:"url,omitempty"`
-	Title       string `json:"title,omitempty"`
-	Fingerprint string `json:"fingerprint,omitempty"`
-	// swagger:strfmt date-time
-	Created  time.Time `json:"created_at,omitempty"`
-	Owner    *User     `json:"user,omitempty"`
-	ReadOnly bool      `json:"read_only,omitempty"`
-	KeyType  string    `json:"key_type,omitempty"`
+	ID          int64     `json:"id"`
+	Key         string    `json:"key"`
+	URL         string    `json:"url,omitempty"`
+	Title       string    `json:"title,omitempty"`
+	Fingerprint string    `json:"fingerprint,omitempty"`
+	Created     time.Time `json:"created_at,omitempty"`
+	Owner       *User     `json:"user,omitempty"`
+	ReadOnly    bool      `json:"read_only,omitempty"`
+	KeyType     string    `json:"key_type,omitempty"`
 }
 
 // ListPublicKeys list all the public keys of the user
@@ -41,6 +40,16 @@ func (c *Client) ListMyPublicKeys() ([]*PublicKey, error) {
 func (c *Client) GetPublicKey(keyID int64) (*PublicKey, error) {
 	key := new(PublicKey)
 	return key, c.getParsedResponse("GET", fmt.Sprintf("/user/keys/%d", keyID), nil, nil, &key)
+}
+
+// CreateKeyOption options when creating a key
+type CreateKeyOption struct {
+	// Title of the key to add
+	Title string `json:"title"`
+	// An armored SSH key to add
+	Key string `json:"key"`
+	// Describe if the key has only read access or read/write
+	ReadOnly bool `json:"read_only"`
 }
 
 // CreatePublicKey create public key with options

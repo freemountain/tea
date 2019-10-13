@@ -11,13 +11,13 @@ import (
 )
 
 // Label a label to an issue or a pr
-// swagger:model
 type Label struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
 	// example: 00aabb
-	Color string `json:"color"`
-	URL   string `json:"url"`
+	Color       string `json:"color"`
+	Description string `json:"description"`
+	URL         string `json:"url"`
 }
 
 // ListRepoLabels list labels of one repository
@@ -35,11 +35,10 @@ func (c *Client) GetRepoLabel(owner, repo string, id int64) (*Label, error) {
 
 // CreateLabelOption options for creating a label
 type CreateLabelOption struct {
-	// required:true
-	Name string `json:"name" binding:"Required"`
-	// required:true
+	Name string `json:"name"`
 	// example: #00aabb
-	Color string `json:"color" binding:"Required;Size(7)"`
+	Color       string `json:"color"`
+	Description string `json:"description"`
 }
 
 // CreateLabel create one label of repository
@@ -55,8 +54,9 @@ func (c *Client) CreateLabel(owner, repo string, opt CreateLabelOption) (*Label,
 
 // EditLabelOption options for editing a label
 type EditLabelOption struct {
-	Name  *string `json:"name"`
-	Color *string `json:"color"`
+	Name        *string `json:"name"`
+	Color       *string `json:"color"`
+	Description *string `json:"description"`
 }
 
 // EditLabel modify one label with options
@@ -76,16 +76,16 @@ func (c *Client) DeleteLabel(owner, repo string, id int64) error {
 	return err
 }
 
-// IssueLabelsOption a collection of labels
-type IssueLabelsOption struct {
-	// list of label IDs
-	Labels []int64 `json:"labels"`
-}
-
 // GetIssueLabels get labels of one issue via issue id
 func (c *Client) GetIssueLabels(owner, repo string, index int64) ([]*Label, error) {
 	labels := make([]*Label, 0, 5)
 	return labels, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/labels", owner, repo, index), nil, nil, &labels)
+}
+
+// IssueLabelsOption a collection of labels
+type IssueLabelsOption struct {
+	// list of label IDs
+	Labels []int64 `json:"labels"`
 }
 
 // AddIssueLabels add one or more labels to one issue

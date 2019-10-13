@@ -11,18 +11,20 @@ import (
 	"fmt"
 )
 
+// AdminListUsers lists all users
+func (c *Client) AdminListUsers() ([]*User, error) {
+	users := make([]*User, 0, 10)
+	return users, c.getParsedResponse("GET", "/admin/users", nil, nil, &users)
+}
+
 // CreateUserOption create user options
 type CreateUserOption struct {
-	SourceID  int64  `json:"source_id"`
-	LoginName string `json:"login_name"`
-	// required: true
-	Username string `json:"username" binding:"Required;AlphaDashDot;MaxSize(40)"`
-	FullName string `json:"full_name" binding:"MaxSize(100)"`
-	// required: true
-	// swagger:strfmt email
-	Email string `json:"email" binding:"Required;Email;MaxSize(254)"`
-	// required: true
-	Password           string `json:"password" binding:"Required;MaxSize(255)"`
+	SourceID           int64  `json:"source_id"`
+	LoginName          string `json:"login_name"`
+	Username           string `json:"username"`
+	FullName           string `json:"full_name"`
+	Email              string `json:"email"`
+	Password           string `json:"password"`
 	MustChangePassword *bool  `json:"must_change_password"`
 	SendNotify         bool   `json:"send_notify"`
 }
@@ -39,16 +41,14 @@ func (c *Client) AdminCreateUser(opt CreateUserOption) (*User, error) {
 
 // EditUserOption edit user options
 type EditUserOption struct {
-	SourceID  int64  `json:"source_id"`
-	LoginName string `json:"login_name"`
-	FullName  string `json:"full_name" binding:"MaxSize(100)"`
-	// required: true
-	// swagger:strfmt email
-	Email                   string `json:"email" binding:"Required;Email;MaxSize(254)"`
-	Password                string `json:"password" binding:"MaxSize(255)"`
+	SourceID                int64  `json:"source_id"`
+	LoginName               string `json:"login_name"`
+	FullName                string `json:"full_name"`
+	Email                   string `json:"email"`
+	Password                string `json:"password"`
 	MustChangePassword      *bool  `json:"must_change_password"`
-	Website                 string `json:"website" binding:"MaxSize(50)"`
-	Location                string `json:"location" binding:"MaxSize(50)"`
+	Website                 string `json:"website"`
+	Location                string `json:"location"`
 	Active                  *bool  `json:"active"`
 	Admin                   *bool  `json:"admin"`
 	AllowGitHook            *bool  `json:"allow_git_hook"`
@@ -74,7 +74,7 @@ func (c *Client) AdminDeleteUser(user string) error {
 	return err
 }
 
-// AdminCreateUserPublicKey create one user with options
+// AdminCreateUserPublicKey adds a public key for the user
 func (c *Client) AdminCreateUserPublicKey(user string, opt CreateKeyOption) (*PublicKey, error) {
 	body, err := json.Marshal(&opt)
 	if err != nil {
@@ -82,4 +82,10 @@ func (c *Client) AdminCreateUserPublicKey(user string, opt CreateKeyOption) (*Pu
 	}
 	key := new(PublicKey)
 	return key, c.getParsedResponse("POST", fmt.Sprintf("/admin/users/%s/keys", user), jsonHeader, bytes.NewReader(body), key)
+}
+
+// AdminDeleteUserPublicKey deletes a user's public key
+func (c *Client) AdminDeleteUserPublicKey(user string, keyID int) error {
+	_, err := c.getResponse("DELETE", fmt.Sprintf("/admin/users/%s/keys/%d", user, keyID), nil, nil)
+	return err
 }

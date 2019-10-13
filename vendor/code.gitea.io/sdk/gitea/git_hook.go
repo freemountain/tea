@@ -17,11 +17,8 @@ type GitHook struct {
 	Content  string `json:"content,omitempty"`
 }
 
-// GitHookList represents a list of Git hooks
-type GitHookList []*GitHook
-
 // ListRepoGitHooks list all the Git hooks of one repository
-func (c *Client) ListRepoGitHooks(user, repo string) (GitHookList, error) {
+func (c *Client) ListRepoGitHooks(user, repo string) ([]*GitHook, error) {
 	hooks := make([]*GitHook, 0, 10)
 	return hooks, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/hooks/git", user, repo), nil, nil, &hooks)
 }

@@ -13,16 +13,15 @@ import (
 
 // DeployKey a deploy key
 type DeployKey struct {
-	ID          int64  `json:"id"`
-	KeyID       int64  `json:"key_id"`
-	Key         string `json:"key"`
-	URL         string `json:"url"`
-	Title       string `json:"title"`
-	Fingerprint string `json:"fingerprint"`
-	// swagger:strfmt date-time
-	Created    time.Time   `json:"created_at"`
-	ReadOnly   bool        `json:"read_only"`
-	Repository *Repository `json:"repository,omitempty"`
+	ID          int64       `json:"id"`
+	KeyID       int64       `json:"key_id"`
+	Key         string      `json:"key"`
+	URL         string      `json:"url"`
+	Title       string      `json:"title"`
+	Fingerprint string      `json:"fingerprint"`
+	Created     time.Time   `json:"created_at"`
+	ReadOnly    bool        `json:"read_only"`
+	Repository  *Repository `json:"repository,omitempty"`
 }
 
 // ListDeployKeys list all the deploy keys of one repository
@@ -35,24 +34,6 @@ func (c *Client) ListDeployKeys(user, repo string) ([]*DeployKey, error) {
 func (c *Client) GetDeployKey(user, repo string, keyID int64) (*DeployKey, error) {
 	key := new(DeployKey)
 	return key, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/keys/%d", user, repo, keyID), nil, nil, &key)
-}
-
-// CreateKeyOption options when creating a key
-type CreateKeyOption struct {
-	// Title of the key to add
-	//
-	// required: true
-	// unique: true
-	Title string `json:"title" binding:"Required"`
-	// An armored SSH key to add
-	//
-	// required: true
-	// unique: true
-	Key string `json:"key" binding:"Required"`
-	// Describe if the key has only read access or read/write
-	//
-	// required: false
-	ReadOnly bool `json:"read_only"`
 }
 
 // CreateDeployKey options when create one deploy key

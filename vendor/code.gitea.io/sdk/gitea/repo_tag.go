@@ -10,13 +10,11 @@ import (
 
 // Tag represents a repository tag
 type Tag struct {
-	Name   string `json:"name"`
-	Commit struct {
-		SHA string `json:"sha"`
-		URL string `json:"url"`
-	} `json:"commit"`
-	ZipballURL string `json:"zipball_url"`
-	TarballURL string `json:"tarball_url"`
+	Name       string      `json:"name"`
+	ID         string      `json:"id"`
+	Commit     *CommitMeta `json:"commit"`
+	ZipballURL string      `json:"zipball_url"`
+	TarballURL string      `json:"tarball_url"`
 }
 
 // ListRepoTags list all the branches of one repository

@@ -11,9 +11,8 @@ import (
 
 // Identity for a person's identity like an author or committer
 type Identity struct {
-	Name string `json:"name" binding:"MaxSize(100)"`
-	// swagger:strfmt email
-	Email string `json:"email" binding:"MaxSize(254)"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }
 
 // CommitMeta contains meta information of a commit in terms of API.
@@ -50,5 +49,5 @@ type Commit struct {
 // GetSingleCommit returns a single commit
 func (c *Client) GetSingleCommit(user, repo, commitID string) (*Commit, error) {
 	commit := new(Commit)
-	return commit, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s", user, repo, commitID), nil, nil, &commit)
+	return commit, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/git/commits/%s", user, repo, commitID), nil, nil, &commit)
 }

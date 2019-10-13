@@ -13,8 +13,7 @@ import (
 
 // TrackedTime worked time for an issue / pr
 type TrackedTime struct {
-	ID int64 `json:"id"`
-	// swagger:strfmt date-time
+	ID      int64     `json:"id"`
 	Created time.Time `json:"created"`
 	// Time in seconds
 	Time    int64 `json:"time"`
@@ -22,32 +21,28 @@ type TrackedTime struct {
 	IssueID int64 `json:"issue_id"`
 }
 
-// TrackedTimes represent a list of tracked times
-type TrackedTimes []*TrackedTime
-
 // GetUserTrackedTimes list tracked times of a user
-func (c *Client) GetUserTrackedTimes(owner, repo, user string) (TrackedTimes, error) {
-	times := make(TrackedTimes, 0, 10)
+func (c *Client) GetUserTrackedTimes(owner, repo, user string) ([]*TrackedTime, error) {
+	times := make([]*TrackedTime, 0, 10)
 	return times, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/times/%s", owner, repo, user), nil, nil, &times)
 }
 
 // GetRepoTrackedTimes list tracked times of a repository
-func (c *Client) GetRepoTrackedTimes(owner, repo string) (TrackedTimes, error) {
-	times := make(TrackedTimes, 0, 10)
+func (c *Client) GetRepoTrackedTimes(owner, repo string) ([]*TrackedTime, error) {
+	times := make([]*TrackedTime, 0, 10)
 	return times, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/times", owner, repo), nil, nil, &times)
 }
 
 // GetMyTrackedTimes list tracked times of the current user
-func (c *Client) GetMyTrackedTimes() (TrackedTimes, error) {
-	times := make(TrackedTimes, 0, 10)
+func (c *Client) GetMyTrackedTimes() ([]*TrackedTime, error) {
+	times := make([]*TrackedTime, 0, 10)
 	return times, c.getParsedResponse("GET", "/user/times", nil, nil, &times)
 }
 
 // AddTimeOption options for adding time to an issue
 type AddTimeOption struct {
 	// time in seconds
-	// required: true
-	Time int64 `json:"time" binding:"Required"`
+	Time int64 `json:"time"`
 }
 
 // AddTime adds time to issue with the given index
@@ -62,7 +57,7 @@ func (c *Client) AddTime(owner, repo string, index int64, opt AddTimeOption) (*T
 }
 
 // ListTrackedTimes get tracked times of one issue via issue id
-func (c *Client) ListTrackedTimes(owner, repo string, index int64) (TrackedTimes, error) {
-	times := make(TrackedTimes, 0, 5)
+func (c *Client) ListTrackedTimes(owner, repo string, index int64) ([]*TrackedTime, error) {
+	times := make([]*TrackedTime, 0, 5)
 	return times, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/times", owner, repo, index), nil, nil, &times)
 }

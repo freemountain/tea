@@ -19,18 +19,12 @@ func BasicAuthEncode(user, pass string) string {
 }
 
 // AccessToken represents an API access token.
-// swagger:response AccessToken
 type AccessToken struct {
 	ID             int64  `json:"id"`
 	Name           string `json:"name"`
-	Token          string `json:"token"`
-	HashedToken    string `json:"hashed_token"`
+	Token          string `json:"sha1"`
 	TokenLastEight string `json:"token_last_eight"`
 }
-
-// AccessTokenList represents a list of API access token.
-// swagger:response AccessTokenList
-type AccessTokenList []*AccessToken
 
 // ListAccessTokens lista all the access tokens of user
 func (c *Client) ListAccessTokens(user, pass string) ([]*AccessToken, error) {
@@ -40,9 +34,8 @@ func (c *Client) ListAccessTokens(user, pass string) ([]*AccessToken, error) {
 }
 
 // CreateAccessTokenOption options when create access token
-// swagger:parameters userCreateToken
 type CreateAccessTokenOption struct {
-	Name string `json:"name" binding:"Required"`
+	Name string `json:"name"`
 }
 
 // CreateAccessToken create one access token with options

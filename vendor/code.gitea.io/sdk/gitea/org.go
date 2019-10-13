@@ -1,4 +1,5 @@
 // Copyright 2015 The Gogs Authors. All rights reserved.
+// Copyright 2019 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -12,14 +13,14 @@ import (
 
 // Organization represents an organization
 type Organization struct {
-	ID          int64       `json:"id"`
-	UserName    string      `json:"username"`
-	FullName    string      `json:"full_name"`
-	AvatarURL   string      `json:"avatar_url"`
-	Description string      `json:"description"`
-	Website     string      `json:"website"`
-	Location    string      `json:"location"`
-	Visibility  VisibleType `json:"visibility"`
+	ID          int64  `json:"id"`
+	UserName    string `json:"username"`
+	FullName    string `json:"full_name"`
+	AvatarURL   string `json:"avatar_url"`
+	Description string `json:"description"`
+	Website     string `json:"website"`
+	Location    string `json:"location"`
+	Visibility  string `json:"visibility"`
 }
 
 // ListMyOrgs list all of current user's organizations
@@ -42,13 +43,24 @@ func (c *Client) GetOrg(orgname string) (*Organization, error) {
 
 // CreateOrgOption options for creating an organization
 type CreateOrgOption struct {
-	// required: true
-	UserName    string      `json:"username" binding:"Required"`
-	FullName    string      `json:"full_name"`
-	Description string      `json:"description"`
-	Website     string      `json:"website"`
-	Location    string      `json:"location"`
-	Visibility  VisibleType `json:"visibility"`
+	UserName    string `json:"username"`
+	FullName    string `json:"full_name"`
+	Description string `json:"description"`
+	Website     string `json:"website"`
+	Location    string `json:"location"`
+	// possible values are `public` (default), `limited` or `private`
+	// enum: public,limited,private
+	Visibility string `json:"visibility"`
+}
+
+// CreateOrg creates an organization
+func (c *Client) CreateOrg(opt CreateOrgOption) (*Organization, error) {
+	body, err := json.Marshal(&opt)
+	if err != nil {
+		return nil, err
+	}
+	org := new(Organization)
+	return org, c.getParsedResponse("POST", "/orgs", jsonHeader, bytes.NewReader(body), org)
 }
 
 // EditOrgOption options for editing an organization
@@ -57,6 +69,9 @@ type EditOrgOption struct {
 	Description string `json:"description"`
 	Website     string `json:"website"`
 	Location    string `json:"location"`
+	// possible values are `public`, `limited` or `private`
+	// enum: public,limited,private
+	Visibility string `json:"visibility"`
 }
 
 // EditOrg modify one organization via options
@@ -66,5 +81,11 @@ func (c *Client) EditOrg(orgname string, opt EditOrgOption) error {
 		return err
 	}
 	_, err = c.getResponse("PATCH", fmt.Sprintf("/orgs/%s", orgname), jsonHeader, bytes.NewReader(body))
+	return err
+}
+
+// DeleteOrg deletes an organization
+func (c *Client) DeleteOrg(orgname string) error {
+	_, err := c.getResponse("DELETE", fmt.Sprintf("/orgs/%s", orgname), nil, nil)
 	return err
 }

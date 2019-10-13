@@ -14,16 +14,14 @@ import (
 )
 
 // Attachment a generic attachment
-// swagger:model
 type Attachment struct {
-	ID            int64  `json:"id"`
-	Name          string `json:"name"`
-	Size          int64  `json:"size"`
-	DownloadCount int64  `json:"download_count"`
-	// swagger:strfmt date-time
-	Created     time.Time `json:"created_at"`
-	UUID        string    `json:"uuid"`
-	DownloadURL string    `json:"browser_download_url"`
+	ID            int64     `json:"id"`
+	Name          string    `json:"name"`
+	Size          int64     `json:"size"`
+	DownloadCount int64     `json:"download_count"`
+	Created       time.Time `json:"created_at"`
+	UUID          string    `json:"uuid"`
+	DownloadURL   string    `json:"browser_download_url"`
 }
 
 // ListReleaseAttachments list release's attachments
@@ -69,6 +67,11 @@ func (c *Client) CreateReleaseAttachment(user, repo string, release int64, file 
 	return attachment, err
 }
 
+// EditAttachmentOptions options for editing attachments
+type EditAttachmentOptions struct {
+	Name string `json:"name"`
+}
+
 // EditReleaseAttachment updates the given attachment with the given options
 func (c *Client) EditReleaseAttachment(user, repo string, release int64, attachment int64, form EditAttachmentOptions) (*Attachment, error) {
 	body, err := json.Marshal(&form)
@@ -83,10 +86,4 @@ func (c *Client) EditReleaseAttachment(user, repo string, release int64, attachm
 func (c *Client) DeleteReleaseAttachment(user, repo string, release int64, id int64) error {
 	_, err := c.getResponse("DELETE", fmt.Sprintf("/repos/%s/%s/releases/%d/assets/%d", user, repo, release, id), nil, nil)
 	return err
-}
-
-// EditAttachmentOptions options for editing attachments
-// swagger:model
-type EditAttachmentOptions struct {
-	Name string `json:"name"`
 }

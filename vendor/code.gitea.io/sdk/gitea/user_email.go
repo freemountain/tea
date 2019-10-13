@@ -11,7 +11,6 @@ import (
 
 // Email an email address belonging to a user
 type Email struct {
-	// swagger:strfmt email
 	Email    string `json:"email"`
 	Verified bool   `json:"verified"`
 	Primary  bool   `json:"primary"`

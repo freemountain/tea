@@ -23,26 +23,14 @@ type GPGKey struct {
 	CanEncryptComms   bool           `json:"can_encrypt_comms"`
 	CanEncryptStorage bool           `json:"can_encrypt_storage"`
 	CanCertify        bool           `json:"can_certify"`
-	// swagger:strfmt date-time
-	Created time.Time `json:"created_at,omitempty"`
-	// swagger:strfmt date-time
-	Expires time.Time `json:"expires_at,omitempty"`
+	Created           time.Time      `json:"created_at,omitempty"`
+	Expires           time.Time      `json:"expires_at,omitempty"`
 }
 
 // GPGKeyEmail an email attached to a GPGKey
-// swagger:model GPGKeyEmail
 type GPGKeyEmail struct {
 	Email    string `json:"email"`
 	Verified bool   `json:"verified"`
-}
-
-// CreateGPGKeyOption options create user GPG key
-type CreateGPGKeyOption struct {
-	// An armored GPG key to add
-	//
-	// required: true
-	// unique: true
-	ArmoredKey string `json:"armored_public_key" binding:"Required"`
 }
 
 // ListGPGKeys list all the GPG keys of the user
@@ -61,6 +49,13 @@ func (c *Client) ListMyGPGKeys() ([]*GPGKey, error) {
 func (c *Client) GetGPGKey(keyID int64) (*GPGKey, error) {
 	key := new(GPGKey)
 	return key, c.getParsedResponse("GET", fmt.Sprintf("/user/gpg_keys/%d", keyID), nil, nil, &key)
+}
+
+// CreateGPGKeyOption options create user GPG key
+type CreateGPGKeyOption struct {
+	// An armored GPG key to add
+	//
+	ArmoredKey string `json:"armored_public_key"`
 }
 
 // CreateGPGKey create GPG key with options

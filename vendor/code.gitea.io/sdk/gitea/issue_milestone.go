@@ -11,18 +11,28 @@ import (
 	"time"
 )
 
+// StateType issue state type
+type StateType string
+
+const (
+	// StateOpen pr is opend
+	StateOpen StateType = "open"
+	// StateClosed pr is closed
+	StateClosed StateType = "closed"
+	// StateAll is all
+	StateAll StateType = "all"
+)
+
 // Milestone milestone is a collection of issues on one repository
 type Milestone struct {
-	ID           int64     `json:"id"`
-	Title        string    `json:"title"`
-	Description  string    `json:"description"`
-	State        StateType `json:"state"`
-	OpenIssues   int       `json:"open_issues"`
-	ClosedIssues int       `json:"closed_issues"`
-	// swagger:strfmt date-time
-	Closed *time.Time `json:"closed_at"`
-	// swagger:strfmt date-time
-	Deadline *time.Time `json:"due_on"`
+	ID           int64      `json:"id"`
+	Title        string     `json:"title"`
+	Description  string     `json:"description"`
+	State        StateType  `json:"state"`
+	OpenIssues   int        `json:"open_issues"`
+	ClosedIssues int        `json:"closed_issues"`
+	Closed       *time.Time `json:"closed_at"`
+	Deadline     *time.Time `json:"due_on"`
 }
 
 // ListRepoMilestones list all the milestones of one repository
@@ -39,10 +49,9 @@ func (c *Client) GetMilestone(owner, repo string, id int64) (*Milestone, error) 
 
 // CreateMilestoneOption options for creating a milestone
 type CreateMilestoneOption struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	// swagger:strfmt date-time
-	Deadline *time.Time `json:"due_on"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	Deadline    *time.Time `json:"due_on"`
 }
 
 // CreateMilestone create one milestone with options

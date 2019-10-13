@@ -1,5 +1,5 @@
-code.gitea.io/sdk v0.0.0-20190424055801-13a7bf625b83 h1:wrdvJESj8NgPL4tDGNHGAIDOe/rFE8+gIGDwsvC6MuE=
-code.gitea.io/sdk v0.0.0-20190424055801-13a7bf625b83/go.mod h1:5bZt0dRznpn2JysytQnV0yCru3FwDv9O5G91jo+lDAk=
+code.gitea.io/sdk/gitea v0.0.0-20191013013401-e41e9ea72caa h1:KgpwNF1StxPXMfCD9M++jvCUPUqHPAbuvQn1q3sWtqw=
+code.gitea.io/sdk/gitea v0.0.0-20191013013401-e41e9ea72caa/go.mod h1:8IxkM1gyiwEjfO0m47bcmr3u3foR15+LoVub43hCHd0=
 github.com/alcortesm/tgz v0.0.0-20161220082320-9c5fe88206d7 h1:uSoVVbwJiQipAclBbw+8quDsfcvFjOpI5iCf4p/cqCs=
 github.com/alcortesm/tgz v0.0.0-20161220082320-9c5fe88206d7/go.mod h1:6zEj6s6u/ghQa61ZWa/C2Aw3RkjiTBOix7dkqa1VLIs=
 github.com/anmitsu/go-shlex v0.0.0-20161002113705-648efa622239 h1:kFOfPq6dUM1hTo4JG6LR5AXSUEsOjtdm0kw0FtQtMJA=
