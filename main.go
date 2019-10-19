@@ -39,6 +39,7 @@ func main() {
 		cmd.CmdIssues,
 		cmd.CmdPulls,
 		cmd.CmdReleases,
+		cmd.CmdLabels,
 	}
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)
