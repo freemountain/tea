@@ -21,25 +21,11 @@ var CmdPulls = cli.Command{
 	Usage:       "Operate with pulls of the repository",
 	Description: `Operate with pulls of the repository`,
 	Action:      runPulls,
-	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "login, l",
-			Usage: "Indicate one login, optional when inside a gitea repository",
-		},
-		cli.StringFlag{
-			Name:  "repo, r",
-			Usage: "Indicate one repository, optional when inside a gitea repository",
-		},
-		cli.StringFlag{
-			Name:        "output, o",
-			Usage:       outputUsage,
-			Destination: &output,
-		},
-	},
+	Flags:       AllDefaultFlags,
 }
 
 func runPulls(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+	login, owner, repo := initCommand()
 
 	prs, err := login.Client().ListRepoPullRequests(owner, repo, gitea.ListPullRequestsOptions{
 		Page:  0,

@@ -23,25 +23,11 @@ var CmdReleases = cli.Command{
 	Subcommands: []cli.Command{
 		CmdReleaseCreate,
 	},
-	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "login, l",
-			Usage: "Indicate one login, optional when inside a gitea repository",
-		},
-		cli.StringFlag{
-			Name:  "repo, r",
-			Usage: "Indicate one repository, optional when inside a gitea repository",
-		},
-		cli.StringFlag{
-			Name:        "output, o",
-			Usage:       outputUsage,
-			Destination: &output,
-		},
-	},
+	Flags: AllDefaultFlags,
 }
 
 func runReleases(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+	login, owner, repo := initCommand()
 
 	releases, err := login.Client().ListReleases(owner, repo)
 	if err != nil {
@@ -84,7 +70,7 @@ var CmdReleaseCreate = cli.Command{
 	Usage:       "Create a release in repository",
 	Description: `Create a release in repository`,
 	Action:      runReleaseCreate,
-	Flags: []cli.Flag{
+	Flags: append([]cli.Flag{
 		cli.StringFlag{
 			Name:  "tag",
 			Usage: "release tag name",
@@ -113,11 +99,11 @@ var CmdReleaseCreate = cli.Command{
 			Name:  "asset, a",
 			Usage: "a list of files to attach to the release",
 		},
-	},
+	}, LoginRepoFlags...),
 }
 
 func runReleaseCreate(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+	login, owner, repo := initCommand()
 
 	release, err := login.Client().CreateRelease(owner, repo, gitea.CreateReleaseOption{
 		TagName:      ctx.String("tag"),

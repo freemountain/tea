@@ -44,7 +44,7 @@ var CmdLabels = cli.Command{
 }
 
 func runLabels(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+	login, owner, repo := initCommand()
 
 	labels, err := login.Client().ListRepoLabels(owner, repo)
 	if err != nil {
@@ -124,7 +124,7 @@ func splitLabelLine(line string) (string, string, string) {
 }
 
 func runLabelCreate(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+	login, owner, repo := initCommand()
 
 	labelFile := ctx.String("file")
 	var err error
@@ -195,7 +195,7 @@ var CmdLabelUpdate = cli.Command{
 }
 
 func runLabelUpdate(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+	login, owner, repo := initCommand()
 
 	id := ctx.Int64("id")
 	var pName, pColor, pDescription *string
@@ -243,7 +243,7 @@ var CmdLabelDelete = cli.Command{
 }
 
 func runLabelDelete(ctx *cli.Context) error {
-	login, owner, repo := initCommand(ctx)
+	login, owner, repo := initCommand()
 
 	err := login.Client().DeleteLabel(owner, repo, ctx.Int64("id"))
 	if err != nil {
