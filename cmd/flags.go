@@ -16,6 +16,7 @@ var (
 	loginValue  string
 	repoValue   string
 	outputValue string
+	remoteValue string
 )
 
 // LoginFlag provides flag to specify tea login profile
@@ -30,6 +31,13 @@ var RepoFlag = cli.StringFlag{
 	Name:        "repo, r",
 	Usage:       "Indicate one repository, optional when inside a gitea repository",
 	Destination: &repoValue,
+}
+
+// RemoteFlag provides flag to specify remote repository
+var RemoteFlag = cli.StringFlag{
+	Name:        "remote, R",
+	Usage:       "Set a specific remote repository, is optional if not set use git default one",
+	Destination: &remoteValue,
 }
 
 // OutputFlag provides flag to specify output type
@@ -63,6 +71,7 @@ var LoginRepoFlags = []cli.Flag{
 // https://github.com/urfave/cli/issues/585
 var AllDefaultFlags = append([]cli.Flag{
 	RepoFlag,
+	RemoteFlag,
 }, LoginOutputFlags...)
 
 // initCommand returns repository and *Login based on flags

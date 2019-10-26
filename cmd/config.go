@@ -195,9 +195,31 @@ func curGitRepoPath() (*Login, string, error) {
 	if err := gitConfig.Unmarshal(bs); err != nil {
 		return nil, "", err
 	}
-	remoteConfig, ok := gitConfig.Remotes["origin"]
+
+	// if no remote
+	if len(gitConfig.Remotes) == 0 {
+		return nil, "", errors.New("No remote repository set on this git repository")
+	}
+
+	// if only one remote exists
+	if len(gitConfig.Remotes) >= 1 && len(remoteValue) == 0 {
+		for remote := range gitConfig.Remotes {
+			remoteValue = remote
+		}
+		if len(gitConfig.Remotes) > 1 {
+			// if master branch is present, use it as the default remote
+			masterBranch, ok := gitConfig.Branches["master"]
+			if ok {
+				if len(masterBranch.Remote) > 0 {
+					remoteValue = masterBranch.Remote
+				}
+			}
+		}
+	}
+
+	remoteConfig, ok := gitConfig.Remotes[remoteValue]
 	if !ok || remoteConfig == nil {
-		return nil, "", errors.New("No remote origin found on this git repository")
+		return nil, "", errors.New("No remote " + remoteValue + " found on this git repository")
 	}
 
 	for _, l := range config.Logins {
