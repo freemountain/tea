@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
@@ -27,24 +28,24 @@ var CmdLabels = cli.Command{
 		CmdLabelUpdate,
 		CmdLabelDelete,
 	},
-	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "login, l",
-			Usage: "Indicate one login, optional when inside a gitea repository",
-		},
-		cli.StringFlag{
-			Name:  "repo, r",
-			Usage: "Indicate one repository, optional when inside a gitea repository",
-		},
+	Flags: append([]cli.Flag{
 		cli.StringFlag{
 			Name:  "save, s",
 			Usage: "Save all the labels as a file",
 		},
-	},
+	}, AllDefaultFlags...),
 }
 
 func runLabels(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
+
+	headers := []string{
+		"Index",
+		"Color",
+		"Name",
+	}
+
+	var values [][]string
 
 	labels, err := login.Client().ListRepoLabels(owner, repo)
 	if err != nil {
@@ -52,7 +53,7 @@ func runLabels(ctx *cli.Context) error {
 	}
 
 	if len(labels) == 0 {
-		fmt.Println("No Labels")
+		Output(outputValue, headers, values)
 		return nil
 	}
 
@@ -69,8 +70,16 @@ func runLabels(ctx *cli.Context) error {
 		}
 	} else {
 		for _, label := range labels {
-			fmt.Fprintf(os.Stdout, "%d #%s %s\n", label.ID, label.Color, label.Name)
+			values = append(
+				values,
+				[]string{
+					strconv.FormatInt(label.ID, 10),
+					label.Color,
+					label.Name,
+				},
+			)
 		}
+		Output(outputValue, headers, values)
 	}
 
 	return nil
