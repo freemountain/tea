@@ -44,7 +44,7 @@ func runReleases(ctx *cli.Context) error {
 	var values [][]string
 
 	if len(releases) == 0 {
-		Output(output, headers, values)
+		Output(outputValue, headers, values)
 		return nil
 	}
 
@@ -59,7 +59,7 @@ func runReleases(ctx *cli.Context) error {
 			},
 		)
 	}
-	Output(output, headers, values)
+	Output(outputValue, headers, values)
 
 	return nil
 }

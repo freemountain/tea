@@ -13,8 +13,6 @@ import (
 	"github.com/urfave/cli"
 )
 
-var output string
-
 // CmdPulls represents to login a gitea server.
 var CmdPulls = cli.Command{
 	Name:        "pulls",
@@ -46,7 +44,7 @@ func runPulls(ctx *cli.Context) error {
 	var values [][]string
 
 	if len(prs) == 0 {
-		Output(output, headers, values)
+		Output(outputValue, headers, values)
 		return nil
 	}
 
@@ -68,7 +66,7 @@ func runPulls(ctx *cli.Context) error {
 			},
 		)
 	}
-	Output(output, headers, values)
+	Output(outputValue, headers, values)
 
 	return nil
 }
