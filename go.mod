@@ -7,8 +7,8 @@ require (
 	github.com/go-gitea/yaml v0.0.0-20170812160011-eb3733d160e7
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/olekukonko/tablewriter v0.0.1
-	github.com/stretchr/testify v1.2.2
+	github.com/stretchr/testify v1.3.0
 	github.com/urfave/cli v1.20.0
-	gopkg.in/src-d/go-git.v4 v4.11.0
+	gopkg.in/src-d/go-git.v4 v4.13.1
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )

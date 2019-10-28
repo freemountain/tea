@@ -20,7 +20,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 	local_git "code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
-	git_config "gopkg.in/src-d/go-git.v4/config"
+	go_git "gopkg.in/src-d/go-git.v4"
 
 	"github.com/go-gitea/yaml"
 )
@@ -187,12 +187,12 @@ func saveConfig(ymlPath string) error {
 }
 
 func curGitRepoPath() (*Login, string, error) {
-	gitConfig := git_config.NewConfig()
-	bs, err := ioutil.ReadFile(filepath.Join(filepath.Dir(os.Args[0]), ".git", "config"))
+	gitPath, err := go_git.PlainOpenWithOptions("./", &go_git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
-		return nil, "", err
+		return nil, "", errors.New("No Gitea login found")
 	}
-	if err := gitConfig.Unmarshal(bs); err != nil {
+	gitConfig, err := gitPath.Config()
+	if err != nil {
 		return nil, "", err
 	}
 
@@ -235,7 +235,7 @@ func curGitRepoPath() (*Login, string, error) {
 					return &l, strings.TrimSuffix(path, ".git"), nil
 				}
 			} else if strings.EqualFold(p.Scheme, "ssh") {
-				if l.GetSSHHost() == p.Host {
+				if l.GetSSHHost() == strings.Split(p.Host, ":")[0] {
 					return &l, strings.TrimLeft(strings.TrimSuffix(p.Path, ".git"), "/"), nil
 				}
 			}
