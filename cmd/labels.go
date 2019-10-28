@@ -43,6 +43,7 @@ func runLabels(ctx *cli.Context) error {
 		"Index",
 		"Color",
 		"Name",
+		"Description",
 	}
 
 	var values [][]string
@@ -76,6 +77,7 @@ func runLabels(ctx *cli.Context) error {
 					strconv.FormatInt(label.ID, 10),
 					label.Color,
 					label.Name,
+					label.Description,
 				},
 			)
 		}
