@@ -19,6 +19,13 @@ If the `tea` executable is not found, you might need to set up your `$GOPATH` an
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 ```
 
+If you have `brew` installed, you can install tea version via:
+
+```sh
+brew tap gitea/tap https://gitea.com/gitea/homebrew-gitea
+brew install --devel tea
+```
+
 ## Usage
 
 First of all, you have to create a token on your `personal settings -> application` page of your gitea instance.
