@@ -84,7 +84,7 @@ func init() {
 	dir := filepath.Join(homeDir, ".tea")
 	err = os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
-		log.Fatal("Init tea config dir", dir, "failed")
+		log.Fatal("Init tea config dir " + dir + " failed")
 	}
 
 	yamlConfigPath = filepath.Join(dir, "tea.yml")
@@ -126,7 +126,7 @@ func addLogin(login Login) error {
 			if l.URL == login.URL && l.Token == login.Token {
 				return nil
 			}
-			return errors.New("login name has already been  used")
+			return errors.New("Login name has already been used")
 		}
 		if l.URL == login.URL && l.Token == login.Token {
 			return errors.New("URL has been added")
@@ -155,7 +155,7 @@ func isFileExist(fileName string) (bool, error) {
 		return false, err
 	}
 	if f.IsDir() {
-		return false, errors.New("the same name directory exist")
+		return false, errors.New("A directory with the same name exists")
 	}
 	return true, nil
 }
@@ -198,7 +198,7 @@ func curGitRepoPath() (*Login, string, error) {
 
 	// if no remote
 	if len(gitConfig.Remotes) == 0 {
-		return nil, "", errors.New("No remote repository set on this git repository")
+		return nil, "", errors.New("No remote(s) found in this Git repository")
 	}
 
 	// if only one remote exists
@@ -219,7 +219,7 @@ func curGitRepoPath() (*Login, string, error) {
 
 	remoteConfig, ok := gitConfig.Remotes[remoteValue]
 	if !ok || remoteConfig == nil {
-		return nil, "", errors.New("No remote " + remoteValue + " found on this git repository")
+		return nil, "", errors.New("Remote " + remoteValue + " not found in this Git repository")
 	}
 
 	for _, l := range config.Logins {
@@ -242,5 +242,5 @@ func curGitRepoPath() (*Login, string, error) {
 		}
 	}
 
-	return nil, "", errors.New("No Gitea login found")
+	return nil, "", errors.New("No Gitea login found. You might want to specify --repo (and --login) to work outside of a repository")
 }

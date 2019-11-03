@@ -20,8 +20,8 @@ import (
 // CmdLabels represents to operate repositories' labels.
 var CmdLabels = cli.Command{
 	Name:        "labels",
-	Usage:       "Operate with labels of the repository",
-	Description: `Operate with labels of the repository`,
+	Usage:       "Manage issue labels",
+	Description: `Manage issue labels`,
 	Action:      runLabels,
 	Subcommands: []cli.Command{
 		CmdLabelCreate,
@@ -90,8 +90,8 @@ func runLabels(ctx *cli.Context) error {
 // CmdLabelCreate represents a sub command of labels to create label.
 var CmdLabelCreate = cli.Command{
 	Name:        "create",
-	Usage:       "Create a label in repository",
-	Description: `Create a label in repository`,
+	Usage:       "Create a label",
+	Description: `Create a label`,
 	Action:      runLabelCreate,
 	Flags: []cli.Flag{
 		cli.StringFlag{
@@ -182,8 +182,8 @@ func runLabelCreate(ctx *cli.Context) error {
 // CmdLabelUpdate represents a sub command of labels to update label.
 var CmdLabelUpdate = cli.Command{
 	Name:        "update",
-	Usage:       "Update a label in repository",
-	Description: `Update a label in repository`,
+	Usage:       "Update a label",
+	Description: `Update a label`,
 	Action:      runLabelUpdate,
 	Flags: []cli.Flag{
 		cli.IntFlag{
@@ -242,8 +242,8 @@ func runLabelUpdate(ctx *cli.Context) error {
 // CmdLabelDelete represents a sub command of labels to delete label.
 var CmdLabelDelete = cli.Command{
 	Name:        "delete",
-	Usage:       "Delete a label in repository",
-	Description: `Delete a label in repository`,
+	Usage:       "Delete a label",
+	Description: `Delete a label`,
 	Action:      runLabelCreate,
 	Flags: []cli.Flag{
 		cli.IntFlag{

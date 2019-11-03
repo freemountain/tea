@@ -16,8 +16,8 @@ import (
 // CmdPulls represents to login a gitea server.
 var CmdPulls = cli.Command{
 	Name:        "pulls",
-	Usage:       "Operate with pulls of the repository",
-	Description: `Operate with pulls of the repository`,
+	Usage:       "List open pull requests",
+	Description: `List open pull requests`,
 	Action:      runPulls,
 	Flags:       AllDefaultFlags,
 }

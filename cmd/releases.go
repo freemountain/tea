@@ -17,8 +17,8 @@ import (
 // CmdReleases represents to login a gitea server.
 var CmdReleases = cli.Command{
 	Name:        "releases",
-	Usage:       "Operate with releases of the repository",
-	Description: `Operate with releases of the repository`,
+	Usage:       "Create releases",
+	Description: `Create releases`,
 	Action:      runReleases,
 	Subcommands: []cli.Command{
 		CmdReleaseCreate,
@@ -67,37 +67,37 @@ func runReleases(ctx *cli.Context) error {
 // CmdReleaseCreate represents a sub command of Release to create release.
 var CmdReleaseCreate = cli.Command{
 	Name:        "create",
-	Usage:       "Create a release in repository",
-	Description: `Create a release in repository`,
+	Usage:       "Create a release",
+	Description: `Create a release`,
 	Action:      runReleaseCreate,
 	Flags: append([]cli.Flag{
 		cli.StringFlag{
 			Name:  "tag",
-			Usage: "release tag name",
+			Usage: "Tag name",
 		},
 		cli.StringFlag{
 			Name:  "target",
-			Usage: "release target refs, branch name or commit id",
+			Usage: "Target refs, branch name or commit id",
 		},
 		cli.StringFlag{
 			Name:  "title, t",
-			Usage: "release title to create",
+			Usage: "Release title",
 		},
 		cli.StringFlag{
 			Name:  "note, n",
-			Usage: "release note to create",
+			Usage: "Release notes",
 		},
 		cli.BoolFlag{
 			Name:  "draft, d",
-			Usage: "the release is a draft",
+			Usage: "Is a draft",
 		},
 		cli.BoolFlag{
 			Name:  "prerelease, p",
-			Usage: "the release is a prerelease",
+			Usage: "Is a pre-release",
 		},
 		cli.StringSliceFlag{
 			Name:  "asset, a",
-			Usage: "a list of files to attach to the release",
+			Usage: "List of files to attach",
 		},
 	}, LoginRepoFlags...),
 }

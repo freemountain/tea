@@ -21,7 +21,7 @@ var CmdLogout = cli.Command{
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name:  "name, n",
-			Usage: "name wants to log out",
+			Usage: "Login name to remove",
 		},
 	},
 }
@@ -33,12 +33,12 @@ func runLogout(ctx *cli.Context) error {
 	} else if ctx.IsSet("name") {
 		name = ctx.String("name")
 	} else {
-		return errors.New("need log out server name")
+		return errors.New("Please specify a login name")
 	}
 
 	err := loadConfig(yamlConfigPath)
 	if err != nil {
-		log.Fatal("load config file failed", yamlConfigPath)
+		log.Fatal("Unable to load config file " + yamlConfigPath)
 	}
 
 	var idx = -1
@@ -52,7 +52,7 @@ func runLogout(ctx *cli.Context) error {
 		config.Logins = append(config.Logins[:idx], config.Logins[idx+1:]...)
 		err = saveConfig(yamlConfigPath)
 		if err != nil {
-			log.Fatal("save config file failed", yamlConfigPath)
+			log.Fatal("Unable to save config file " + yamlConfigPath)
 		}
 	}
 

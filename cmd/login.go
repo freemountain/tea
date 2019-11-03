@@ -19,9 +19,8 @@ import (
 // CmdLogin represents to login a gitea server.
 var CmdLogin = cli.Command{
 	Name:        "login",
-	Usage:       "Log in a Gitea server",
-	Description: `Log in a Gitea server`,
-	Action:      runLoginList,
+	Usage:       "Log in to a Gitea server",
+	Description: `Log in to a Gitea server`,
 	Subcommands: []cli.Command{
 		cmdLoginList,
 		cmdLoginAdd,
@@ -31,28 +30,28 @@ var CmdLogin = cli.Command{
 // CmdLogin represents to login a gitea server.
 var cmdLoginAdd = cli.Command{
 	Name:        "add",
-	Usage:       "Add a Login of a Gitea server",
-	Description: `Add a Login of a Gitea server`,
+	Usage:       "Add a Gitea login",
+	Description: `Add a Gitea login`,
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name:  "name, n",
-			Usage: "Name for the gitea login",
+			Usage: "Login name",
 		},
 		cli.StringFlag{
 			Name:   "url, u",
 			Value:  "https://try.gitea.io",
 			EnvVar: "GITEA_SERVER_URL",
-			Usage:  "Gitea server URL",
+			Usage:  "Server URL",
 		},
 		cli.StringFlag{
 			Name:   "token, t",
 			Value:  "",
 			EnvVar: "GITEA_SERVER_TOKEN",
-			Usage:  "token for operating the Gitea login",
+			Usage:  "Access token. Can be obtained from Settings > Applications",
 		},
 		cli.BoolFlag{
 			Name:  "insecure, i",
-			Usage: "insecure visit gitea server",
+			Usage: "Disable TLS verification",
 		},
 	},
 	Action: runLoginAdd,
@@ -62,18 +61,16 @@ func runLoginAdd(ctx *cli.Context) error {
 	if !ctx.IsSet("url") {
 		log.Fatal("You have to input Gitea server URL")
 	}
-
 	if !ctx.IsSet("token") {
 		log.Fatal("No token found")
 	}
-
 	if !ctx.IsSet("name") {
 		log.Fatal("You have to set a name for the login")
 	}
 
 	err := loadConfig(yamlConfigPath)
 	if err != nil {
-		log.Fatal("load config file failed", yamlConfigPath)
+		log.Fatal("Unable to load config file " + yamlConfigPath)
 	}
 
 	client := gitea.NewClient(ctx.String("url"), ctx.String("token"))
@@ -92,7 +89,7 @@ func runLoginAdd(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Login successful! Login name", u.UserName)
+	fmt.Println("Login successful! Login name " + u.UserName)
 
 	err = addLogin(Login{
 		Name:     ctx.String("name"),
@@ -115,15 +112,15 @@ func runLoginAdd(ctx *cli.Context) error {
 // CmdLogin represents to login a gitea server.
 var cmdLoginList = cli.Command{
 	Name:        "ls",
-	Usage:       "List all Logins of Gitea servers",
-	Description: `List all Logins of Gitea servers`,
+	Usage:       "List Gitea logins",
+	Description: `List Gitea logins`,
 	Action:      runLoginList,
 }
 
 func runLoginList(ctx *cli.Context) error {
 	err := loadConfig(yamlConfigPath)
 	if err != nil {
-		log.Fatal("load config file failed", yamlConfigPath)
+		log.Fatal("Unable to load config file " + yamlConfigPath)
 	}
 
 	fmt.Printf("Name\tURL\tSSHHost\n")

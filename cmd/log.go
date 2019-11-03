@@ -17,8 +17,6 @@ var (
 	showLog bool
 )
 
-const outputUsage = "Specify output format - table (default), csv, simple, tsv or yaml."
-
 // Println println content according the flag
 func Println(a ...interface{}) {
 	if showLog {

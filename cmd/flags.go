@@ -22,28 +22,28 @@ var (
 // LoginFlag provides flag to specify tea login profile
 var LoginFlag = cli.StringFlag{
 	Name:        "login, l",
-	Usage:       "Indicate one login, optional when inside a gitea repository",
+	Usage:       "Use a different Gitea login. Optional",
 	Destination: &loginValue,
 }
 
 // RepoFlag provides flag to specify repository
 var RepoFlag = cli.StringFlag{
 	Name:        "repo, r",
-	Usage:       "Indicate one repository, optional when inside a gitea repository",
+	Usage:       "Repository to interact with. Optional",
 	Destination: &repoValue,
 }
 
 // RemoteFlag provides flag to specify remote repository
 var RemoteFlag = cli.StringFlag{
 	Name:        "remote, R",
-	Usage:       "Set a specific remote repository, is optional if not set use git default one",
+	Usage:       "Discover Gitea login from remote. Optional",
 	Destination: &remoteValue,
 }
 
 // OutputFlag provides flag to specify output type
 var OutputFlag = cli.StringFlag{
 	Name:        "output, o",
-	Usage:       "Specify output format. (csv, simple, table, tsv, yaml)",
+	Usage:       "Output format. (csv, simple, table, tsv, yaml)",
 	Destination: &outputValue,
 }
 
@@ -78,7 +78,7 @@ var AllDefaultFlags = append([]cli.Flag{
 func initCommand() (*Login, string, string) {
 	err := loadConfig(yamlConfigPath)
 	if err != nil {
-		log.Fatal("load config file failed ", yamlConfigPath)
+		log.Fatal("Unable to load config file " + yamlConfigPath)
 	}
 
 	var login *Login
@@ -90,7 +90,7 @@ func initCommand() (*Login, string, string) {
 	} else {
 		login = getLoginByName(loginValue)
 		if login == nil {
-			log.Fatal("indicated login name ", loginValue, " does not exist")
+			log.Fatal("Login name " + loginValue + " does not exist")
 		}
 	}
 
