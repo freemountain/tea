@@ -163,15 +163,15 @@ steps:
     event:
     - push
 
-- name: github
+- name: gitea
   pull: always
   image: plugins/gitea-releases:1
   settings:
     files:
     - "dist/release/*"
-  environment:
-    GITHUB_TOKEN:
-      from_secret: github_token
+    base_url: https://gitea.com
+    api_key:
+      from_secret: gitea_token
   when:
     event:
     - tag
