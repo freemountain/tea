@@ -39,6 +39,7 @@ func main() {
 		cmd.CmdIssues,
 		cmd.CmdPulls,
 		cmd.CmdReleases,
+		cmd.CmdRepos,
 		cmd.CmdLabels,
 	}
 	app.EnableBashCompletion = true

@@ -105,3 +105,20 @@ func initCommand() (*Login, string, string) {
 	owner, repo := splitRepo(repoPath)
 	return login, owner, repo
 }
+
+// initCommandLoginOnly return *Login based on flags
+func initCommandLoginOnly() *Login {
+	err := loadConfig(yamlConfigPath)
+	if err != nil {
+		log.Fatal("load config file failed ", yamlConfigPath)
+	}
+
+	var login *Login
+
+	login = getLoginByName(loginValue)
+	if login == nil {
+		log.Fatal("indicated login name ", loginValue, " does not exist")
+	}
+
+	return login
+}
