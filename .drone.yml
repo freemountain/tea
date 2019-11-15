@@ -165,7 +165,7 @@ steps:
 
 - name: gitea
   pull: always
-  image: plugins/gitea-releases:1
+  image: plugins/gitea-release:1
   settings:
     files:
     - "dist/release/*"
