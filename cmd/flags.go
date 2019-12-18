@@ -63,6 +63,7 @@ var LoginOutputFlags = []cli.Flag{
 var LoginRepoFlags = []cli.Flag{
 	LoginFlag,
 	RepoFlag,
+	RemoteFlag,
 }
 
 // AllDefaultFlags defines flags that should be available
