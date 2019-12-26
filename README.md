@@ -42,7 +42,7 @@ tea issues
 tea releases
 ```
 
-> If you are inside a git repository hosted on a gitea instance, you don't need to specify the `--login` and `--repo` flags!
+To fetch issues from different repos, use the `--remote` flag (when inside a gitea repository directory) or `--login` & `--repo` flags.
 
 ## Compilation
 
@@ -57,6 +57,10 @@ go build
 ## Contributing
 
 Fork -> Patch -> Push -> Pull Request
+
+- `make test` run testsuite
+- `make vendor` when adding new dependencies
+- ... (for other development tasks, check the `Makefile`)
 
 ## Authors
 
