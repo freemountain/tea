@@ -3,7 +3,7 @@ module code.gitea.io/tea
 go 1.12
 
 require (
-	code.gitea.io/sdk/gitea v0.0.0-20191013013401-e41e9ea72caa
+	code.gitea.io/sdk/gitea v0.0.0-20200103062250-c7686bd633c6
 	github.com/go-gitea/yaml v0.0.0-20170812160011-eb3733d160e7
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/olekukonko/tablewriter v0.0.1

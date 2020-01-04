@@ -1,4 +1,4 @@
-# code.gitea.io/sdk/gitea v0.0.0-20191013013401-e41e9ea72caa
+# code.gitea.io/sdk/gitea v0.0.0-20200103062250-c7686bd633c6
 code.gitea.io/sdk/gitea
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
