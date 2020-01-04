@@ -1,5 +1,7 @@
 # code.gitea.io/sdk/gitea v0.0.0-20200103062250-c7686bd633c6
 code.gitea.io/sdk/gitea
+# github.com/cpuguy83/go-md2man/v2 v2.0.0
+github.com/cpuguy83/go-md2man/v2/md2man
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/emirpasic/gods v1.12.0
@@ -23,8 +25,12 @@ github.com/mitchellh/go-homedir
 github.com/olekukonko/tablewriter
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
+# github.com/russross/blackfriday/v2 v2.0.1
+github.com/russross/blackfriday/v2
 # github.com/sergi/go-diff v1.0.0
 github.com/sergi/go-diff/diffmatchpatch
+# github.com/shurcooL/sanitized_anchor_name v1.0.0
+github.com/shurcooL/sanitized_anchor_name
 # github.com/src-d/gcfg v1.4.0
 github.com/src-d/gcfg
 github.com/src-d/gcfg/scanner
@@ -32,7 +38,7 @@ github.com/src-d/gcfg/token
 github.com/src-d/gcfg/types
 # github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
-# github.com/urfave/cli v1.20.0
+# github.com/urfave/cli v1.22.2
 github.com/urfave/cli
 # github.com/xanzy/ssh-agent v0.2.1
 github.com/xanzy/ssh-agent
