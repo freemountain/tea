@@ -10,7 +10,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // CmdPulls represents to login a gitea server.

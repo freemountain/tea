@@ -13,7 +13,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // CmdIssues represents to login a gitea server.
@@ -22,9 +22,9 @@ var CmdIssues = cli.Command{
 	Usage:       "List and create issues",
 	Description: `List and create issues`,
 	Action:      runIssues,
-	Subcommands: []cli.Command{
-		CmdIssuesList,
-		CmdIssuesCreate,
+	Subcommands: []*cli.Command{
+		&CmdIssuesList,
+		&CmdIssuesCreate,
 	},
 	Flags: AllDefaultFlags,
 }
@@ -124,11 +124,11 @@ var CmdIssuesCreate = cli.Command{
 	Description: `Create an issue on repository`,
 	Action:      runIssuesCreate,
 	Flags: append([]cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "title, t",
 			Usage: "issue title to create",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "body, b",
 			Usage: "issue body to create",
 		},

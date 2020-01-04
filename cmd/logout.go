@@ -9,7 +9,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // CmdLogout represents to logout a gitea server.
@@ -19,7 +19,7 @@ var CmdLogout = cli.Command{
 	Description: `Log out from a Gitea server`,
 	Action:      runLogout,
 	Flags: []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "name, n",
 			Usage: "Login name to remove",
 		},

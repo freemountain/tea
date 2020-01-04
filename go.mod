@@ -9,7 +9,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/stretchr/testify v1.4.0
-	github.com/urfave/cli v1.22.2
+	github.com/urfave/cli/v2 v2.1.1
 	gopkg.in/src-d/go-git.v4 v4.13.1
 	gopkg.in/yaml.v2 v2.2.7 // indirect
 )

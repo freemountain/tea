@@ -7,7 +7,7 @@ package cmd
 import (
 	"log"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // create global variables for global Flags to simplify
@@ -52,8 +52,8 @@ var OutputFlag = cli.StringFlag{
 // subcommand to work around issue and provide --login and --output:
 // https://github.com/urfave/cli/issues/585
 var LoginOutputFlags = []cli.Flag{
-	LoginFlag,
-	OutputFlag,
+	&LoginFlag,
+	&OutputFlag,
 }
 
 // LoginRepoFlags defines login and repo flags that should
@@ -61,9 +61,9 @@ var LoginOutputFlags = []cli.Flag{
 // the subcommand to work around issue and provide --login and --repo:
 // https://github.com/urfave/cli/issues/585
 var LoginRepoFlags = []cli.Flag{
-	LoginFlag,
-	RepoFlag,
-	RemoteFlag,
+	&LoginFlag,
+	&RepoFlag,
+	&RemoteFlag,
 }
 
 // AllDefaultFlags defines flags that should be available
@@ -71,8 +71,8 @@ var LoginRepoFlags = []cli.Flag{
 // to work around issue and provide --login, --repo and --output:
 // https://github.com/urfave/cli/issues/585
 var AllDefaultFlags = append([]cli.Flag{
-	RepoFlag,
-	RemoteFlag,
+	&RepoFlag,
+	&RemoteFlag,
 }, LoginOutputFlags...)
 
 // initCommand returns repository and *Login based on flags

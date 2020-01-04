@@ -13,7 +13,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // CmdLogin represents to login a gitea server.
@@ -21,9 +21,9 @@ var CmdLogin = cli.Command{
 	Name:        "login",
 	Usage:       "Log in to a Gitea server",
 	Description: `Log in to a Gitea server`,
-	Subcommands: []cli.Command{
-		cmdLoginList,
-		cmdLoginAdd,
+	Subcommands: []*cli.Command{
+		&cmdLoginList,
+		&cmdLoginAdd,
 	},
 }
 
@@ -33,23 +33,23 @@ var cmdLoginAdd = cli.Command{
 	Usage:       "Add a Gitea login",
 	Description: `Add a Gitea login`,
 	Flags: []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "name, n",
 			Usage: "Login name",
 		},
-		cli.StringFlag{
-			Name:   "url, u",
-			Value:  "https://try.gitea.io",
-			EnvVar: "GITEA_SERVER_URL",
-			Usage:  "Server URL",
+		&cli.StringFlag{
+			Name:    "url, u",
+			Value:   "https://try.gitea.io",
+			EnvVars: []string{"GITEA_SERVER_URL"},
+			Usage:   "Server URL",
 		},
-		cli.StringFlag{
-			Name:   "token, t",
-			Value:  "",
-			EnvVar: "GITEA_SERVER_TOKEN",
-			Usage:  "Access token. Can be obtained from Settings > Applications",
+		&cli.StringFlag{
+			Name:    "token, t",
+			Value:   "",
+			EnvVars: []string{"GITEA_SERVER_TOKEN"},
+			Usage:   "Access token. Can be obtained from Settings > Applications",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "insecure, i",
 			Usage: "Disable TLS verification",
 		},

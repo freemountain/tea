@@ -13,7 +13,7 @@ import (
 	"code.gitea.io/tea/cmd"
 	"code.gitea.io/tea/modules/setting"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // Version holds the current Gitea version
@@ -33,14 +33,14 @@ func main() {
 	app.Usage = "Command line tool to interact with Gitea"
 	app.Description = ``
 	app.Version = Version + formatBuiltWith(Tags)
-	app.Commands = []cli.Command{
-		cmd.CmdLogin,
-		cmd.CmdLogout,
-		cmd.CmdIssues,
-		cmd.CmdPulls,
-		cmd.CmdReleases,
-		cmd.CmdRepos,
-		cmd.CmdLabels,
+	app.Commands = []*cli.Command{
+		&cmd.CmdLogin,
+		&cmd.CmdLogout,
+		&cmd.CmdIssues,
+		&cmd.CmdPulls,
+		&cmd.CmdReleases,
+		&cmd.CmdRepos,
+		&cmd.CmdLabels,
 	}
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)

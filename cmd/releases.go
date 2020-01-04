@@ -11,7 +11,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // CmdReleases represents to login a gitea server.
@@ -20,8 +20,8 @@ var CmdReleases = cli.Command{
 	Usage:       "Create releases",
 	Description: `Create releases`,
 	Action:      runReleases,
-	Subcommands: []cli.Command{
-		CmdReleaseCreate,
+	Subcommands: []*cli.Command{
+		&CmdReleaseCreate,
 	},
 	Flags: AllDefaultFlags,
 }
@@ -71,31 +71,31 @@ var CmdReleaseCreate = cli.Command{
 	Description: `Create a release`,
 	Action:      runReleaseCreate,
 	Flags: append([]cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "tag",
 			Usage: "Tag name",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "target",
 			Usage: "Target refs, branch name or commit id",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "title, t",
 			Usage: "Release title",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "note, n",
 			Usage: "Release notes",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "draft, d",
 			Usage: "Is a draft",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "prerelease, p",
 			Usage: "Is a pre-release",
 		},
-		cli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Name:  "asset, a",
 			Usage: "List of files to attach",
 		},

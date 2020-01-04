@@ -14,7 +14,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // CmdLabels represents to operate repositories' labels.
@@ -23,13 +23,13 @@ var CmdLabels = cli.Command{
 	Usage:       "Manage issue labels",
 	Description: `Manage issue labels`,
 	Action:      runLabels,
-	Subcommands: []cli.Command{
-		CmdLabelCreate,
-		CmdLabelUpdate,
-		CmdLabelDelete,
+	Subcommands: []*cli.Command{
+		&CmdLabelCreate,
+		&CmdLabelUpdate,
+		&CmdLabelDelete,
 	},
 	Flags: append([]cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "save, s",
 			Usage: "Save all the labels as a file",
 		},
@@ -94,19 +94,19 @@ var CmdLabelCreate = cli.Command{
 	Description: `Create a label`,
 	Action:      runLabelCreate,
 	Flags: []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "name",
 			Usage: "label name",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "color",
 			Usage: "label color value",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "description",
 			Usage: "label description",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "file",
 			Usage: "indicate a label file",
 		},
@@ -186,19 +186,19 @@ var CmdLabelUpdate = cli.Command{
 	Description: `Update a label`,
 	Action:      runLabelUpdate,
 	Flags: []cli.Flag{
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:  "id",
 			Usage: "label id",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "name",
 			Usage: "label name",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "color",
 			Usage: "label color value",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "description",
 			Usage: "label description",
 		},
@@ -246,7 +246,7 @@ var CmdLabelDelete = cli.Command{
 	Description: `Delete a label`,
 	Action:      runLabelCreate,
 	Flags: []cli.Flag{
-		cli.IntFlag{
+		&cli.IntFlag{
 			Name:  "id",
 			Usage: "label id",
 		},

@@ -9,7 +9,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // CmdRepos represents to login a gitea server.
@@ -18,8 +18,8 @@ var CmdRepos = cli.Command{
 	Usage:       "Operate with repositories",
 	Description: `Operate with repositories`,
 	Action:      runReposList,
-	Subcommands: []cli.Command{
-		CmdReposList,
+	Subcommands: []*cli.Command{
+		&CmdReposList,
 	},
 	Flags: LoginOutputFlags,
 }
@@ -31,15 +31,15 @@ var CmdReposList = cli.Command{
 	Description: `List available repositories`,
 	Action:      runReposList,
 	Flags: append([]cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "mode",
 			Usage: "Filter listed repositories based on mode, optional - fork, mirror, source",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "org",
 			Usage: "Filter listed repositories based on organization, optional",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "user",
 			Usage: "Filter listed repositories absed on user, optional",
 		},
