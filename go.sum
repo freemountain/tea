@@ -1,5 +1,5 @@
-code.gitea.io/sdk/gitea v0.0.0-20200103062250-c7686bd633c6 h1:SFCUXiw/mg8Luu6+2/X8g4a0NGaT8eClU/bWjCKjs3o=
-code.gitea.io/sdk/gitea v0.0.0-20200103062250-c7686bd633c6/go.mod h1:8IxkM1gyiwEjfO0m47bcmr3u3foR15+LoVub43hCHd0=
+code.gitea.io/sdk/gitea v0.11.0 h1:XgZtmImZsjMC+Z1WBfO6bYTCOJiGp+7w0HKmfhTwytw=
+code.gitea.io/sdk/gitea v0.11.0/go.mod h1:z3uwDV/b9Ls47NGukYM9XhnHtqPh/J+t40lsUrR6JDY=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/alcortesm/tgz v0.0.0-20161220082320-9c5fe88206d7 h1:uSoVVbwJiQipAclBbw+8quDsfcvFjOpI5iCf4p/cqCs=
 github.com/alcortesm/tgz v0.0.0-20161220082320-9c5fe88206d7/go.mod h1:6zEj6s6u/ghQa61ZWa/C2Aw3RkjiTBOix7dkqa1VLIs=
@@ -25,6 +25,8 @@ github.com/go-gitea/yaml v0.0.0-20170812160011-eb3733d160e7 h1:/FEVbfrJ50yBk73Ly
 github.com/go-gitea/yaml v0.0.0-20170812160011-eb3733d160e7/go.mod h1:WjJPyqjAk/UMv+Fk/ZRjEOh5SXszSALnSzKqICd7pNg=
 github.com/google/go-cmp v0.3.0 h1:crn/baboCvb5fXaQ0IJ1SGTsTVrWpDsCWC8EGETZijY=
 github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
+github.com/hashicorp/go-version v1.2.0 h1:3vNe/fWF5CBgRIguda1meWhsZHy3m8gCJ5wx+dIzX/E=
+github.com/hashicorp/go-version v1.2.0/go.mod h1:fltr4n8CU8Ke44wwGCBoEymUuxUHl09ZGVZPK5anwXA=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 h1:BQSFePA1RWJOlocH6Fxy8MmwDt+yVQYULKfN0RoTN8A=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99/go.mod h1:1lJo3i6rXxKeerYnT8Nvf0QmHCRC1n8sfWVwXF2Frvo=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
