@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	code.gitea.io/sdk/gitea v0.11.0
+	github.com/araddon/dateparse v0.0.0-20190622164848-0fb0a474d195
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/go-gitea/yaml v0.0.0-20170812160011-eb3733d160e7
 	github.com/mattn/go-runewidth v0.0.4 // indirect

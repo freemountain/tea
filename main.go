@@ -29,7 +29,7 @@ func init() {
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "Tea"
+	app.Name = "tea"
 	app.Usage = "Command line tool to interact with Gitea"
 	app.Description = ``
 	app.Version = Version + formatBuiltWith(Tags)
@@ -41,6 +41,7 @@ func main() {
 		&cmd.CmdReleases,
 		&cmd.CmdRepos,
 		&cmd.CmdLabels,
+		&cmd.CmdTrackedTimes,
 	}
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)

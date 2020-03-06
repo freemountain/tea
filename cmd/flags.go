@@ -21,28 +21,32 @@ var (
 
 // LoginFlag provides flag to specify tea login profile
 var LoginFlag = cli.StringFlag{
-	Name:        "login, l",
+	Name:        "login",
+	Aliases:     []string{"l"},
 	Usage:       "Use a different Gitea login. Optional",
 	Destination: &loginValue,
 }
 
 // RepoFlag provides flag to specify repository
 var RepoFlag = cli.StringFlag{
-	Name:        "repo, r",
+	Name:        "repo",
+	Aliases:     []string{"r"},
 	Usage:       "Repository to interact with. Optional",
 	Destination: &repoValue,
 }
 
 // RemoteFlag provides flag to specify remote repository
 var RemoteFlag = cli.StringFlag{
-	Name:        "remote, R",
+	Name:        "remote",
+	Aliases:     []string{"R"},
 	Usage:       "Discover Gitea login from remote. Optional",
 	Destination: &remoteValue,
 }
 
 // OutputFlag provides flag to specify output type
 var OutputFlag = cli.StringFlag{
-	Name:        "output, o",
+	Name:        "output",
+	Aliases:     []string{"o"},
 	Usage:       "Output format. (csv, simple, table, tsv, yaml)",
 	Destination: &outputValue,
 }

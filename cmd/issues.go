@@ -125,12 +125,14 @@ var CmdIssuesCreate = cli.Command{
 	Action:      runIssuesCreate,
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
-			Name:  "title, t",
-			Usage: "issue title to create",
+			Name:    "title",
+			Aliases: []string{"t"},
+			Usage:   "issue title to create",
 		},
 		&cli.StringFlag{
-			Name:  "body, b",
-			Usage: "issue body to create",
+			Name:    "body",
+			Aliases: []string{"b"},
+			Usage:   "issue body to create",
 		},
 	}, LoginRepoFlags...),
 }

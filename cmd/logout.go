@@ -20,8 +20,9 @@ var CmdLogout = cli.Command{
 	Action:      runLogout,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:  "name, n",
-			Usage: "Login name to remove",
+			Name:    "name",
+			Aliases: []string{"n"},
+			Usage:   "Login name to remove",
 		},
 	},
 }
