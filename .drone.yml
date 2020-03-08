@@ -72,6 +72,8 @@ steps:
 - name: static
   pull: always
   image: techknowlogick/xgo:latest
+  environment:
+    GOPROXY: https://goproxy.cn
   commands:
   - export PATH=$PATH:$GOPATH/bin
   - make release
