@@ -74,9 +74,6 @@ steps:
   image: techknowlogick/xgo:latest
   environment:
     GOPROXY: https://goproxy.cn
-    # This path does not exist. However, when we set the gopath to /go, the build fails. Not sure why.
-    # Leaving this here until we know how to resolve this properly.
-    GOPATH: /srv/app
   commands:
   - export PATH=$PATH:$GOPATH/bin
   - make release
