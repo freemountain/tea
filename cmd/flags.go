@@ -81,24 +81,9 @@ var AllDefaultFlags = append([]cli.Flag{
 
 // initCommand returns repository and *Login based on flags
 func initCommand() (*Login, string, string) {
-	err := loadConfig(yamlConfigPath)
-	if err != nil {
-		log.Fatal("Unable to load config file " + yamlConfigPath)
-	}
+	login := initCommandLoginOnly()
 
-	var login *Login
-	if loginValue == "" {
-		login, err = getActiveLogin()
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		login = getLoginByName(loginValue)
-		if login == nil {
-			log.Fatal("Login name " + loginValue + " does not exist")
-		}
-	}
-
+	var err error
 	repoPath := repoValue
 	if repoPath == "" {
 		login, repoPath, err = curGitRepoPath()
@@ -119,10 +104,16 @@ func initCommandLoginOnly() *Login {
 	}
 
 	var login *Login
-
-	login = getLoginByName(loginValue)
-	if login == nil {
-		log.Fatal("indicated login name ", loginValue, " does not exist")
+	if loginValue == "" {
+		login, err = getActiveLogin()
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		login = getLoginByName(loginValue)
+		if login == nil {
+			log.Fatal("Login name " + loginValue + " does not exist")
+		}
 	}
 
 	return login

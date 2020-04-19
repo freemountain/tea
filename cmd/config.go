@@ -18,21 +18,24 @@ import (
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
-	local_git "code.gitea.io/tea/modules/git"
+	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
-	go_git "gopkg.in/src-d/go-git.v4"
 
 	"github.com/go-gitea/yaml"
 )
 
 // Login represents a login to a gitea server, you even could add multiple logins for one gitea server
 type Login struct {
-	Name     string `yaml:"name"`
-	URL      string `yaml:"url"`
-	Token    string `yaml:"token"`
-	Active   bool   `yaml:"active"`
-	SSHHost  string `yaml:"ssh_host"`
+	Name    string `yaml:"name"`
+	URL     string `yaml:"url"`
+	Token   string `yaml:"token"`
+	Active  bool   `yaml:"active"`
+	SSHHost string `yaml:"ssh_host"`
+	// optional path to the private key
+	SSHKey   string `yaml:"ssh_key"`
 	Insecure bool   `yaml:"insecure"`
+	// optional gitea username
+	User string `yaml:"user"`
 }
 
 // Client returns a client to operate Gitea API
@@ -187,11 +190,11 @@ func saveConfig(ymlPath string) error {
 }
 
 func curGitRepoPath() (*Login, string, error) {
-	gitPath, err := go_git.PlainOpenWithOptions("./", &go_git.PlainOpenOptions{DetectDotGit: true})
+	repo, err := git.RepoForWorkdir()
 	if err != nil {
 		return nil, "", errors.New("No Gitea login found")
 	}
-	gitConfig, err := gitPath.Config()
+	gitConfig, err := repo.Config()
 	if err != nil {
 		return nil, "", err
 	}
@@ -224,7 +227,7 @@ func curGitRepoPath() (*Login, string, error) {
 
 	for _, l := range config.Logins {
 		for _, u := range remoteConfig.URLs {
-			p, err := local_git.ParseURL(strings.TrimSpace(u))
+			p, err := git.ParseURL(strings.TrimSpace(u))
 			if err != nil {
 				return nil, "", fmt.Errorf("Git remote URL parse failed: %s", err.Error())
 			}

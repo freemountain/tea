@@ -69,9 +69,9 @@ func runTrackedTimes(ctx *cli.Context) error {
 		times, err = client.GetRepoTrackedTimes(owner, repo)
 	} else if strings.HasPrefix(user, "#") {
 		// get all tracked times on the specified issue
-		issue, err2 := strconv.ParseInt(user[1:], 10, 64)
-		if err2 != nil {
-			return err2
+		issue, err := argToIndex(user)
+		if err != nil {
+			return err
 		}
 		times, err = client.ListTrackedTimes(owner, repo, issue)
 	} else {
@@ -166,11 +166,7 @@ func runTrackedTimesAdd(ctx *cli.Context) error {
 		return fmt.Errorf("No issue or duration specified.\nUsage:\t%s", ctx.Command.UsageText)
 	}
 
-	issueStr := ctx.Args().First()
-	if strings.HasPrefix(issueStr, "#") {
-		issueStr = issueStr[1:]
-	}
-	issue, err := strconv.ParseInt(issueStr, 10, 64)
+	issue, err := argToIndex(ctx.Args().First())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -212,11 +208,7 @@ func runTrackedTimesDelete(ctx *cli.Context) error {
 		return fmt.Errorf("No issue or time ID specified.\nUsage:\t%s", ctx.Command.UsageText)
 	}
 
-	issueStr := ctx.Args().First()
-	if strings.HasPrefix(issueStr, "#") {
-		issueStr = issueStr[1:]
-	}
-	issue, err := strconv.ParseInt(issueStr, 10, 64)
+	issue, err := argToIndex(ctx.Args().First())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -256,11 +248,7 @@ func runTrackedTimesReset(ctx *cli.Context) error {
 		return fmt.Errorf("No issue specified.\nUsage:\t%s", ctx.Command.UsageText)
 	}
 
-	issueStr := ctx.Args().First()
-	if strings.HasPrefix(issueStr, "#") {
-		issueStr = issueStr[1:]
-	}
-	issue, err := strconv.ParseInt(issueStr, 10, 64)
+	issue, err := argToIndex(ctx.Args().First())
 	if err != nil {
 		log.Fatal(err)
 	}

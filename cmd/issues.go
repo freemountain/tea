@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 
 	"code.gitea.io/sdk/gitea"
 
@@ -53,15 +52,10 @@ func runIssues(ctx *cli.Context) error {
 func runIssueDetail(ctx *cli.Context, index string) error {
 	login, owner, repo := initCommand()
 
-	if strings.HasPrefix(index, "#") {
-		index = index[1:]
-	}
-
-	idx, err := strconv.ParseInt(index, 10, 64)
+	idx, err := argToIndex(index)
 	if err != nil {
 		return err
 	}
-
 	issue, err := login.Client().GetIssue(owner, repo, idx)
 	if err != nil {
 		return err

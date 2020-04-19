@@ -37,7 +37,11 @@ func runOpen(ctx *cli.Context) error {
 	case strings.EqualFold(number, "releases"):
 		suffix = "releases"
 	case strings.EqualFold(number, "commits"):
-		b, err := local_git.GetRepoReference("./")
+		repo, err := local_git.RepoForWorkdir()
+		if err != nil {
+			log.Fatal(err)
+		}
+		b, err := repo.Head()
 		if err != nil {
 			log.Fatal(err)
 			return nil
