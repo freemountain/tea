@@ -19,10 +19,13 @@ var CmdIssues = cli.Command{
 	Name:        "issues",
 	Usage:       "List and create issues",
 	Description: `List and create issues`,
+	ArgsUsage:   "[<issue index>]",
 	Action:      runIssues,
 	Subcommands: []*cli.Command{
 		&CmdIssuesList,
 		&CmdIssuesCreate,
+		&CmdIssuesReopen,
+		&CmdIssuesClose,
 	},
 	Flags: AllDefaultFlags,
 }
@@ -169,4 +172,47 @@ func runIssuesCreate(ctx *cli.Context) error {
 	}
 
 	return nil
+}
+
+// CmdIssuesReopen represents a sub command of issues to open an issue
+var CmdIssuesReopen = cli.Command{
+	Name:        "reopen",
+	Aliases:     []string{"open"},
+	Usage:       "Change state of an issue to 'open'",
+	Description: `Change state of an issue to 'open'`,
+	ArgsUsage:   "<issue index>",
+	Action: func(ctx *cli.Context) error {
+		var s = string(gitea.StateOpen)
+		return editIssueState(ctx, gitea.EditIssueOption{State: &s})
+	},
+	Flags: AllDefaultFlags,
+}
+
+// CmdIssuesClose represents a sub command of issues to close an issue
+var CmdIssuesClose = cli.Command{
+	Name:        "close",
+	Usage:       "Change state of an issue to 'closed'",
+	Description: `Change state of an issue to 'closed'`,
+	ArgsUsage:   "<issue index>",
+	Action: func(ctx *cli.Context) error {
+		var s = string(gitea.StateClosed)
+		return editIssueState(ctx, gitea.EditIssueOption{State: &s})
+	},
+	Flags: AllDefaultFlags,
+}
+
+// editIssueState abstracts the arg parsing to edit the given issue
+func editIssueState(ctx *cli.Context, opts gitea.EditIssueOption) error {
+	login, owner, repo := initCommand()
+	if ctx.Args().Len() == 0 {
+		log.Fatal(ctx.Command.ArgsUsage)
+	}
+
+	index, err := argToIndex(ctx.Args().First())
+	if err != nil {
+		return err
+	}
+
+	_, err = login.Client().EditIssue(owner, repo, index, opts)
+	return err
 }
