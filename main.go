@@ -16,8 +16,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Version holds the current Gitea version
-var Version = "0.1.0-dev"
+// Version holds the current tea version
+var Version = "development"
 
 // Tags holds the build tags used
 var Tags = ""

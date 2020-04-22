@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.3.0](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=1227) - 2020-04-22
+
+* FEATURES
+  * Add `tea pulls [checkout | clean]` commands (#93 #97 #107) (#105)
+  * Add `tea open` (#101)
+  * Add `tea issues [open|close]` commands (#99)
+* ENHANCEMENTS
+  * Ignore PRs for `tea issues` (#111)
+  * Add --state flag filter to issue & PR lists (#100)
+
 ## [v0.2.0](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=538) - 2020-03-06
 * FEATURES
   * Add `tea times` command (#54)
