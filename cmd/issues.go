@@ -64,7 +64,7 @@ func runIssueDetail(ctx *cli.Context, index string) error {
 		return err
 	}
 
-	fmt.Printf("#%d %s\n%s created %s\n\n%s", issue.Index,
+	fmt.Printf("#%d %s\n%s created %s\n\n%s\n", issue.Index,
 		issue.Title,
 		issue.Poster.UserName,
 		issue.Created.Format("2006-01-02 15:04:05"),
