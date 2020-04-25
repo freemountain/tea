@@ -81,6 +81,9 @@ func readSSHPrivKey(keyFile string) (sig ssh.Signer, err error) {
 	sig, err = ssh.ParsePrivateKey(sshKey)
 	if err != nil {
 		pass, err := promptPass(keyFile)
+		if err != nil {
+			return nil, err
+		}
 		sig, err = ssh.ParsePrivateKeyWithPassphrase(sshKey, []byte(pass))
 		if err != nil {
 			return nil, err
