@@ -21,7 +21,7 @@ import (
 	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
 
-	"github.com/go-gitea/yaml"
+	"gopkg.in/yaml.v2"
 )
 
 // Login represents a login to a gitea server, you even could add multiple logins for one gitea server
