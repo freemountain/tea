@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"net/url"
 
-	"gopkg.in/src-d/go-git.v4"
-	git_config "gopkg.in/src-d/go-git.v4/config"
+	"github.com/go-git/go-git/v5"
+	git_config "github.com/go-git/go-git/v5/config"
 )
 
 // GetRemote tries to match a Remote of the repo via the given URL.

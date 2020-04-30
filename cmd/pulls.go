@@ -13,9 +13,9 @@ import (
 	local_git "code.gitea.io/tea/modules/git"
 
 	"code.gitea.io/sdk/gitea"
+	"github.com/go-git/go-git/v5"
+	git_config "github.com/go-git/go-git/v5/config"
 	"github.com/urfave/cli/v2"
-	"gopkg.in/src-d/go-git.v4"
-	git_config "gopkg.in/src-d/go-git.v4/config"
 )
 
 // CmdPulls is the main command to operate on PRs

@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"strings"
 
-	"gopkg.in/src-d/go-git.v4"
-	git_config "gopkg.in/src-d/go-git.v4/config"
-	git_plumbing "gopkg.in/src-d/go-git.v4/plumbing"
-	git_transport "gopkg.in/src-d/go-git.v4/plumbing/transport"
+	"github.com/go-git/go-git/v5"
+	git_config "github.com/go-git/go-git/v5/config"
+	git_plumbing "github.com/go-git/go-git/v5/plumbing"
+	git_transport "github.com/go-git/go-git/v5/plumbing/transport"
 )
 
 // TeaCreateBranch creates a new branch in the repo, tracking from another branch.

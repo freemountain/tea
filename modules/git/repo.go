@@ -5,7 +5,7 @@
 package git
 
 import (
-	"gopkg.in/src-d/go-git.v4"
+	"github.com/go-git/go-git/v5"
 )
 
 // TeaRepo is a go-git Repository, with an extended high level interface.

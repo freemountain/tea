@@ -14,11 +14,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	git_transport "github.com/go-git/go-git/v5/plumbing/transport"
+	gogit_http "github.com/go-git/go-git/v5/plumbing/transport/http"
+	gogit_ssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
-	git_transport "gopkg.in/src-d/go-git.v4/plumbing/transport"
-	gogit_http "gopkg.in/src-d/go-git.v4/plumbing/transport/http"
-	gogit_ssh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
 )
 
 // GetAuthForURL returns the appropriate AuthMethod to be used in Push() / Pull()
