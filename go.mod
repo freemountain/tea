@@ -3,7 +3,7 @@ module code.gitea.io/tea
 go 1.12
 
 require (
-	code.gitea.io/sdk/gitea v0.11.3
+	code.gitea.io/sdk/gitea v0.12.0
 	gitea.com/jolheiser/gitea-vet v0.1.0
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect

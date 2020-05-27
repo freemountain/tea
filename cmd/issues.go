@@ -87,8 +87,7 @@ func runIssuesList(ctx *cli.Context) error {
 	}
 
 	issues, err := login.Client().ListRepoIssues(owner, repo, gitea.ListIssueOption{
-		Page:  0,
-		State: string(state),
+		State: state,
 		Type:  gitea.IssueTypeIssue,
 	})
 
@@ -182,7 +181,7 @@ var CmdIssuesReopen = cli.Command{
 	Description: `Change state of an issue to 'open'`,
 	ArgsUsage:   "<issue index>",
 	Action: func(ctx *cli.Context) error {
-		var s = string(gitea.StateOpen)
+		var s = gitea.StateOpen
 		return editIssueState(ctx, gitea.EditIssueOption{State: &s})
 	},
 	Flags: AllDefaultFlags,
@@ -195,7 +194,7 @@ var CmdIssuesClose = cli.Command{
 	Description: `Change state of an issue to 'closed'`,
 	ArgsUsage:   "<issue index>",
 	Action: func(ctx *cli.Context) error {
-		var s = string(gitea.StateClosed)
+		var s = gitea.StateClosed
 		return editIssueState(ctx, gitea.EditIssueOption{State: &s})
 	},
 	Flags: AllDefaultFlags,

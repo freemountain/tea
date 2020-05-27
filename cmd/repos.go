@@ -58,11 +58,11 @@ func runReposList(ctx *cli.Context) error {
 	var err error
 
 	if org != "" {
-		rps, err = login.Client().ListOrgRepos(org)
+		rps, err = login.Client().ListOrgRepos(org, gitea.ListOrgReposOptions{})
 	} else if user != "" {
-		rps, err = login.Client().ListUserRepos(user)
+		rps, err = login.Client().ListUserRepos(user, gitea.ListReposOptions{})
 	} else {
-		rps, err = login.Client().ListMyRepos()
+		rps, err = login.Client().ListMyRepos(gitea.ListReposOptions{})
 	}
 	if err != nil {
 		log.Fatal(err)

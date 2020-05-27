@@ -50,29 +50,25 @@ type CreateStatusOption struct {
 }
 
 // CreateStatus creates a new Status for a given Commit
-//
-// POST /repos/:owner/:repo/statuses/:sha
 func (c *Client) CreateStatus(owner, repo, sha string, opts CreateStatusOption) (*Status, error) {
 	body, err := json.Marshal(&opts)
 	if err != nil {
 		return nil, err
 	}
-	status := &Status{}
-	return status, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/statuses/%s", owner, repo, sha),
-		jsonHeader, bytes.NewReader(body), status)
+	status := new(Status)
+	return status, c.getParsedResponse("POST", fmt.Sprintf("/repos/%s/%s/statuses/%s", owner, repo, sha), jsonHeader, bytes.NewReader(body), status)
 }
 
-// ListStatusesOption holds pagination information
+// ListStatusesOption options for listing a repository's commit's statuses
 type ListStatusesOption struct {
-	Page int
+	ListOptions
 }
 
 // ListStatuses returns all statuses for a given Commit
-//
-// GET /repos/:owner/:repo/commits/:ref/statuses
-func (c *Client) ListStatuses(owner, repo, sha string, opts ListStatusesOption) ([]*Status, error) {
-	statuses := make([]*Status, 0, 10)
-	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?page=%d", owner, repo, sha, opts.Page), nil, nil, &statuses)
+func (c *Client) ListStatuses(owner, repo, sha string, opt ListStatusesOption) ([]*Status, error) {
+	opt.setDefaults()
+	statuses := make([]*Status, 0, opt.PageSize)
+	return statuses, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/statuses?%s", owner, repo, sha, opt.getURLQuery().Encode()), nil, nil, &statuses)
 }
 
 // CombinedStatus holds the combined state of several statuses for a single commit
@@ -87,9 +83,7 @@ type CombinedStatus struct {
 }
 
 // GetCombinedStatus returns the CombinedStatus for a given Commit
-//
-// GET /repos/:owner/:repo/commits/:ref/status
 func (c *Client) GetCombinedStatus(owner, repo, sha string) (*CombinedStatus, error) {
-	status := &CombinedStatus{}
+	status := new(CombinedStatus)
 	return status, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/commits/%s/status", owner, repo, sha), nil, nil, status)
 }

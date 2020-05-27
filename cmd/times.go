@@ -73,7 +73,7 @@ func runTrackedTimes(ctx *cli.Context) error {
 		if err != nil {
 			return err
 		}
-		times, err = client.ListTrackedTimes(owner, repo, issue)
+		times, err = client.ListTrackedTimes(owner, repo, issue, gitea.ListTrackedTimesOptions{})
 	} else {
 		// get all tracked times by the specified user
 		times, err = client.GetUserTrackedTimes(owner, repo, user)

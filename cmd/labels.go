@@ -49,7 +49,7 @@ func runLabels(ctx *cli.Context) error {
 
 	var values [][]string
 
-	labels, err := login.Client().ListRepoLabels(owner, repo)
+	labels, err := login.Client().ListRepoLabels(owner, repo, gitea.ListLabelsOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}

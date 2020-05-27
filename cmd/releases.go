@@ -29,7 +29,7 @@ var CmdReleases = cli.Command{
 func runReleases(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
-	releases, err := login.Client().ListReleases(owner, repo)
+	releases, err := login.Client().ListReleases(owner, repo, gitea.ListReleasesOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}

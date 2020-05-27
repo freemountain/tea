@@ -1,5 +1,5 @@
-code.gitea.io/sdk/gitea v0.11.3 h1:CdI3J82Mqn0mElyEKa5DUSr3Wi2R+qm/6uVtCkSSqSM=
-code.gitea.io/sdk/gitea v0.11.3/go.mod h1:z3uwDV/b9Ls47NGukYM9XhnHtqPh/J+t40lsUrR6JDY=
+code.gitea.io/sdk/gitea v0.12.0 h1:hvDCz4wtFvo7rf5Ebj8tGd4aJ4wLPKX3BKFX9Dk1Pgs=
+code.gitea.io/sdk/gitea v0.12.0/go.mod h1:z3uwDV/b9Ls47NGukYM9XhnHtqPh/J+t40lsUrR6JDY=
 gitea.com/jolheiser/gitea-vet v0.1.0 h1:gJEms9YWbIcrPOEmDOJ+5JZXCYFxNpwxlI73uRulAi4=
 gitea.com/jolheiser/gitea-vet v0.1.0/go.mod h1:2Oa6TAdEp1N/38oBNh3ZeiSEER60D/CeDaBFv2sdH58=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=

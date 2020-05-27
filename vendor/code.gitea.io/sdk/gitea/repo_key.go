@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -24,10 +25,32 @@ type DeployKey struct {
 	Repository  *Repository `json:"repository,omitempty"`
 }
 
+// ListDeployKeysOptions options for listing a repository's deploy keys
+type ListDeployKeysOptions struct {
+	ListOptions
+	KeyID       int64
+	Fingerprint string
+}
+
+// QueryEncode turns options into querystring argument
+func (opt *ListDeployKeysOptions) QueryEncode() string {
+	query := opt.getURLQuery()
+	if opt.KeyID > 0 {
+		query.Add("key_id", fmt.Sprintf("%d", opt.KeyID))
+	}
+	if len(opt.Fingerprint) > 0 {
+		query.Add("fingerprint", opt.Fingerprint)
+	}
+	return query.Encode()
+}
+
 // ListDeployKeys list all the deploy keys of one repository
-func (c *Client) ListDeployKeys(user, repo string) ([]*DeployKey, error) {
-	keys := make([]*DeployKey, 0, 10)
-	return keys, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/keys", user, repo), nil, nil, &keys)
+func (c *Client) ListDeployKeys(user, repo string, opt ListDeployKeysOptions) ([]*DeployKey, error) {
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/keys", user, repo))
+	opt.setDefaults()
+	link.RawQuery = opt.QueryEncode()
+	keys := make([]*DeployKey, 0, opt.PageSize)
+	return keys, c.getParsedResponse("GET", link.String(), nil, nil, &keys)
 }
 
 // GetDeployKey get one deploy key with key id

@@ -52,8 +52,7 @@ func runPulls(ctx *cli.Context) error {
 	}
 
 	prs, err := login.Client().ListRepoPullRequests(owner, repo, gitea.ListPullRequestsOptions{
-		Page:  0,
-		State: string(state),
+		State: state,
 	})
 
 	if err != nil {

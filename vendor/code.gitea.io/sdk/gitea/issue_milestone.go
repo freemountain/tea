@@ -8,19 +8,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
-)
-
-// StateType issue state type
-type StateType string
-
-const (
-	// StateOpen pr is opend
-	StateOpen StateType = "open"
-	// StateClosed pr is closed
-	StateClosed StateType = "closed"
-	// StateAll is all
-	StateAll StateType = "all"
 )
 
 // Milestone milestone is a collection of issues on one repository
@@ -35,10 +24,30 @@ type Milestone struct {
 	Deadline     *time.Time `json:"due_on"`
 }
 
+// ListMilestoneOption list milestone options
+type ListMilestoneOption struct {
+	ListOptions
+	// open, closed, all
+	State StateType
+}
+
+// QueryEncode turns options into querystring argument
+func (opt *ListMilestoneOption) QueryEncode() string {
+	query := opt.getURLQuery()
+	if opt.State != "" {
+		query.Add("state", string(opt.State))
+	}
+	return query.Encode()
+}
+
 // ListRepoMilestones list all the milestones of one repository
-func (c *Client) ListRepoMilestones(owner, repo string) ([]*Milestone, error) {
-	milestones := make([]*Milestone, 0, 10)
-	return milestones, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/milestones", owner, repo), nil, nil, &milestones)
+func (c *Client) ListRepoMilestones(owner, repo string, opt ListMilestoneOption) ([]*Milestone, error) {
+	opt.setDefaults()
+	milestones := make([]*Milestone, 0, opt.PageSize)
+
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/milestones", owner, repo))
+	link.RawQuery = opt.QueryEncode()
+	return milestones, c.getParsedResponse("GET", link.String(), nil, nil, &milestones)
 }
 
 // GetMilestone get one milestone by repo name and milestone id

@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -25,16 +26,50 @@ type Comment struct {
 	Updated          time.Time `json:"updated_at"`
 }
 
+// ListIssueCommentOptions list comment options
+type ListIssueCommentOptions struct {
+	ListOptions
+	Since  time.Time
+	Before time.Time
+}
+
+// QueryEncode turns options into querystring argument
+func (opt *ListIssueCommentOptions) QueryEncode() string {
+	query := opt.getURLQuery()
+	if !opt.Since.IsZero() {
+		query.Add("since", opt.Since.Format(time.RFC3339))
+	}
+	if !opt.Before.IsZero() {
+		query.Add("before", opt.Before.Format(time.RFC3339))
+	}
+	return query.Encode()
+}
+
 // ListIssueComments list comments on an issue.
-func (c *Client) ListIssueComments(owner, repo string, index int64) ([]*Comment, error) {
-	comments := make([]*Comment, 0, 10)
-	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/%d/comments", owner, repo, index), nil, nil, &comments)
+func (c *Client) ListIssueComments(owner, repo string, index int64, opt ListIssueCommentOptions) ([]*Comment, error) {
+	opt.setDefaults()
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues/%d/comments", owner, repo, index))
+	link.RawQuery = opt.QueryEncode()
+	comments := make([]*Comment, 0, opt.PageSize)
+	return comments, c.getParsedResponse("GET", link.String(), nil, nil, &comments)
 }
 
 // ListRepoIssueComments list comments for a given repo.
-func (c *Client) ListRepoIssueComments(owner, repo string) ([]*Comment, error) {
-	comments := make([]*Comment, 0, 10)
-	return comments, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments", owner, repo), nil, nil, &comments)
+func (c *Client) ListRepoIssueComments(owner, repo string, opt ListIssueCommentOptions) ([]*Comment, error) {
+	opt.setDefaults()
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/issues/comments", owner, repo))
+	link.RawQuery = opt.QueryEncode()
+	comments := make([]*Comment, 0, opt.PageSize)
+	return comments, c.getParsedResponse("GET", link.String(), nil, nil, &comments)
+}
+
+// GetIssueComment get a comment for a given repo by id.
+func (c *Client) GetIssueComment(owner, repo string, id int64) (*Comment, error) {
+	comment := new(Comment)
+	if err := c.CheckServerVersionConstraint(">=1.12.0"); err != nil {
+		return comment, err
+	}
+	return comment, c.getParsedResponse("GET", fmt.Sprintf("/repos/%s/%s/issues/comments/%d", owner, repo, id), nil, nil, &comment)
 }
 
 // CreateIssueCommentOption options for creating a comment on an issue

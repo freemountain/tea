@@ -59,26 +59,32 @@ type PullRequest struct {
 
 // ListPullRequestsOptions options for listing pull requests
 type ListPullRequestsOptions struct {
-	Page int `json:"page"`
-	// open, closed, all
-	State string `json:"state"`
+	ListOptions
+	State StateType `json:"state"`
 	// oldest, recentupdate, leastupdate, mostcomment, leastcomment, priority
-	Sort      string `json:"sort"`
-	Milestone int64  `json:"milestone"`
+	Sort      string
+	Milestone int64
 }
 
-// ListRepoPullRequests list PRs of one repository
-func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOptions) ([]*PullRequest, error) {
-	// declare variables
-	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls", owner, repo))
-	prs := make([]*PullRequest, 0, 10)
-	query := make(url.Values)
-	// add options to query
-	if opt.Page > 0 {
-		query.Add("page", fmt.Sprintf("%d", opt.Page))
-	}
+// MergeStyle is used specify how a pull is merged
+type MergeStyle string
+
+const (
+	// MergeStyleMerge merge pull as usual
+	MergeStyleMerge MergeStyle = "merge"
+	// MergeStyleRebase rebase pull
+	MergeStyleRebase MergeStyle = "rebase"
+	// MergeStyleRebaseMerge rebase and merge pull
+	MergeStyleRebaseMerge MergeStyle = "rebase-merge"
+	// MergeStyleSquash squash and merge pull
+	MergeStyleSquash MergeStyle = "squash"
+)
+
+// QueryEncode turns options into querystring argument
+func (opt *ListPullRequestsOptions) QueryEncode() string {
+	query := opt.getURLQuery()
 	if len(opt.State) > 0 {
-		query.Add("state", opt.State)
+		query.Add("state", string(opt.State))
 	}
 	if len(opt.Sort) > 0 {
 		query.Add("sort", opt.Sort)
@@ -86,8 +92,16 @@ func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOp
 	if opt.Milestone > 0 {
 		query.Add("milestone", fmt.Sprintf("%d", opt.Milestone))
 	}
-	link.RawQuery = query.Encode()
-	// request
+	return query.Encode()
+}
+
+// ListRepoPullRequests list PRs of one repository
+func (c *Client) ListRepoPullRequests(owner, repo string, opt ListPullRequestsOptions) ([]*PullRequest, error) {
+	opt.setDefaults()
+	prs := make([]*PullRequest, 0, opt.PageSize)
+
+	link, _ := url.Parse(fmt.Sprintf("/repos/%s/%s/pulls", owner, repo))
+	link.RawQuery = opt.QueryEncode()
 	return prs, c.getParsedResponse("GET", link.String(), jsonHeader, nil, &prs)
 }
 
@@ -129,7 +143,7 @@ type EditPullRequestOption struct {
 	Assignees []string   `json:"assignees"`
 	Milestone int64      `json:"milestone"`
 	Labels    []int64    `json:"labels"`
-	State     *string    `json:"state"`
+	State     *StateType `json:"state"`
 	Deadline  *time.Time `json:"due_date"`
 }
 
@@ -146,15 +160,18 @@ func (c *Client) EditPullRequest(owner, repo string, index int64, opt EditPullRe
 
 // MergePullRequestOption options when merging a pull request
 type MergePullRequestOption struct {
-	// required: true
-	// enum: merge,rebase,rebase-merge,squash
-	Do                string `json:"Do" binding:"Required;In(merge,rebase,rebase-merge,squash)"`
-	MergeTitleField   string `json:"MergeTitleField"`
-	MergeMessageField string `json:"MergeMessageField"`
+	Style   MergeStyle `json:"Do"`
+	Title   string     `json:"MergeTitleField"`
+	Message string     `json:"MergeMessageField"`
 }
 
 // MergePullRequest merge a PR to repository by PR id
 func (c *Client) MergePullRequest(owner, repo string, index int64, opt MergePullRequestOption) (bool, error) {
+	if opt.Style == MergeStyleSquash {
+		if err := c.CheckServerVersionConstraint(">=1.11.5"); err != nil {
+			return false, err
+		}
+	}
 	body, err := json.Marshal(&opt)
 	if err != nil {
 		return false, err
