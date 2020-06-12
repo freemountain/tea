@@ -55,7 +55,7 @@ var cmdLoginAdd = cli.Command{
 			Usage:    "Access token. Can be obtained from Settings > Applications",
 			Required: true,
 		},
-		&cli.BoolFlag{
+		&cli.StringFlag{
 			Name:    "ssh-key",
 			Aliases: []string{"s"},
 			Usage:   "Path to a SSH key to use for pull/push operations",
