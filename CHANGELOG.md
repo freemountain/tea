@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.3.1](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=1265) - 2020-06-15
+
+* BUGFIXES
+  * --ssh-key should be string not bool (#135) (#137)
+  * modules/git: fix dropped error (#127)
+  * Issues details: add missing newline (#126)
+
 ## [v0.3.0](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=1227) - 2020-04-22
 
 * FEATURES
