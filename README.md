@@ -21,12 +21,14 @@ go install code.gitea.io/tea
 ```
 
 
-Or if you have `brew` installed, you can install `tea` via:
+If you have `brew` installed, you can install `tea` via:
 
 ```sh
 brew tap gitea/tap https://gitea.com/gitea/homebrew-gitea
 brew install tea
 ```
+
+Distribution packages exist for: **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))** and **archlinux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea))**
 
 ## Usage
 
