@@ -35,6 +35,7 @@ var CmdPulls = cli.Command{
 	Subcommands: []*cli.Command{
 		&CmdPullsCheckout,
 		&CmdPullsClean,
+		&CmdPullsCreate,
 	},
 }
 
@@ -262,6 +263,111 @@ call me again with the --ignore-sha flag`, pr.Head.Ref)
 		return err
 	}
 	return r.TeaDeleteBranch(branch, pr.Head.Ref, auth)
+}
+
+// CmdPullsCreate creates a pull request
+var CmdPullsCreate = cli.Command{
+	Name:        "create",
+	Usage:       "Create a pull-request",
+	Description: "Create a pull-request",
+	Action:      runPullsCreate,
+	Flags: append([]cli.Flag{
+		&cli.StringFlag{
+			Name:  "head",
+			Usage: "Set head branch (default is current one)",
+		},
+		&cli.StringFlag{
+			Name:    "base",
+			Aliases: []string{"b"},
+			Usage:   "Set base branch (default is default branch)",
+		},
+		&cli.StringFlag{
+			Name:    "title",
+			Aliases: []string{"t"},
+			Usage:   "Set title of pull (default is head branch name)",
+		},
+		&cli.StringFlag{
+			Name:    "description",
+			Aliases: []string{"d"},
+			Usage:   "Set body of new pull",
+		},
+	}, AllDefaultFlags...),
+}
+
+func runPullsCreate(ctx *cli.Context) error {
+	login, ownerArg, repoArg := initCommand()
+	client := login.Client()
+
+	repo, err := login.Client().GetRepo(ownerArg, repoArg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// open local git repo
+	localRepo, err := local_git.RepoForWorkdir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	base := ctx.String("base")
+	// default is default branch
+	if len(base) == 0 {
+		base = repo.DefaultBranch
+	}
+
+	head := ctx.String("head")
+	// default is current one
+	if len(head) == 0 {
+		head, err = localRepo.TeaGetCurrentBranchName()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	title := ctx.String("title")
+	// default is head branch name
+	if len(title) == 0 {
+		title = head
+		if strings.Contains(title, ":") {
+			title = strings.SplitN(title, ":", 2)[1]
+		}
+		title = strings.Replace(title, "-", " ", -1)
+		title = strings.Replace(title, "_", " ", -1)
+		title = strings.Title(strings.ToLower(title))
+	}
+	// title is required
+	if len(title) == 0 {
+		fmt.Printf("Title is required")
+		return nil
+	}
+
+	// push if possible
+	err = localRepo.Push(&git.PushOptions{})
+	if err != nil {
+		fmt.Printf("Error occurred during 'git push':\n%s\n", err.Error())
+	}
+
+	pr, err := client.CreatePullRequest(ownerArg, repoArg, gitea.CreatePullRequestOption{
+		Head:  head,
+		Base:  base,
+		Title: title,
+		Body:  ctx.String("description"),
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("#%d %s\n%s created %s\n", pr.Index,
+		pr.Title,
+		pr.Poster.UserName,
+		pr.Created.Format("2006-01-02 15:04:05"),
+	)
+	if len(pr.Body) != 0 {
+		fmt.Printf("\n%s\n", pr.Body)
+	}
+	fmt.Println(pr.HTMLURL)
+	return nil
 }
 
 func argToIndex(arg string) (int64, error) {

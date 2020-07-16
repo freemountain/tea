@@ -175,3 +175,17 @@ func (r TeaRepo) TeaFindBranchByName(branchName, repoURL string) (b *git_config.
 	}
 	return b, b.Validate()
 }
+
+// TeaGetCurrentBranchName return the name of the branch witch is currently active
+func (r TeaRepo) TeaGetCurrentBranchName() (string, error) {
+	localHead, err := r.Head()
+	if err != nil {
+		return "", err
+	}
+
+	if !localHead.Name().IsBranch() {
+		return "", fmt.Errorf("active ref is no branch")
+	}
+
+	return strings.TrimLeft(localHead.Name().String(), "refs/heads/"), nil
+}
