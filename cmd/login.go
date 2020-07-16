@@ -129,6 +129,7 @@ var cmdLoginList = cli.Command{
 	Usage:       "List Gitea logins",
 	Description: `List Gitea logins`,
 	Action:      runLoginList,
+	Flags:       []cli.Flag{&OutputFlag},
 }
 
 func runLoginList(ctx *cli.Context) error {
@@ -137,10 +138,23 @@ func runLoginList(ctx *cli.Context) error {
 		log.Fatal("Unable to load config file " + yamlConfigPath)
 	}
 
-	fmt.Printf("Name\tURL\tSSHHost\n")
-	for _, l := range config.Logins {
-		fmt.Printf("%s\t%s\t%s\n", l.Name, l.URL, l.GetSSHHost())
+	headers := []string{
+		"Name",
+		"URL",
+		"SSHHost",
 	}
+
+	var values [][]string
+
+	for _, l := range config.Logins {
+		values = append(values, []string{
+			l.Name,
+			l.URL,
+			l.GetSSHHost(),
+		})
+	}
+
+	Output(outputValue, headers, values)
 
 	return nil
 }
