@@ -189,10 +189,13 @@ func saveConfig(ymlPath string) error {
 	return ioutil.WriteFile(ymlPath, bs, 0660)
 }
 
-func curGitRepoPath() (*Login, string, error) {
-	repo, err := git.RepoForWorkdir()
-	if err != nil {
-		return nil, "", errors.New("No Gitea login found")
+func curGitRepoPath(path string) (*Login, string, error) {
+	var err error
+	var repo *git.TeaRepo
+	if len(path) == 0 {
+		repo, err = git.RepoForWorkdir()
+	} else {
+		repo, err = git.RepoFromPath(path)
 	}
 	gitConfig, err := repo.Config()
 	if err != nil {

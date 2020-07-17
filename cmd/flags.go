@@ -81,15 +81,10 @@ var AllDefaultFlags = append([]cli.Flag{
 
 // initCommand returns repository and *Login based on flags
 func initCommand() (*Login, string, string) {
-	login := initCommandLoginOnly()
+	login, repoPath, err := curGitRepoPath(repoValue)
+	if err != nil {
+		log.Fatal(err.Error())
 
-	var err error
-	repoPath := repoValue
-	if repoPath == "" {
-		login, repoPath, err = curGitRepoPath()
-		if err != nil {
-			log.Fatal(err.Error())
-		}
 	}
 
 	owner, repo := splitRepo(repoPath)

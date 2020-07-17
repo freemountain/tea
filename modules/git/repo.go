@@ -25,3 +25,15 @@ func RepoForWorkdir() (*TeaRepo, error) {
 
 	return &TeaRepo{repo}, nil
 }
+
+// RepoFromPath tries to open the git repository by path
+func RepoFromPath(path string) (*TeaRepo, error) {
+	repo, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{
+		DetectDotGit: true,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &TeaRepo{repo}, nil
+}
