@@ -21,6 +21,7 @@ var CmdLogin = cli.Command{
 	Name:        "login",
 	Usage:       "Log in to a Gitea server",
 	Description: `Log in to a Gitea server`,
+	Action:      runLoginList,
 	Subcommands: []*cli.Command{
 		&cmdLoginList,
 		&cmdLoginAdd,
