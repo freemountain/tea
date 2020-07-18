@@ -1,5 +1,22 @@
 # Changelog
 
+## [v0.4.0](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=1264) - 2020-07-18
+
+* FEATURES
+  * Add notifications subcomand (#148)
+  * Add subcomand 'pulls create' (#144)
+* BUGFIXES
+  * Fix Login Detection By Repo Param (#151)
+  * Fix Login List Output (#150)
+  * Fix --ssh-key Option (#135)
+* ENHANCEMENTS
+  * Subcomand Login Show List By Default (#152)
+* BUILD
+  * Migrate src-d/go-git to go-git/go-git (#128)
+  * Migrate gitea-sdk to v0.12.0 (#133)
+  * Migrate yaml lib (#130)
+  * Add gitea-vet (#121)
+
 ## [v0.3.1](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=1265) - 2020-06-15
 
 * BUGFIXES
