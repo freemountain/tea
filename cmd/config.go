@@ -197,6 +197,9 @@ func curGitRepoPath(path string) (*Login, string, error) {
 	} else {
 		repo, err = git.RepoFromPath(path)
 	}
+	if err != nil {
+		return nil, "", err
+	}
 	gitConfig, err := repo.Config()
 	if err != nil {
 		return nil, "", err

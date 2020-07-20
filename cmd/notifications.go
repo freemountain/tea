@@ -46,9 +46,6 @@ var CmdNotifications = cli.Command{
 }
 
 func runNotifications(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
-
-	client := login.Client()
 	var news []*gitea.NotificationThread
 	var err error
 
@@ -58,11 +55,13 @@ func runNotifications(ctx *cli.Context) error {
 	}
 
 	if ctx.Bool("all") {
-		news, err = client.ListNotifications(gitea.ListNotificationOptions{
+		login := initCommandLoginOnly()
+		news, err = login.Client().ListNotifications(gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 		})
 	} else {
-		news, err = client.ListRepoNotifications(owner, repo, gitea.ListNotificationOptions{
+		login, owner, repo := initCommand()
+		news, err = login.Client().ListRepoNotifications(owner, repo, gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 		})
 	}
