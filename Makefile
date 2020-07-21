@@ -71,7 +71,7 @@ vet:
 	# Default vet
 	$(GO) vet -mod=vendor $(PACKAGES)
 	# Custom vet
-	$(GO) build -mod=vendor gitea.com/jolheiser/gitea-vet
+	$(GO) build -mod=vendor code.gitea.io/gitea-vet
 	$(GO) vet -vettool=gitea-vet $(PACKAGES)
 
 .PHONY: lint

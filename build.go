@@ -10,5 +10,5 @@ package main
 
 import (
 	// for vet
-	_ "gitea.com/jolheiser/gitea-vet"
+	_ "code.gitea.io/gitea-vet"
 )
