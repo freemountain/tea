@@ -143,6 +143,7 @@ func runLoginList(ctx *cli.Context) error {
 		"Name",
 		"URL",
 		"SSHHost",
+		"User",
 	}
 
 	var values [][]string
@@ -152,6 +153,7 @@ func runLoginList(ctx *cli.Context) error {
 			l.Name,
 			l.URL,
 			l.GetSSHHost(),
+			l.User,
 		})
 	}
 
