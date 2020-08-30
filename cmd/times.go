@@ -101,6 +101,15 @@ func runTrackedTimes(ctx *cli.Context) error {
 	return nil
 }
 
+func formatDuration(seconds int64, outputType string) string {
+	switch outputType {
+	case "yaml":
+	case "csv":
+		return fmt.Sprint(seconds)
+	}
+	return time.Duration(1e9 * seconds).String()
+}
+
 func printTrackedTimes(times []*gitea.TrackedTime, outputType string, from, until time.Time, printTotal bool) {
 	var outputValues [][]string
 	var totalDuration int64
@@ -126,14 +135,14 @@ func printTrackedTimes(times []*gitea.TrackedTime, outputType string, from, unti
 				t.Created.In(localLoc).Format("2006-01-02 15:04:05"),
 				"#" + strconv.FormatInt(t.Issue.Index, 10),
 				t.UserName,
-				time.Duration(1e9 * t.Time).String(),
+				formatDuration(t.Time, outputType),
 			},
 		)
 	}
 
 	if printTotal {
 		outputValues = append(outputValues, []string{
-			"TOTAL", "", "", time.Duration(1e9 * totalDuration).String(),
+			"TOTAL", "", "", formatDuration(totalDuration, outputType),
 		})
 	}
 
