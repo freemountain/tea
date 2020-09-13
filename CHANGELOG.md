@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.4.1](https://gitea.com/gitea/tea/releases/tag/v0.4.1) - 2020-09-13
+
+* BUGFIXES
+  * Notification don't relay on a repo (#159)
+
 ## [v0.4.0](https://gitea.com/gitea/tea/pulls?q=&type=all&state=closed&milestone=1264) - 2020-07-18
 
 * FEATURES
