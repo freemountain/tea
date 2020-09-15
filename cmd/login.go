@@ -10,6 +10,10 @@ import (
 	"log"
 	"net/http"
 	"net/http/cookiejar"
+	"net/url"
+	"os"
+	"strings"
+	"time"
 
 	"code.gitea.io/sdk/gitea"
 
@@ -21,7 +25,7 @@ var CmdLogin = cli.Command{
 	Name:        "login",
 	Usage:       "Log in to a Gitea server",
 	Description: `Log in to a Gitea server`,
-	Action:      runLoginList,
+	Action:      runLoginAddInteractive,
 	Subcommands: []*cli.Command{
 		&cmdLoginList,
 		&cmdLoginAdd,
@@ -35,10 +39,9 @@ var cmdLoginAdd = cli.Command{
 	Description: `Add a Gitea login`,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:     "name",
-			Aliases:  []string{"n"},
-			Usage:    "Login name",
-			Required: true,
+			Name:    "name",
+			Aliases: []string{"n"},
+			Usage:   "Login name",
 		},
 		&cli.StringFlag{
 			Name:     "url",
@@ -49,12 +52,24 @@ var cmdLoginAdd = cli.Command{
 			Required: true,
 		},
 		&cli.StringFlag{
-			Name:     "token",
-			Aliases:  []string{"t"},
-			Value:    "",
-			EnvVars:  []string{"GITEA_SERVER_TOKEN"},
-			Usage:    "Access token. Can be obtained from Settings > Applications",
-			Required: true,
+			Name:    "token",
+			Aliases: []string{"t"},
+			Value:   "",
+			EnvVars: []string{"GITEA_SERVER_TOKEN"},
+			Usage:   "Access token. Can be obtained from Settings > Applications",
+		},
+		&cli.StringFlag{
+			Name:    "user",
+			Value:   "",
+			EnvVars: []string{"GITEA_SERVER_USER"},
+			Usage:   "User for basic auth (will create token)",
+		},
+		&cli.StringFlag{
+			Name:    "password",
+			Aliases: []string{"pwd"},
+			Value:   "",
+			EnvVars: []string{"GITEA_SERVER_PASSWORD"},
+			Usage:   "Password for basic auth (will create token)",
 		},
 		&cli.StringFlag{
 			Name:    "ssh-key",
@@ -71,14 +86,100 @@ var cmdLoginAdd = cli.Command{
 }
 
 func runLoginAdd(ctx *cli.Context) error {
-	if !ctx.IsSet("url") {
+	return runLoginAddMain(
+		ctx.String("name"),
+		ctx.String("token"),
+		ctx.String("user"),
+		ctx.String("password"),
+		ctx.String("ssh-key"),
+		ctx.String("url"),
+		ctx.Bool("insecure"))
+}
+
+func runLoginAddInteractive(ctx *cli.Context) error {
+	var stdin, name, token, user, passwd, sshKey, giteaURL string
+	var insecure = false
+
+	fmt.Print("URL of Gitea instance: ")
+	if _, err := fmt.Scanln(&stdin); err != nil {
+		stdin = ""
+	}
+	giteaURL = strings.TrimSpace(stdin)
+	if len(giteaURL) == 0 {
+		fmt.Println("URL is required!")
+		return nil
+	}
+
+	parsedURL, err := url.Parse(giteaURL)
+	if err != nil {
+		return err
+	}
+	name = strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
+
+	fmt.Print("Name of new Login [" + name + "]: ")
+	if _, err := fmt.Scanln(&stdin); err != nil {
+		stdin = ""
+	}
+	if len(strings.TrimSpace(stdin)) != 0 {
+		name = strings.TrimSpace(stdin)
+	}
+
+	fmt.Print("Do you have a token [Yes/no]: ")
+	if _, err := fmt.Scanln(&stdin); err != nil {
+		stdin = ""
+	}
+	if len(stdin) != 0 && strings.ToLower(stdin[:1]) == "n" {
+		fmt.Print("Username: ")
+		if _, err := fmt.Scanln(&stdin); err != nil {
+			stdin = ""
+		}
+		user = strings.TrimSpace(stdin)
+
+		fmt.Print("Password: ")
+		if _, err := fmt.Scanln(&stdin); err != nil {
+			stdin = ""
+		}
+		passwd = strings.TrimSpace(stdin)
+	} else {
+		fmt.Print("Token: ")
+		if _, err := fmt.Scanln(&stdin); err != nil {
+			stdin = ""
+		}
+		token = strings.TrimSpace(stdin)
+	}
+
+	fmt.Print("Set Optional settings [yes/No]: ")
+	if _, err := fmt.Scanln(&stdin); err != nil {
+		stdin = ""
+	}
+	if len(stdin) != 0 && strings.ToLower(stdin[:1]) == "y" {
+		fmt.Print("SSH Key Path: ")
+		if _, err := fmt.Scanln(&stdin); err != nil {
+			stdin = ""
+		}
+		sshKey = strings.TrimSpace(stdin)
+
+		fmt.Print("Allow Insecure connections  [yes/No]: ")
+		if _, err := fmt.Scanln(&stdin); err != nil {
+			stdin = ""
+		}
+		insecure = len(stdin) != 0 && strings.ToLower(stdin[:1]) == "y"
+	}
+
+	return runLoginAddMain(name, token, user, passwd, sshKey, giteaURL, insecure)
+}
+
+func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecure bool) error {
+
+	if len(giteaURL) == 0 {
 		log.Fatal("You have to input Gitea server URL")
 	}
-	if !ctx.IsSet("token") {
-		log.Fatal("No token found")
-	}
-	if !ctx.IsSet("name") {
-		log.Fatal("You have to set a name for the login")
+	if len(token) == 0 && (len(user)+len(passwd)) == 0 {
+		log.Fatal("No token set")
+	} else if len(user) != 0 && len(passwd) == 0 {
+		log.Fatal("No password set")
+	} else if len(user) == 0 && len(passwd) != 0 {
+		log.Fatal("No user set")
 	}
 
 	err := loadConfig(yamlConfigPath)
@@ -86,8 +187,11 @@ func runLoginAdd(ctx *cli.Context) error {
 		log.Fatal("Unable to load config file " + yamlConfigPath)
 	}
 
-	client := gitea.NewClient(ctx.String("url"), ctx.String("token"))
-	if ctx.Bool("insecure") {
+	client := gitea.NewClient(giteaURL, token)
+	if len(token) == 0 {
+		client.SetBasicAuth(user, passwd)
+	}
+	if insecure {
 		cookieJar, _ := cookiejar.New(nil)
 
 		client.SetHTTPClient(&http.Client{
@@ -97,19 +201,55 @@ func runLoginAdd(ctx *cli.Context) error {
 			},
 		})
 	}
+
 	u, err := client.GetMyUserInfo()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	if len(token) == 0 {
+		// create token
+		host, _ := os.Hostname()
+		tl, err := client.ListAccessTokens(gitea.ListAccessTokensOptions{})
+		if err != nil {
+			return err
+		}
+		tokenName := host + "-tea"
+		for i := range tl {
+			if tl[i].Name == tokenName {
+				tokenName += time.Now().Format("2006-01-02_15-04-05")
+				break
+			}
+		}
+		t, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{Name: tokenName})
+		if err != nil {
+			return err
+		}
+		token = t.Token
+	}
+
 	fmt.Println("Login successful! Login name " + u.UserName)
 
+	if len(name) == 0 {
+		parsedURL, err := url.Parse(giteaURL)
+		if err != nil {
+			return err
+		}
+		name = strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
+		for _, l := range config.Logins {
+			if l.Name == name {
+				name += "_" + u.UserName
+				break
+			}
+		}
+	}
+
 	err = addLogin(Login{
-		Name:     ctx.String("name"),
-		URL:      ctx.String("url"),
-		Token:    ctx.String("token"),
-		Insecure: ctx.Bool("insecure"),
-		SSHKey:   ctx.String("ssh-key"),
+		Name:     name,
+		URL:      giteaURL,
+		Token:    token,
+		Insecure: insecure,
+		SSHKey:   sshKey,
 		User:     u.UserName,
 	})
 	if err != nil {
