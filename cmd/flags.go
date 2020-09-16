@@ -83,10 +83,8 @@ var AllDefaultFlags = append([]cli.Flag{
 
 // initCommand returns repository and *Login based on flags
 func initCommand() (*Login, string, string) {
-	var (
-		login    *Login
-		repoPath string
-	)
+	var login *Login
+
 	err := loadConfig(yamlConfigPath)
 	if err != nil {
 		log.Fatal("load config file failed ", yamlConfigPath)
@@ -102,7 +100,7 @@ func initCommand() (*Login, string, string) {
 	}
 
 	if exist || len(repoValue) == 0 {
-		login, repoPath, err = curGitRepoPath(repoValue)
+		login, repoValue, err = curGitRepoPath(repoValue)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -115,7 +113,7 @@ func initCommand() (*Login, string, string) {
 		}
 	}
 
-	owner, repo := getOwnerAndRepo(repoPath, login.User)
+	owner, repo := getOwnerAndRepo(repoValue, login.User)
 	return login, owner, repo
 }
 
