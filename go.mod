@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	code.gitea.io/gitea-vet v0.2.0
-	code.gitea.io/sdk/gitea v0.12.1
+	code.gitea.io/sdk/gitea v0.13.0
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/go-git/go-git/v5 v5.1.0

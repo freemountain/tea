@@ -49,7 +49,7 @@ func runLabels(ctx *cli.Context) error {
 
 	var values [][]string
 
-	labels, err := login.Client().ListRepoLabels(owner, repo, gitea.ListLabelsOptions{})
+	labels, _, err := login.Client().ListRepoLabels(owner, repo, gitea.ListLabelsOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -141,7 +141,7 @@ func runLabelCreate(ctx *cli.Context) error {
 	labelFile := ctx.String("file")
 	var err error
 	if len(labelFile) == 0 {
-		_, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
+		_, _, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
 			Name:        ctx.String("name"),
 			Color:       ctx.String("color"),
 			Description: ctx.String("description"),
@@ -162,7 +162,7 @@ func runLabelCreate(ctx *cli.Context) error {
 			if color == "" || name == "" {
 				log.Printf("Line %d ignored because lack of enough fields: %s\n", i, line)
 			} else {
-				_, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
+				_, _, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
 					Name:        name,
 					Color:       color,
 					Description: description,
@@ -227,7 +227,7 @@ func runLabelUpdate(ctx *cli.Context) error {
 	}
 
 	var err error
-	_, err = login.Client().EditLabel(owner, repo, id, gitea.EditLabelOption{
+	_, _, err = login.Client().EditLabel(owner, repo, id, gitea.EditLabelOption{
 		Name:        pName,
 		Color:       pColor,
 		Description: pDescription,
@@ -257,7 +257,7 @@ var CmdLabelDelete = cli.Command{
 func runLabelDelete(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
-	err := login.Client().DeleteLabel(owner, repo, ctx.Int64("id"))
+	_, err := login.Client().DeleteLabel(owner, repo, ctx.Int64("id"))
 	if err != nil {
 		log.Fatal(err)
 	}

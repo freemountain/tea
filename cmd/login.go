@@ -187,22 +187,25 @@ func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecur
 		log.Fatal("Unable to load config file " + yamlConfigPath)
 	}
 
-	client := gitea.NewClient(giteaURL, token)
-	if len(token) == 0 {
-		client.SetBasicAuth(user, passwd)
-	}
+	httpClient := &http.Client{}
 	if insecure {
 		cookieJar, _ := cookiejar.New(nil)
-
-		client.SetHTTPClient(&http.Client{
+		httpClient = &http.Client{
 			Jar: cookieJar,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			},
-		})
+			}}
+	}
+	client, err := gitea.NewClient(giteaURL,
+		gitea.SetToken(token),
+		gitea.SetBasicAuth(user, passwd),
+		gitea.SetHTTPClient(httpClient),
+	)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	u, err := client.GetMyUserInfo()
+	u, _, err := client.GetMyUserInfo()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -210,7 +213,7 @@ func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecur
 	if len(token) == 0 {
 		// create token
 		host, _ := os.Hostname()
-		tl, err := client.ListAccessTokens(gitea.ListAccessTokensOptions{})
+		tl, _, err := client.ListAccessTokens(gitea.ListAccessTokensOptions{})
 		if err != nil {
 			return err
 		}
@@ -221,7 +224,7 @@ func runLoginAddMain(name, token, user, passwd, sshKey, giteaURL string, insecur
 				break
 			}
 		}
-		t, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{Name: tokenName})
+		t, _, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{Name: tokenName})
 		if err != nil {
 			return err
 		}

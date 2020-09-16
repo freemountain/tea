@@ -24,13 +24,16 @@ var CmdNotifications = cli.Command{
 			Aliases: []string{"a"},
 			Usage:   "show all notifications of related gitea instance",
 		},
-		/* // not supported jet
 		&cli.BoolFlag{
 			Name:    "read",
 			Aliases: []string{"rd"},
 			Usage:   "show read notifications instead unread",
 		},
-		*/
+		&cli.BoolFlag{
+			Name:    "pinned",
+			Aliases: []string{"pd"},
+			Usage:   "show pinned notifications instead unread",
+		},
 		&cli.IntFlag{
 			Name:    "page",
 			Aliases: []string{"p"},
@@ -54,15 +57,25 @@ func runNotifications(ctx *cli.Context) error {
 		PageSize: ctx.Int("limit"),
 	}
 
+	var status []gitea.NotifyStatus
+	if ctx.Bool("read") {
+		status = []gitea.NotifyStatus{gitea.NotifyStatusRead}
+	}
+	if ctx.Bool("pinned") {
+		status = append(status, gitea.NotifyStatusPinned)
+	}
+
 	if ctx.Bool("all") {
 		login := initCommandLoginOnly()
-		news, err = login.Client().ListNotifications(gitea.ListNotificationOptions{
+		news, _, err = login.Client().ListNotifications(gitea.ListNotificationOptions{
 			ListOptions: listOpts,
+			Status:      status,
 		})
 	} else {
 		login, owner, repo := initCommand()
-		news, err = login.Client().ListRepoNotifications(owner, repo, gitea.ListNotificationOptions{
+		news, _, err = login.Client().ListRepoNotifications(owner, repo, gitea.ListNotificationOptions{
 			ListOptions: listOpts,
+			Status:      status,
 		})
 	}
 	if err != nil {

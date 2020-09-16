@@ -52,7 +52,7 @@ func runPulls(ctx *cli.Context) error {
 		state = gitea.StateClosed
 	}
 
-	prs, err := login.Client().ListRepoPullRequests(owner, repo, gitea.ListPullRequestsOptions{
+	prs, _, err := login.Client().ListRepoPullRequests(owner, repo, gitea.ListPullRequestsOptions{
 		State: state,
 	})
 
@@ -120,7 +120,7 @@ func runPullsCheckout(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	pr, err := login.Client().GetPullRequest(owner, repo, idx)
+	pr, _, err := login.Client().GetPullRequest(owner, repo, idx)
 	if err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func runPullsClean(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	pr, err := login.Client().GetPullRequest(owner, repo, idx)
+	pr, _, err := login.Client().GetPullRequest(owner, repo, idx)
 	if err != nil {
 		return err
 	}
@@ -298,7 +298,7 @@ func runPullsCreate(ctx *cli.Context) error {
 	login, ownerArg, repoArg := initCommand()
 	client := login.Client()
 
-	repo, err := login.Client().GetRepo(ownerArg, repoArg)
+	repo, _, err := login.Client().GetRepo(ownerArg, repoArg)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -347,7 +347,7 @@ func runPullsCreate(ctx *cli.Context) error {
 		fmt.Printf("Error occurred during 'git push':\n%s\n", err.Error())
 	}
 
-	pr, err := client.CreatePullRequest(ownerArg, repoArg, gitea.CreatePullRequestOption{
+	pr, _, err := client.CreatePullRequest(ownerArg, repoArg, gitea.CreatePullRequestOption{
 		Head:  head,
 		Base:  base,
 		Title: title,

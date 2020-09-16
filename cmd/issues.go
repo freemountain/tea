@@ -59,7 +59,7 @@ func runIssueDetail(ctx *cli.Context, index string) error {
 	if err != nil {
 		return err
 	}
-	issue, err := login.Client().GetIssue(owner, repo, idx)
+	issue, _, err := login.Client().GetIssue(owner, repo, idx)
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func runIssuesList(ctx *cli.Context) error {
 		state = gitea.StateClosed
 	}
 
-	issues, err := login.Client().ListRepoIssues(owner, repo, gitea.ListIssueOption{
+	issues, _, err := login.Client().ListRepoIssues(owner, repo, gitea.ListIssueOption{
 		State: state,
 		Type:  gitea.IssueTypeIssue,
 	})
@@ -154,7 +154,7 @@ var CmdIssuesCreate = cli.Command{
 func runIssuesCreate(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
-	_, err := login.Client().CreateIssue(owner, repo, gitea.CreateIssueOption{
+	_, _, err := login.Client().CreateIssue(owner, repo, gitea.CreateIssueOption{
 		Title: ctx.String("title"),
 		Body:  ctx.String("body"),
 		// TODO:
@@ -212,6 +212,6 @@ func editIssueState(ctx *cli.Context, opts gitea.EditIssueOption) error {
 		return err
 	}
 
-	_, err = login.Client().EditIssue(owner, repo, index, opts)
+	_, _, err = login.Client().EditIssue(owner, repo, index, opts)
 	return err
 }

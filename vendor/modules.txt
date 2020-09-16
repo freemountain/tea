@@ -1,7 +1,7 @@
 # code.gitea.io/gitea-vet v0.2.0
 code.gitea.io/gitea-vet
 code.gitea.io/gitea-vet/checks
-# code.gitea.io/sdk/gitea v0.12.1
+# code.gitea.io/sdk/gitea v0.13.0
 code.gitea.io/sdk/gitea
 # github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
 github.com/araddon/dateparse

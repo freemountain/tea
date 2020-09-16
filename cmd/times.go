@@ -66,17 +66,17 @@ func runTrackedTimes(ctx *cli.Context) error {
 	fmt.Println(ctx.Command.ArgsUsage)
 	if user == "" {
 		// get all tracked times on the repo
-		times, err = client.GetRepoTrackedTimes(owner, repo)
+		times, _, err = client.GetRepoTrackedTimes(owner, repo)
 	} else if strings.HasPrefix(user, "#") {
 		// get all tracked times on the specified issue
 		issue, err := argToIndex(user)
 		if err != nil {
 			return err
 		}
-		times, err = client.ListTrackedTimes(owner, repo, issue, gitea.ListTrackedTimesOptions{})
+		times, _, err = client.ListTrackedTimes(owner, repo, issue, gitea.ListTrackedTimesOptions{})
 	} else {
 		// get all tracked times by the specified user
-		times, err = client.GetUserTrackedTimes(owner, repo, user)
+		times, _, err = client.GetUserTrackedTimes(owner, repo, user)
 	}
 
 	if err != nil {
@@ -185,7 +185,7 @@ func runTrackedTimesAdd(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	_, err = login.Client().AddTime(owner, repo, issue, gitea.AddTimeOption{
+	_, _, err = login.Client().AddTime(owner, repo, issue, gitea.AddTimeOption{
 		Time: int64(duration.Seconds()),
 	})
 	if err != nil {
@@ -227,7 +227,7 @@ func runTrackedTimesDelete(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	err = client.DeleteTime(owner, repo, issue, timeID)
+	_, err = client.DeleteTime(owner, repo, issue, timeID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -262,7 +262,7 @@ func runTrackedTimesReset(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	err = client.ResetIssueTime(owner, repo, issue)
+	_, err = client.ResetIssueTime(owner, repo, issue)
 	if err != nil {
 		log.Fatal(err)
 	}

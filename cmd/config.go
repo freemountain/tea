@@ -40,16 +40,23 @@ type Login struct {
 
 // Client returns a client to operate Gitea API
 func (l *Login) Client() *gitea.Client {
-	client := gitea.NewClient(l.URL, l.Token)
+	httpClient := &http.Client{}
 	if l.Insecure {
 		cookieJar, _ := cookiejar.New(nil)
 
-		client.SetHTTPClient(&http.Client{
+		httpClient = &http.Client{
 			Jar: cookieJar,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			},
-		})
+			}}
+	}
+
+	client, err := gitea.NewClient(l.URL,
+		gitea.SetToken(l.Token),
+		gitea.SetHTTPClient(httpClient),
+	)
+	if err != nil {
+		log.Fatal(err)
 	}
 	return client
 }
