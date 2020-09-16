@@ -7,6 +7,8 @@ package cmd
 import (
 	"log"
 
+	"code.gitea.io/tea/modules/utils"
+
 	"github.com/urfave/cli/v2"
 )
 
@@ -81,14 +83,29 @@ var AllDefaultFlags = append([]cli.Flag{
 
 // initCommand returns repository and *Login based on flags
 func initCommand() (*Login, string, string) {
+	var (
+		login    *Login
+		repoPath string
+	)
 	err := loadConfig(yamlConfigPath)
 	if err != nil {
 		log.Fatal("load config file failed ", yamlConfigPath)
 	}
 
-	login, repoPath, err := curGitRepoPath(repoValue)
+	if login, err = getActiveLogin(); err != nil {
+		log.Fatal(err.Error())
+	}
+
+	exist, err := utils.PathExists(repoValue)
 	if err != nil {
 		log.Fatal(err.Error())
+	}
+
+	if exist || len(repoValue) == 0 {
+		login, repoPath, err = curGitRepoPath(repoValue)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
 	}
 
 	if loginValue != "" {
@@ -98,7 +115,7 @@ func initCommand() (*Login, string, string) {
 		}
 	}
 
-	owner, repo := splitRepo(repoPath)
+	owner, repo := getOwnerAndRepo(repoPath, login.User)
 	return login, owner, repo
 }
 
