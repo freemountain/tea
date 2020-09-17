@@ -245,7 +245,7 @@ var CmdLabelDelete = cli.Command{
 	Name:        "delete",
 	Usage:       "Delete a label",
 	Description: `Delete a label`,
-	Action:      runLabelCreate,
+	Action:      runLabelDelete,
 	Flags: []cli.Flag{
 		&cli.IntFlag{
 			Name:  "id",
