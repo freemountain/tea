@@ -62,10 +62,11 @@ func runPulls(ctx *cli.Context) error {
 
 	headers := []string{
 		"Index",
+		"Title",
 		"State",
 		"Author",
+		"Milestone",
 		"Updated",
-		"Title",
 	}
 
 	var values [][]string
@@ -79,18 +80,23 @@ func runPulls(ctx *cli.Context) error {
 		if pr == nil {
 			continue
 		}
-		name := pr.Poster.FullName
-		if len(name) == 0 {
-			name = pr.Poster.UserName
+		author := pr.Poster.FullName
+		if len(author) == 0 {
+			author = pr.Poster.UserName
+		}
+		mile := ""
+		if pr.Milestone != nil {
+			mile = pr.Milestone.Title
 		}
 		values = append(
 			values,
 			[]string{
 				strconv.FormatInt(pr.Index, 10),
-				string(pr.State),
-				name,
-				pr.Updated.Format("2006-01-02 15:04:05"),
 				pr.Title,
+				string(pr.State),
+				author,
+				mile,
+				pr.Updated.Format("2006-01-02 15:04:05"),
 			},
 		)
 	}

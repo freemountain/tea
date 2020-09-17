@@ -97,10 +97,11 @@ func runIssuesList(ctx *cli.Context) error {
 
 	headers := []string{
 		"Index",
+		"Title",
 		"State",
 		"Author",
+		"Milestone",
 		"Updated",
-		"Title",
 	}
 
 	var values [][]string
@@ -111,18 +112,23 @@ func runIssuesList(ctx *cli.Context) error {
 	}
 
 	for _, issue := range issues {
-		name := issue.Poster.FullName
-		if len(name) == 0 {
-			name = issue.Poster.UserName
+		author := issue.Poster.FullName
+		if len(author) == 0 {
+			author = issue.Poster.UserName
+		}
+		mile := ""
+		if issue.Milestone != nil {
+			mile = issue.Milestone.Title
 		}
 		values = append(
 			values,
 			[]string{
 				strconv.FormatInt(issue.Index, 10),
-				string(issue.State),
-				name,
-				issue.Updated.Format("2006-01-02 15:04:05"),
 				issue.Title,
+				string(issue.State),
+				author,
+				mile,
+				issue.Updated.Format("2006-01-02 15:04:05"),
 			},
 		)
 	}

@@ -44,6 +44,7 @@ func main() {
 		&cmd.CmdTrackedTimes,
 		&cmd.CmdOpen,
 		&cmd.CmdNotifications,
+		&cmd.CmdMilestones,
 	}
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)
