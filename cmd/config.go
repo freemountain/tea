@@ -21,6 +21,7 @@ import (
 	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
 
+	"github.com/muesli/termenv"
 	"gopkg.in/yaml.v2"
 )
 
@@ -98,6 +99,13 @@ func init() {
 	}
 
 	yamlConfigPath = filepath.Join(dir, "tea.yml")
+}
+
+func getGlamourTheme() string {
+	if termenv.HasDarkBackground() {
+		return "dark"
+	}
+	return "light"
 }
 
 func getOwnerAndRepo(repoPath, user string) (string, string) {

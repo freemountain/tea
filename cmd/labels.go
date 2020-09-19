@@ -14,6 +14,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 
+	"github.com/muesli/termenv"
 	"github.com/urfave/cli/v2"
 )
 
@@ -59,6 +60,8 @@ func runLabels(ctx *cli.Context) error {
 		return nil
 	}
 
+	p := termenv.ColorProfile()
+
 	fPath := ctx.String("save")
 	if len(fPath) > 0 {
 		f, err := os.Create(fPath)
@@ -72,11 +75,13 @@ func runLabels(ctx *cli.Context) error {
 		}
 	} else {
 		for _, label := range labels {
+			color := termenv.String(label.Color)
+
 			values = append(
 				values,
 				[]string{
 					strconv.FormatInt(label.ID, 10),
-					label.Color,
+					fmt.Sprint(color.Background(p.Color("#" + label.Color))),
 					label.Name,
 					label.Description,
 				},
