@@ -14,7 +14,7 @@ It uses [code.gitea.io/sdk](https://code.gitea.io/sdk) and interacts with the Gi
 You can use the prebuilt binaries from [dl.gitea.io](https://dl.gitea.io/tea/)
 
 
-To install from source, go 1.12 or newer is required:
+To install from source, go 1.13 or newer is required:
 ```sh
 go get code.gitea.io/tea
 go install code.gitea.io/tea
