@@ -102,7 +102,7 @@ func initCommand() (*Login, string, string) {
 		log.Fatal("load config file failed ", yamlConfigPath)
 	}
 
-	if login, err = getActiveLogin(); err != nil {
+	if login, err = getDefaultLogin(); err != nil {
 		log.Fatal(err.Error())
 	}
 
@@ -138,7 +138,7 @@ func initCommandLoginOnly() *Login {
 
 	var login *Login
 	if loginValue == "" {
-		login, err = getActiveLogin()
+		login, err = getDefaultLogin()
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -17,6 +17,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 
+	"github.com/skratchdot/open-golang/open"
 	"github.com/urfave/cli/v2"
 )
 
@@ -29,7 +30,60 @@ var CmdLogin = cli.Command{
 	Subcommands: []*cli.Command{
 		&cmdLoginList,
 		&cmdLoginAdd,
+		&cmdLoginEdit,
+		&cmdLoginSetDefault,
 	},
+}
+
+// cmdLoginEdit represents to login a gitea server.
+var cmdLoginEdit = cli.Command{
+	Name:        "edit",
+	Usage:       "Edit Gitea logins",
+	Description: `Edit Gitea logins`,
+	Action:      runLoginEdit,
+	Flags:       []cli.Flag{&OutputFlag},
+}
+
+func runLoginEdit(ctx *cli.Context) error {
+	return open.Start(yamlConfigPath)
+}
+
+// cmdLoginSetDefault represents to login a gitea server.
+var cmdLoginSetDefault = cli.Command{
+	Name:        "default",
+	Usage:       "Get or Set Default Login",
+	Description: `Get or Set Default Login`,
+	ArgsUsage:   "<Login>",
+	Action:      runLoginSetDefault,
+	Flags:       []cli.Flag{&OutputFlag},
+}
+
+func runLoginSetDefault(ctx *cli.Context) error {
+	if err := loadConfig(yamlConfigPath); err != nil {
+		return err
+	}
+	if ctx.Args().Len() == 0 {
+		l, err := getDefaultLogin()
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Default Login: %s\n", l.Name)
+		return nil
+	}
+	loginExist := false
+	for i := range config.Logins {
+		config.Logins[i].Default = false
+		if config.Logins[i].Name == ctx.Args().First() {
+			config.Logins[i].Default = true
+			loginExist = true
+		}
+	}
+
+	if !loginExist {
+		return fmt.Errorf("login '%s' not found", ctx.Args().First())
+	}
+
+	return saveConfig(yamlConfigPath)
 }
 
 // CmdLogin represents to login a gitea server.
@@ -287,6 +341,7 @@ func runLoginList(ctx *cli.Context) error {
 		"URL",
 		"SSHHost",
 		"User",
+		"Default",
 	}
 
 	var values [][]string
@@ -297,6 +352,7 @@ func runLoginList(ctx *cli.Context) error {
 			l.URL,
 			l.GetSSHHost(),
 			l.User,
+			fmt.Sprint(l.Default),
 		})
 	}
 

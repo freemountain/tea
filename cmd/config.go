@@ -30,7 +30,7 @@ type Login struct {
 	Name    string `yaml:"name"`
 	URL     string `yaml:"url"`
 	Token   string `yaml:"token"`
-	Active  bool   `yaml:"active"`
+	Default bool   `yaml:"default"`
 	SSHHost string `yaml:"ssh_host"`
 	// optional path to the private key
 	SSHKey   string `yaml:"ssh_key"`
@@ -119,12 +119,12 @@ func getOwnerAndRepo(repoPath, user string) (string, string) {
 	return user, repoPath
 }
 
-func getActiveLogin() (*Login, error) {
+func getDefaultLogin() (*Login, error) {
 	if len(config.Logins) == 0 {
 		return nil, errors.New("No available login")
 	}
 	for _, l := range config.Logins {
-		if l.Active {
+		if l.Default {
 			return &l, nil
 		}
 	}
