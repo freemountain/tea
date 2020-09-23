@@ -13,6 +13,7 @@ import (
 	local_git "code.gitea.io/tea/modules/git"
 
 	"code.gitea.io/sdk/gitea"
+	"github.com/charmbracelet/glamour"
 	"github.com/go-git/go-git/v5"
 	git_config "github.com/go-git/go-git/v5/config"
 	"github.com/urfave/cli/v2"
@@ -398,14 +399,16 @@ func runPullsCreate(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("#%d %s\n%s created %s\n", pr.Index,
+	in := fmt.Sprintf("# #%d %s (%s)\n%s created %s\n\n%s\n", pr.Index,
 		pr.Title,
+		pr.State,
 		pr.Poster.UserName,
 		pr.Created.Format("2006-01-02 15:04:05"),
+		pr.Body,
 	)
-	if len(pr.Body) != 0 {
-		fmt.Printf("\n%s\n", pr.Body)
-	}
+	out, err := glamour.Render(in, getGlamourTheme())
+	fmt.Print(out)
+
 	fmt.Println(pr.HTMLURL)
 	return nil
 }
