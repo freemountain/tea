@@ -176,6 +176,48 @@ func (r TeaRepo) TeaFindBranchByName(branchName, repoURL string) (b *git_config.
 	return b, b.Validate()
 }
 
+// TeaFindBranchRemote gives the first remote that has a branch with the same name or sha,
+// depending on what is passed in.
+// This function is needed, as git does not always define branches in .git/config with remote entries.
+func (r TeaRepo) TeaFindBranchRemote(branchName, hash string) (*git.Remote, error) {
+	remotes, err := r.Remotes()
+	if err != nil {
+		return nil, err
+	}
+
+	switch {
+	case len(remotes) == 0:
+		return nil, nil
+	case len(remotes) == 1:
+		return remotes[0], nil
+	}
+
+	// check if the given remote has our branch (.git/refs/remotes/<remoteName>/*)
+	iter, err := r.References()
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
+
+	var match *git.Remote
+	err = iter.ForEach(func(ref *git_plumbing.Reference) error {
+		if ref.Name().IsRemote() {
+			names := strings.SplitN(ref.Name().Short(), "/", 2)
+			remote := names[0]
+			branch := names[1]
+			hashMatch := hash != "" && hash == ref.Hash().String()
+			nameMatch := branchName != "" && branchName == branch
+			if hashMatch || nameMatch {
+				match, err = r.Remote(remote)
+				return err
+			}
+		}
+		return nil
+	})
+
+	return match, err
+}
+
 // TeaGetCurrentBranchName return the name of the branch witch is currently active
 func (r TeaRepo) TeaGetCurrentBranchName() (string, error) {
 	localHead, err := r.Head()
