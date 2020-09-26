@@ -229,5 +229,5 @@ func (r TeaRepo) TeaGetCurrentBranchName() (string, error) {
 		return "", fmt.Errorf("active ref is no branch")
 	}
 
-	return strings.TrimLeft(localHead.Name().String(), "refs/heads/"), nil
+	return strings.TrimPrefix(localHead.Name().String(), "refs/heads/"), nil
 }
