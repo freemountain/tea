@@ -23,8 +23,8 @@ import (
 var CmdPulls = cli.Command{
 	Name:        "pulls",
 	Aliases:     []string{"pull", "pr"},
-	Usage:       "List open pull requests",
-	Description: `List open pull requests`,
+	Usage:       "List, create, checkout and clean pull requests",
+	Description: `List, create, checkout and clean pull requests`,
 	ArgsUsage:   "[<pull index>]",
 	Action:      runPulls,
 	Flags:       IssuePRFlags,
