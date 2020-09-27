@@ -39,13 +39,16 @@ var CmdReleaseList = cli.Command{
 	Usage:       "List Releases",
 	Description: "List Releases",
 	Action:      runReleases,
-	Flags:       AllDefaultFlags,
+	Flags: append([]cli.Flag{
+		&PaginationPageFlag,
+		&PaginationLimitFlag,
+	}, AllDefaultFlags...),
 }
 
 func runReleases(ctx *cli.Context) error {
 	login, owner, repo := initCommand()
 
-	releases, _, err := login.Client().ListReleases(owner, repo, gitea.ListReleasesOptions{})
+	releases, _, err := login.Client().ListReleases(owner, repo, gitea.ListReleasesOptions{ListOptions: getListOptions(ctx)})
 	if err != nil {
 		log.Fatal(err)
 	}

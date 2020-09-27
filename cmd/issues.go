@@ -84,8 +84,9 @@ func runIssuesList(ctx *cli.Context) error {
 	}
 
 	issues, _, err := login.Client().ListRepoIssues(owner, repo, gitea.ListIssueOption{
-		State: state,
-		Type:  gitea.IssueTypeIssue,
+		ListOptions: getListOptions(ctx),
+		State:       state,
+		Type:        gitea.IssueTypeIssue,
 	})
 
 	if err != nil {

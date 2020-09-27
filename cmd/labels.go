@@ -35,6 +35,8 @@ var CmdLabels = cli.Command{
 			Aliases: []string{"s"},
 			Usage:   "Save all the labels as a file",
 		},
+		&PaginationPageFlag,
+		&PaginationLimitFlag,
 	}, AllDefaultFlags...),
 }
 
@@ -50,7 +52,7 @@ func runLabels(ctx *cli.Context) error {
 
 	var values [][]string
 
-	labels, _, err := login.Client().ListRepoLabels(owner, repo, gitea.ListLabelsOptions{})
+	labels, _, err := login.Client().ListRepoLabels(owner, repo, gitea.ListLabelsOptions{ListOptions: getListOptions(ctx)})
 	if err != nil {
 		log.Fatal(err)
 	}

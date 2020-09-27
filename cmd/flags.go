@@ -60,6 +60,20 @@ var StateFlag = cli.StringFlag{
 	DefaultText: "open",
 }
 
+// PaginationPageFlag provides flag for pagination options
+var PaginationPageFlag = cli.StringFlag{
+	Name:    "page",
+	Aliases: []string{"p"},
+	Usage:   "specify page, default is 1",
+}
+
+// PaginationLimitFlag provides flag for pagination options
+var PaginationLimitFlag = cli.StringFlag{
+	Name:    "limit",
+	Aliases: []string{"lm"},
+	Usage:   "specify limit of items per page",
+}
+
 // LoginOutputFlags defines login and output flags that should
 // added to all subcommands and appended to the flags of the
 // subcommand to work around issue and provide --login and --output:
@@ -91,6 +105,8 @@ var AllDefaultFlags = append([]cli.Flag{
 // IssuePRFlags defines flags that should be available on issue & pr listing flags.
 var IssuePRFlags = append([]cli.Flag{
 	&StateFlag,
+	&PaginationPageFlag,
+	&PaginationLimitFlag,
 }, AllDefaultFlags...)
 
 // initCommand returns repository and *Login based on flags

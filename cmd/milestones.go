@@ -43,6 +43,8 @@ var CmdMilestonesList = cli.Command{
 			Usage:       "Filter by milestone state (all|open|closed)",
 			DefaultText: "open",
 		},
+		&PaginationPageFlag,
+		&PaginationLimitFlag,
 	}, AllDefaultFlags...),
 }
 
@@ -86,7 +88,8 @@ func runMilestonesList(ctx *cli.Context) error {
 	}
 
 	milestones, _, err := login.Client().ListRepoMilestones(owner, repo, gitea.ListMilestoneOption{
-		State: state,
+		ListOptions: getListOptions(ctx),
+		State:       state,
 	})
 
 	if err != nil {

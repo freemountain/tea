@@ -59,6 +59,8 @@ var CmdReposList = cli.Command{
 			Required: false,
 			Usage:    "Filter archived repos (true|false)",
 		},
+		&PaginationPageFlag,
+		&PaginationLimitFlag,
 	}, LoginOutputFlags...),
 }
 
@@ -189,10 +191,11 @@ func runReposList(ctx *cli.Context) error {
 	}
 
 	rps, _, err := client.SearchRepos(gitea.SearchRepoOptions{
-		OwnerID:    ownerID,
-		IsPrivate:  isPrivate,
-		IsArchived: isArchived,
-		Type:       mode,
+		ListOptions: getListOptions(ctx),
+		OwnerID:     ownerID,
+		IsPrivate:   isPrivate,
+		IsArchived:  isArchived,
+		Type:        mode,
 	})
 	if err != nil {
 		return err

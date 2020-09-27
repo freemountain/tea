@@ -34,6 +34,8 @@ var CmdMilestonesIssues = cli.Command{
 			Name:  "kind",
 			Usage: "Filter by kind (issue|pull)",
 		},
+		&PaginationPageFlag,
+		&PaginationLimitFlag,
 	}, AllDefaultFlags...),
 }
 
@@ -89,9 +91,10 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 	}
 
 	issues, _, err := client.ListRepoIssues(owner, repo, gitea.ListIssueOption{
-		Milestones: []string{milestone},
-		Type:       kind,
-		State:      state,
+		ListOptions: getListOptions(ctx),
+		Milestones:  []string{milestone},
+		Type:        kind,
+		State:       state,
 	})
 	if err != nil {
 		return err
