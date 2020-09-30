@@ -10,9 +10,9 @@ import (
 	"io/ioutil"
 	"net/url"
 	"os"
-	"os/user"
-	"path/filepath"
 	"strings"
+
+	"code.gitea.io/tea/modules/utils"
 
 	git_transport "github.com/go-git/go-git/v5/plumbing/transport"
 	gogit_http "github.com/go-git/go-git/v5/plumbing/transport/http"
@@ -67,9 +67,9 @@ func GetAuthForURL(remoteURL *url.URL, httpUser, keyFile string) (auth git_trans
 
 func readSSHPrivKey(keyFile string) (sig ssh.Signer, err error) {
 	if keyFile != "" {
-		keyFile, err = absPathWithExpansion(keyFile)
+		keyFile, err = utils.AbsPathWithExpansion(keyFile)
 	} else {
-		keyFile, err = absPathWithExpansion("~/.ssh/id_rsa")
+		keyFile, err = utils.AbsPathWithExpansion("~/.ssh/id_rsa")
 	}
 	if err != nil {
 		return nil, err
@@ -103,18 +103,4 @@ func promptPass(domain string) (string, error) {
 	fmt.Printf("%s password: ", domain)
 	pass, err := terminal.ReadPassword(0)
 	return string(pass), err
-}
-
-func absPathWithExpansion(p string) (string, error) {
-	u, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-	if p == "~" {
-		return u.HomeDir, nil
-	} else if strings.HasPrefix(p, "~/") {
-		return filepath.Join(u.HomeDir, p[2:]), nil
-	} else {
-		return filepath.Abs(p)
-	}
 }

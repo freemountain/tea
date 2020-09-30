@@ -2,23 +2,24 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package cmd
+package flags
 
 import (
-	"log"
-
-	"code.gitea.io/tea/modules/utils"
-
+	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
 
 // create global variables for global Flags to simplify
 // access to the options without requiring cli.Context
 var (
-	loginValue  string
-	repoValue   string
-	outputValue string
-	remoteValue string
+	// GlobalLoginValue contain value of --login|-l arg
+	GlobalLoginValue string
+	// GlobalRepoValue contain value of --repo|-r arg
+	GlobalRepoValue string
+	// GlobalOutputValue contain value of --output|-o arg
+	GlobalOutputValue string
+	// GlobalRemoteValue contain value of --remote|-R arg
+	GlobalRemoteValue string
 )
 
 // LoginFlag provides flag to specify tea login profile
@@ -26,7 +27,7 @@ var LoginFlag = cli.StringFlag{
 	Name:        "login",
 	Aliases:     []string{"l"},
 	Usage:       "Use a different Gitea login. Optional",
-	Destination: &loginValue,
+	Destination: &GlobalLoginValue,
 }
 
 // RepoFlag provides flag to specify repository
@@ -34,7 +35,7 @@ var RepoFlag = cli.StringFlag{
 	Name:        "repo",
 	Aliases:     []string{"r"},
 	Usage:       "Repository to interact with. Optional",
-	Destination: &repoValue,
+	Destination: &GlobalRepoValue,
 }
 
 // RemoteFlag provides flag to specify remote repository
@@ -42,7 +43,7 @@ var RemoteFlag = cli.StringFlag{
 	Name:        "remote",
 	Aliases:     []string{"R"},
 	Usage:       "Discover Gitea login from remote. Optional",
-	Destination: &remoteValue,
+	Destination: &GlobalRemoteValue,
 }
 
 // OutputFlag provides flag to specify output type
@@ -50,7 +51,7 @@ var OutputFlag = cli.StringFlag{
 	Name:        "output",
 	Aliases:     []string{"o"},
 	Usage:       "Output format. (csv, simple, table, tsv, yaml)",
-	Destination: &outputValue,
+	Destination: &GlobalOutputValue,
 }
 
 // StateFlag provides flag to specify issue/pr state, defaulting to "open"
@@ -109,61 +110,15 @@ var IssuePRFlags = append([]cli.Flag{
 	&PaginationLimitFlag,
 }, AllDefaultFlags...)
 
-// initCommand returns repository and *Login based on flags
-func initCommand() (*Login, string, string) {
-	var login *Login
-
-	err := loadConfig(yamlConfigPath)
-	if err != nil {
-		log.Fatal("load config file failed ", yamlConfigPath)
+// GetListOptions return ListOptions based on PaginationFlags
+func GetListOptions(ctx *cli.Context) gitea.ListOptions {
+	page := ctx.Int("page")
+	limit := ctx.Int("limit")
+	if limit != 0 && page == 0 {
+		page = 1
 	}
-
-	if login, err = getDefaultLogin(); err != nil {
-		log.Fatal(err.Error())
+	return gitea.ListOptions{
+		Page:     page,
+		PageSize: limit,
 	}
-
-	exist, err := utils.PathExists(repoValue)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	if exist || len(repoValue) == 0 {
-		login, repoValue, err = curGitRepoPath(repoValue)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-	}
-
-	if loginValue != "" {
-		login = getLoginByName(loginValue)
-		if login == nil {
-			log.Fatal("Login name " + loginValue + " does not exist")
-		}
-	}
-
-	owner, repo := getOwnerAndRepo(repoValue, login.User)
-	return login, owner, repo
-}
-
-// initCommandLoginOnly return *Login based on flags
-func initCommandLoginOnly() *Login {
-	err := loadConfig(yamlConfigPath)
-	if err != nil {
-		log.Fatal("load config file failed ", yamlConfigPath)
-	}
-
-	var login *Login
-	if loginValue == "" {
-		login, err = getDefaultLogin()
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		login = getLoginByName(loginValue)
-		if login == nil {
-			log.Fatal("Login name " + loginValue + " does not exist")
-		}
-	}
-
-	return login
 }

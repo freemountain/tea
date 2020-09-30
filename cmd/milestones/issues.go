@@ -2,11 +2,16 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package cmd
+package milestones
 
 import (
 	"fmt"
 	"strconv"
+
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/print"
+	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -34,9 +39,9 @@ var CmdMilestonesIssues = cli.Command{
 			Name:  "kind",
 			Usage: "Filter by kind (issue|pull)",
 		},
-		&PaginationPageFlag,
-		&PaginationLimitFlag,
-	}, AllDefaultFlags...),
+		&flags.PaginationPageFlag,
+		&flags.PaginationLimitFlag,
+	}, flags.AllDefaultFlags...),
 }
 
 // CmdMilestoneAddIssue represents a sub command of milestone issues to add an issue/pull to an milestone
@@ -47,7 +52,7 @@ var CmdMilestoneAddIssue = cli.Command{
 	Description: "Add an issue/pull to an milestone",
 	ArgsUsage:   "<milestone name> <issue/pull index>",
 	Action:      runMilestoneIssueAdd,
-	Flags:       AllDefaultFlags,
+	Flags:       flags.AllDefaultFlags,
 }
 
 // CmdMilestoneRemoveIssue represents a sub command of milestones to remove an issue/pull from an milestone
@@ -58,11 +63,11 @@ var CmdMilestoneRemoveIssue = cli.Command{
 	Description: "Remove an issue/pull to an milestone",
 	ArgsUsage:   "<milestone name> <issue/pull index>",
 	Action:      runMilestoneIssueRemove,
-	Flags:       AllDefaultFlags,
+	Flags:       flags.AllDefaultFlags,
 }
 
 func runMilestoneIssueList(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 
 	state := gitea.StateOpen
@@ -91,7 +96,7 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 	}
 
 	issues, _, err := client.ListRepoIssues(owner, repo, gitea.ListIssueOption{
-		ListOptions: getListOptions(ctx),
+		ListOptions: flags.GetListOptions(ctx),
 		Milestones:  []string{milestone},
 		Type:        kind,
 		State:       state,
@@ -112,7 +117,7 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 	var values [][]string
 
 	if len(issues) == 0 {
-		Output(outputValue, headers, values)
+		print.OutputList(flags.GlobalOutputValue, headers, values)
 		return nil
 	}
 
@@ -137,12 +142,12 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 			},
 		)
 	}
-	Output(outputValue, headers, values)
+	print.OutputList(flags.GlobalOutputValue, headers, values)
 	return nil
 }
 
 func runMilestoneIssueAdd(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 	if ctx.Args().Len() == 0 {
 		return fmt.Errorf("need two arguments")
@@ -150,7 +155,7 @@ func runMilestoneIssueAdd(ctx *cli.Context) error {
 
 	mileName := ctx.Args().Get(0)
 	issueIndex := ctx.Args().Get(1)
-	idx, err := argToIndex(issueIndex)
+	idx, err := utils.ArgToIndex(issueIndex)
 	if err != nil {
 		return err
 	}
@@ -168,7 +173,7 @@ func runMilestoneIssueAdd(ctx *cli.Context) error {
 }
 
 func runMilestoneIssueRemove(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 	if ctx.Args().Len() == 0 {
 		return fmt.Errorf("need two arguments")
@@ -176,7 +181,7 @@ func runMilestoneIssueRemove(ctx *cli.Context) error {
 
 	mileName := ctx.Args().Get(0)
 	issueIndex := ctx.Args().Get(1)
-	idx, err := argToIndex(issueIndex)
+	idx, err := utils.ArgToIndex(issueIndex)
 	if err != nil {
 		return err
 	}

@@ -6,13 +6,16 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-	"strconv"
 	"strings"
 	"time"
 
-	"code.gitea.io/sdk/gitea"
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/cmd/times"
+	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/print"
+	"code.gitea.io/tea/modules/utils"
 
+	"code.gitea.io/sdk/gitea"
 	"github.com/araddon/dateparse"
 	"github.com/urfave/cli/v2"
 )
@@ -28,9 +31,9 @@ var CmdTrackedTimes = cli.Command{
 	ArgsUsage: "[username | #issue]",
 	Action:    runTrackedTimes,
 	Subcommands: []*cli.Command{
-		&CmdTrackedTimesAdd,
-		&CmdTrackedTimesDelete,
-		&CmdTrackedTimesReset,
+		&times.CmdTrackedTimesAdd,
+		&times.CmdTrackedTimesDelete,
+		&times.CmdTrackedTimesReset,
 	},
 	Flags: append([]cli.Flag{
 		&cli.StringFlag{
@@ -48,11 +51,11 @@ var CmdTrackedTimes = cli.Command{
 			Aliases: []string{"t"},
 			Usage:   "Print the total duration at the end",
 		},
-	}, AllDefaultFlags...),
+	}, flags.AllDefaultFlags...),
 }
 
 func runTrackedTimes(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 
 	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {
@@ -69,7 +72,7 @@ func runTrackedTimes(ctx *cli.Context) error {
 		times, _, err = client.GetRepoTrackedTimes(owner, repo)
 	} else if strings.HasPrefix(user, "#") {
 		// get all tracked times on the specified issue
-		issue, err := argToIndex(user)
+		issue, err := utils.ArgToIndex(user)
 		if err != nil {
 			return err
 		}
@@ -97,175 +100,6 @@ func runTrackedTimes(ctx *cli.Context) error {
 		}
 	}
 
-	printTrackedTimes(times, outputValue, from, until, ctx.Bool("total"))
-	return nil
-}
-
-func formatDuration(seconds int64, outputType string) string {
-	switch outputType {
-	case "yaml":
-	case "csv":
-		return fmt.Sprint(seconds)
-	}
-	return time.Duration(1e9 * seconds).String()
-}
-
-func printTrackedTimes(times []*gitea.TrackedTime, outputType string, from, until time.Time, printTotal bool) {
-	var outputValues [][]string
-	var totalDuration int64
-
-	localLoc, err := time.LoadLocation("Local") // local timezone for time formatting
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, t := range times {
-		if !from.IsZero() && from.After(t.Created) {
-			continue
-		}
-		if !until.IsZero() && until.Before(t.Created) {
-			continue
-		}
-
-		totalDuration += t.Time
-
-		outputValues = append(
-			outputValues,
-			[]string{
-				t.Created.In(localLoc).Format("2006-01-02 15:04:05"),
-				"#" + strconv.FormatInt(t.Issue.Index, 10),
-				t.UserName,
-				formatDuration(t.Time, outputType),
-			},
-		)
-	}
-
-	if printTotal {
-		outputValues = append(outputValues, []string{
-			"TOTAL", "", "", formatDuration(totalDuration, outputType),
-		})
-	}
-
-	headers := []string{
-		"Created",
-		"Issue",
-		"User",
-		"Duration",
-	}
-	Output(outputType, headers, outputValues)
-}
-
-// CmdTrackedTimesAdd represents a sub command of times to add time to an issue
-var CmdTrackedTimesAdd = cli.Command{
-	Name:      "add",
-	Usage:     "Track spent time on an issue",
-	UsageText: "tea times add <issue> <duration>",
-	Description: `Track spent time on an issue
-	 Example:
-		tea times add 1 1h25m
-	`,
-	Action: runTrackedTimesAdd,
-	Flags:  LoginRepoFlags,
-}
-
-func runTrackedTimesAdd(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
-
-	if ctx.Args().Len() < 2 {
-		return fmt.Errorf("No issue or duration specified.\nUsage:\t%s", ctx.Command.UsageText)
-	}
-
-	issue, err := argToIndex(ctx.Args().First())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	duration, err := time.ParseDuration(strings.Join(ctx.Args().Tail(), ""))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, _, err = login.Client().AddTime(owner, repo, issue, gitea.AddTimeOption{
-		Time: int64(duration.Seconds()),
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
-}
-
-// CmdTrackedTimesDelete is a sub command of CmdTrackedTimes, and removes time from an issue
-var CmdTrackedTimesDelete = cli.Command{
-	Name:      "delete",
-	Aliases:   []string{"rm"},
-	Usage:     "Delete a single tracked time on an issue",
-	UsageText: "tea times delete <issue> <time ID>",
-	Action:    runTrackedTimesDelete,
-	Flags:     LoginRepoFlags,
-}
-
-func runTrackedTimesDelete(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
-	client := login.Client()
-
-	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {
-		return err
-	}
-
-	if ctx.Args().Len() < 2 {
-		return fmt.Errorf("No issue or time ID specified.\nUsage:\t%s", ctx.Command.UsageText)
-	}
-
-	issue, err := argToIndex(ctx.Args().First())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	timeID, err := strconv.ParseInt(ctx.Args().Get(1), 10, 64)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, err = client.DeleteTime(owner, repo, issue, timeID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
-}
-
-// CmdTrackedTimesReset is a subcommand of CmdTrackedTimes, and
-// clears all tracked times on an issue.
-var CmdTrackedTimesReset = cli.Command{
-	Name:      "reset",
-	Usage:     "Reset tracked time on an issue",
-	UsageText: "tea times reset <issue>",
-	Action:    runTrackedTimesReset,
-	Flags:     LoginRepoFlags,
-}
-
-func runTrackedTimesReset(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
-	client := login.Client()
-
-	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {
-		return err
-	}
-
-	if ctx.Args().Len() != 1 {
-		return fmt.Errorf("No issue specified.\nUsage:\t%s", ctx.Command.UsageText)
-	}
-
-	issue, err := argToIndex(ctx.Args().First())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, err = client.ResetIssueTime(owner, repo, issue)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	print.TrackedTimesList(times, flags.GlobalOutputValue, from, until, ctx.Bool("total"))
 	return nil
 }

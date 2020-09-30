@@ -9,6 +9,8 @@ import (
 	"log"
 	"os"
 
+	"code.gitea.io/tea/modules/config"
+
 	"github.com/urfave/cli/v2"
 )
 
@@ -37,23 +39,23 @@ func runLogout(ctx *cli.Context) error {
 		return errors.New("Please specify a login name")
 	}
 
-	err := loadConfig(yamlConfigPath)
+	err := config.LoadConfig()
 	if err != nil {
-		log.Fatal("Unable to load config file " + yamlConfigPath)
+		log.Fatal(err)
 	}
 
 	var idx = -1
-	for i, l := range config.Logins {
+	for i, l := range config.Config.Logins {
 		if l.Name == name {
 			idx = i
 			break
 		}
 	}
 	if idx > -1 {
-		config.Logins = append(config.Logins[:idx], config.Logins[idx+1:]...)
-		err = saveConfig(yamlConfigPath)
+		config.Config.Logins = append(config.Config.Logins[:idx], config.Config.Logins[idx+1:]...)
+		err = config.SaveConfig()
 		if err != nil {
-			log.Fatal("Unable to save config file " + yamlConfigPath)
+			log.Fatal(err)
 		}
 	}
 

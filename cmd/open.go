@@ -9,6 +9,8 @@ import (
 	"path"
 	"strings"
 
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
 
 	"github.com/skratchdot/open-golang/open"
@@ -21,11 +23,11 @@ var CmdOpen = cli.Command{
 	Usage:       "Open something of the repository on web browser",
 	Description: `Open something of the repository on web browser`,
 	Action:      runOpen,
-	Flags:       append([]cli.Flag{}, LoginRepoFlags...),
+	Flags:       append([]cli.Flag{}, flags.LoginRepoFlags...),
 }
 
 func runOpen(ctx *cli.Context) error {
-	login, owner, repo := initCommand()
+	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 
 	var suffix string
 	number := ctx.Args().Get(0)

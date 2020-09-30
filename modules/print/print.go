@@ -2,12 +2,23 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package utils
+package print
 
-import "fmt"
+import (
+	"fmt"
 
-// FormatSize get kb in int and return string
-func FormatSize(kb int64) string {
+	"github.com/muesli/termenv"
+)
+
+func getGlamourTheme() string {
+	if termenv.HasDarkBackground() {
+		return "dark"
+	}
+	return "light"
+}
+
+// formatSize get kb in int and return string
+func formatSize(kb int64) string {
 	if kb < 1024 {
 		return fmt.Sprintf("%d Kb", kb)
 	}

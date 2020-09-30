@@ -8,6 +8,10 @@ import (
 	"log"
 	"strings"
 
+	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/print"
+
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
@@ -34,16 +38,16 @@ var CmdNotifications = cli.Command{
 			Aliases: []string{"pd"},
 			Usage:   "show pinned notifications instead unread",
 		},
-		&PaginationPageFlag,
-		&PaginationLimitFlag,
-	}, AllDefaultFlags...),
+		&flags.PaginationPageFlag,
+		&flags.PaginationLimitFlag,
+	}, flags.AllDefaultFlags...),
 }
 
 func runNotifications(ctx *cli.Context) error {
 	var news []*gitea.NotificationThread
 	var err error
 
-	listOpts := getListOptions(ctx)
+	listOpts := flags.GetListOptions(ctx)
 	if listOpts.Page == 0 {
 		listOpts.Page = 1
 	}
@@ -57,13 +61,13 @@ func runNotifications(ctx *cli.Context) error {
 	}
 
 	if ctx.Bool("all") {
-		login := initCommandLoginOnly()
+		login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
 		news, _, err = login.Client().ListNotifications(gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
 		})
 	} else {
-		login, owner, repo := initCommand()
+		login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 		news, _, err = login.Client().ListRepoNotifications(owner, repo, gitea.ListNotificationOptions{
 			ListOptions: listOpts,
 			Status:      status,
@@ -107,7 +111,7 @@ func runNotifications(ctx *cli.Context) error {
 	}
 
 	if len(values) != 0 {
-		Output(outputValue, headers, values)
+		print.OutputList(flags.GlobalOutputValue, headers, values)
 	}
 	return nil
 }

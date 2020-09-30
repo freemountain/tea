@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package cmd
+package print
 
 import (
 	"fmt"
@@ -17,27 +17,8 @@ var (
 	showLog bool
 )
 
-// Println println content according the flag
-func Println(a ...interface{}) {
-	if showLog {
-		fmt.Println(a...)
-	}
-}
-
-// Printf printf content according the flag
-func Printf(format string, a ...interface{}) {
-	if showLog {
-		fmt.Printf(format, a...)
-	}
-}
-
-// Error println content as an error information
-func Error(a ...interface{}) {
-	fmt.Println(a...)
-}
-
-// Errorf printf content as an error information
-func Errorf(format string, a ...interface{}) {
+// errorf printf content as an error information
+func errorf(format string, a ...interface{}) {
 	fmt.Printf(format, a...)
 }
 
@@ -91,9 +72,9 @@ func outputyaml(headers []string, values [][]string) {
 	}
 }
 
-// Output provides general function to convert given information
-// into several outputs
-func Output(output string, headers []string, values [][]string) {
+// OutputList provides general function to convert given list of items
+// into several outputs (table, csv, simple, tsv, yaml)
+func OutputList(output string, headers []string, values [][]string) {
 	switch {
 	case output == "" || output == "table":
 		outputtable(headers, values)
@@ -106,6 +87,6 @@ func Output(output string, headers []string, values [][]string) {
 	case output == "yaml":
 		outputyaml(headers, values)
 	default:
-		Errorf("unknown output type '" + output + "', available types are:\n- csv: comma-separated values\n- simple: space-separated values\n- table: auto-aligned table format (default)\n- tsv: tab-separated values\n- yaml: YAML format\n")
+		errorf("unknown output type '" + output + "', available types are:\n- csv: comma-separated values\n- simple: space-separated values\n- table: auto-aligned table format (default)\n- tsv: tab-separated values\n- yaml: YAML format\n")
 	}
 }
