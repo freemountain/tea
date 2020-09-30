@@ -13,7 +13,6 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"os"
-	"strings"
 	"time"
 
 	"code.gitea.io/tea/modules/utils"
@@ -72,6 +71,29 @@ func (l *Login) GetSSHHost() string {
 	return u.Hostname()
 }
 
+// GenerateToken creates a new token when given BasicAuth credentials
+func (l *Login) GenerateToken(user, pass string) (string, error) {
+	client := l.Client()
+	gitea.SetBasicAuth(user, pass)(client)
+
+	host, _ := os.Hostname()
+	tl, _, err := client.ListAccessTokens(gitea.ListAccessTokensOptions{})
+	if err != nil {
+		return "", err
+	}
+	tokenName := host + "-tea"
+
+	for i := range tl {
+		if tl[i].Name == tokenName {
+			tokenName += time.Now().Format("2006-01-02_15-04-05")
+			break
+		}
+	}
+
+	t, _, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{Name: tokenName})
+	return t.Token, err
+}
+
 // GetDefaultLogin return the default login
 func GetDefaultLogin() (*Login, error) {
 	if len(Config.Logins) == 0 {
@@ -98,7 +120,6 @@ func GetLoginByName(name string) *Login {
 
 // AddLogin add login to config ( global var & file)
 func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool) error {
-
 	if len(giteaURL) == 0 {
 		log.Fatal("You have to input Gitea server URL")
 	}
@@ -110,79 +131,45 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 		log.Fatal("No user set")
 	}
 
-	err := LoadConfig()
+	serverURL, err := utils.NormalizeURL(giteaURL)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Unable to parse URL", err)
 	}
 
-	httpClient := &http.Client{}
-	if insecure {
-		cookieJar, _ := cookiejar.New(nil)
-		httpClient = &http.Client{
-			Jar: cookieJar,
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			}}
-	}
-	client, err := gitea.NewClient(giteaURL,
-		gitea.SetToken(token),
-		gitea.SetBasicAuth(user, passwd),
-		gitea.SetHTTPClient(httpClient),
-	)
+	err = LoadConfig()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Unable to load config file " + yamlConfigPath)
 	}
 
-	u, _, err := client.GetMyUserInfo()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if len(token) == 0 {
-		// create token
-		host, _ := os.Hostname()
-		tl, _, err := client.ListAccessTokens(gitea.ListAccessTokensOptions{})
-		if err != nil {
-			return err
-		}
-		tokenName := host + "-tea"
-		for i := range tl {
-			if tl[i].Name == tokenName {
-				tokenName += time.Now().Format("2006-01-02_15-04-05")
-				break
-			}
-		}
-		t, _, err := client.CreateAccessToken(gitea.CreateAccessTokenOption{Name: tokenName})
-		if err != nil {
-			return err
-		}
-		token = t.Token
-	}
-
-	fmt.Println("Login successful! Login name " + u.UserName)
-
-	if len(name) == 0 {
-		parsedURL, err := url.Parse(giteaURL)
-		if err != nil {
-			return err
-		}
-		name = strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
-		for _, l := range Config.Logins {
-			if l.Name == name {
-				name += "_" + u.UserName
-				break
-			}
-		}
-	}
-
-	err = addLoginToConfig(Login{
+	login := Login{
 		Name:     name,
-		URL:      giteaURL,
+		URL:      serverURL.String(),
 		Token:    token,
 		Insecure: insecure,
 		SSHKey:   sshKey,
-		User:     u.UserName,
-	})
+	}
+
+	if len(token) == 0 {
+		login.Token, err = login.GenerateToken(user, passwd)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	u, _, err := login.Client().GetMyUserInfo()
+	if err != nil {
+		log.Fatal(err)
+	}
+	login.User = u.UserName
+
+	if len(login.Name) == 0 {
+		login.Name, err = GenerateLoginName(giteaURL, login.User)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	err = addLoginToConfig(login)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -192,7 +179,30 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 		log.Fatal(err)
 	}
 
+	fmt.Printf("Login as %s on %s successful. Added this login as %s\n", login.User, login.URL, login.Name)
+
 	return nil
+}
+
+// GenerateLoginName generates a name string based on instance URL & adds username if the result is not unique
+func GenerateLoginName(url, user string) (string, error) {
+	parsedURL, err := utils.NormalizeURL(url)
+	if err != nil {
+		return "", err
+	}
+	name := parsedURL.Host
+
+	// append user name if login name already exists
+	if len(user) != 0 {
+		for _, l := range Config.Logins {
+			if l.Name == name {
+				name += "_" + user
+				break
+			}
+		}
+	}
+
+	return name, nil
 }
 
 // addLoginToConfig add a login to global Config var
@@ -205,18 +215,18 @@ func addLoginToConfig(login Login) error {
 			return errors.New("Login name has already been used")
 		}
 		if l.URL == login.URL && l.Token == login.Token {
-			return errors.New("URL has been added")
+			return errors.New("Login for this URL and token already exists")
 		}
 	}
 
-	u, err := url.Parse(login.URL)
-	if err != nil {
-		return err
-	}
-
-	if login.SSHHost == "" {
+	if len(login.SSHHost) == 0 {
+		u, err := url.Parse(login.URL)
+		if err != nil {
+			return err
+		}
 		login.SSHHost = u.Hostname()
 	}
+
 	Config.Logins = append(Config.Logins, login)
 
 	return nil
@@ -254,7 +264,7 @@ func InitCommand(repoValue, loginValue, remoteValue string) (*Login, string, str
 		}
 	}
 
-	owner, repo := GetOwnerAndRepo(repoValue, login.User)
+	owner, repo := utils.GetOwnerAndRepo(repoValue, login.User)
 	return login, owner, repo
 }
 

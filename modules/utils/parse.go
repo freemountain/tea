@@ -5,6 +5,7 @@
 package utils
 
 import (
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -15,4 +16,26 @@ func ArgToIndex(arg string) (int64, error) {
 		arg = arg[1:]
 	}
 	return strconv.ParseInt(arg, 10, 64)
+}
+
+// NormalizeURL normalizes the input with a protocol
+func NormalizeURL(raw string) (*url.URL, error) {
+	var prefix string
+	if !strings.HasPrefix(raw, "http") {
+		prefix = "https://"
+	}
+	return url.Parse(prefix + raw)
+}
+
+// GetOwnerAndRepo return repoOwner and repoName
+// based on relative path and default owner (if not in path)
+func GetOwnerAndRepo(repoPath, user string) (string, string) {
+	if len(repoPath) == 0 {
+		return "", ""
+	}
+	p := strings.Split(repoPath, "/")
+	if len(p) >= 2 {
+		return p[0], p[1]
+	}
+	return user, repoPath
 }

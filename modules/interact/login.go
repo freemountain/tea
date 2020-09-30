@@ -6,7 +6,6 @@ package interact
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 
 	"code.gitea.io/tea/modules/config"
@@ -27,11 +26,10 @@ func CreateLogin() error {
 		return nil
 	}
 
-	parsedURL, err := url.Parse(giteaURL)
+	name, err := config.GenerateLoginName(giteaURL, "")
 	if err != nil {
 		return err
 	}
-	name = strings.ReplaceAll(strings.Title(parsedURL.Host), ".", "")
 
 	fmt.Print("Name of new Login [" + name + "]: ")
 	if _, err := fmt.Scanln(&stdin); err != nil {

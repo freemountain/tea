@@ -13,6 +13,7 @@ import (
 	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/print"
+	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/go-git/go-git/v5"
@@ -106,7 +107,7 @@ func runPullsCreate(ctx *cli.Context) error {
 		if err != nil {
 			log.Fatal(err)
 		}
-		owner, _ := config.GetOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
+		owner, _ := utils.GetOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
 		head = fmt.Sprintf("%s:%s", owner, branchName)
 	}
 

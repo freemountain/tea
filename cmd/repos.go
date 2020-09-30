@@ -9,6 +9,7 @@ import (
 	"code.gitea.io/tea/cmd/repos"
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/print"
+	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -38,7 +39,7 @@ func runRepos(ctx *cli.Context) error {
 func runRepoDetail(path string) error {
 	login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
 	client := login.Client()
-	repoOwner, repoName := config.GetOwnerAndRepo(path, login.User)
+	repoOwner, repoName := utils.GetOwnerAndRepo(path, login.User)
 	repo, _, err := client.GetRepo(repoOwner, repoName)
 	if err != nil {
 		return err
