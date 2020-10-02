@@ -13,6 +13,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"code.gitea.io/tea/modules/utils"
@@ -30,8 +31,10 @@ type Login struct {
 	// optional path to the private key
 	SSHKey   string `yaml:"ssh_key"`
 	Insecure bool   `yaml:"insecure"`
-	// optional gitea username
+	// User is username from gitea
 	User string `yaml:"user"`
+	// Created is auto created unix timestamp
+	Created int64 `yaml:"created"`
 }
 
 // Client returns a client to operate Gitea API
@@ -120,9 +123,29 @@ func GetLoginByName(name string) *Login {
 
 // AddLogin add login to config ( global var & file)
 func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool) error {
+	// checks ...
+	// ... if we have a url
 	if len(giteaURL) == 0 {
 		log.Fatal("You have to input Gitea server URL")
 	}
+
+	err := LoadConfig()
+	if err != nil {
+		log.Fatal("Unable to load config file " + yamlConfigPath)
+	}
+
+	for _, l := range Config.Logins {
+		// ... if there already exist a login with same name
+		if strings.ToLower(l.Name) == strings.ToLower(name) {
+			return fmt.Errorf("login name '%s' has already been used", l.Name)
+		}
+		// ... if we already use this token
+		if l.Token == token {
+			return fmt.Errorf("token already been used, delete login '%s' first", l.Name)
+		}
+	}
+
+	// .. if we have enough information to authenticate
 	if len(token) == 0 && (len(user)+len(passwd)) == 0 {
 		log.Fatal("No token set")
 	} else if len(user) != 0 && len(passwd) == 0 {
@@ -131,14 +154,10 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 		log.Fatal("No user set")
 	}
 
+	// Normalize URL
 	serverURL, err := utils.NormalizeURL(giteaURL)
 	if err != nil {
 		log.Fatal("Unable to parse URL", err)
-	}
-
-	err = LoadConfig()
-	if err != nil {
-		log.Fatal("Unable to load config file " + yamlConfigPath)
 	}
 
 	login := Login{
@@ -147,6 +166,7 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 		Token:    token,
 		Insecure: insecure,
 		SSHKey:   sshKey,
+		Created:  time.Now().Unix(),
 	}
 
 	if len(token) == 0 {
@@ -156,6 +176,7 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 		}
 	}
 
+	// Verify if authentication works and get user info
 	u, _, err := login.Client().GetMyUserInfo()
 	if err != nil {
 		log.Fatal(err)
@@ -169,11 +190,14 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 		}
 	}
 
-	err = addLoginToConfig(login)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// we do not have a method to get SSH config from api,
+	// so we just use the hostname
+	login.SSHHost = serverURL.Hostname()
 
+	// save login to global var
+	Config.Logins = append(Config.Logins, login)
+
+	// save login to config file
 	err = SaveConfig()
 	if err != nil {
 		log.Fatal(err)
@@ -221,33 +245,6 @@ func GenerateLoginName(url, user string) (string, error) {
 	}
 
 	return name, nil
-}
-
-// addLoginToConfig add a login to global Config var
-func addLoginToConfig(login Login) error {
-	for _, l := range Config.Logins {
-		if l.Name == login.Name {
-			if l.URL == login.URL && l.Token == login.Token {
-				return nil
-			}
-			return errors.New("Login name has already been used")
-		}
-		if l.URL == login.URL && l.Token == login.Token {
-			return errors.New("Login for this URL and token already exists")
-		}
-	}
-
-	if len(login.SSHHost) == 0 {
-		u, err := url.Parse(login.URL)
-		if err != nil {
-			return err
-		}
-		login.SSHHost = u.Hostname()
-	}
-
-	Config.Logins = append(Config.Logins, login)
-
-	return nil
 }
 
 // InitCommand returns repository and *Login based on flags

@@ -24,7 +24,7 @@ func NormalizeURL(raw string) (*url.URL, error) {
 	if !strings.HasPrefix(raw, "http") {
 		prefix = "https://"
 	}
-	return url.Parse(prefix + raw)
+	return url.Parse(strings.TrimSuffix(prefix+raw, "/"))
 }
 
 // GetOwnerAndRepo return repoOwner and repoName

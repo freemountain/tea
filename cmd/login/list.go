@@ -21,11 +21,12 @@ var CmdLoginList = cli.Command{
 	Aliases:     []string{"list"},
 	Usage:       "List Gitea logins",
 	Description: `List Gitea logins`,
-	Action:      runLoginList,
+	Action:      RunLoginList,
 	Flags:       []cli.Flag{&flags.OutputFlag},
 }
 
-func runLoginList(ctx *cli.Context) error {
+// RunLoginList list all logins
+func RunLoginList(ctx *cli.Context) error {
 	err := config.LoadConfig()
 	if err != nil {
 		log.Fatal(err)

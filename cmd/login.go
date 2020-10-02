@@ -5,7 +5,11 @@
 package cmd
 
 import (
+	"fmt"
+
 	"code.gitea.io/tea/cmd/login"
+	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/print"
 
 	"github.com/urfave/cli/v2"
 )
@@ -16,11 +20,34 @@ var CmdLogin = cli.Command{
 	Aliases:     []string{"login"},
 	Usage:       "Log in to a Gitea server",
 	Description: `Log in to a Gitea server`,
-	Action:      login.RunLoginAddInteractive, // TODO show list if no arg & detail if login as arg
+	ArgsUsage:   "[<login name>]",
+	Action:      runLogins,
 	Subcommands: []*cli.Command{
 		&login.CmdLoginList,
 		&login.CmdLoginAdd,
 		&login.CmdLoginEdit,
 		&login.CmdLoginSetDefault,
 	},
+}
+
+func runLogins(ctx *cli.Context) error {
+	if ctx.Args().Len() == 1 {
+		return runLoginDetail(ctx.Args().First())
+	}
+	return login.RunLoginList(ctx)
+}
+
+func runLoginDetail(name string) error {
+	if err := config.LoadConfig(); err != nil {
+		return err
+	}
+
+	l := config.GetLoginByName(name)
+	if l == nil {
+		fmt.Printf("Login '%s' do not exist\n\n", name)
+		return nil
+	}
+
+	print.LoginDetails(l)
+	return nil
 }

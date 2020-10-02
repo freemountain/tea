@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"code.gitea.io/tea/cmd"
-	"code.gitea.io/tea/modules/setting"
 
 	"github.com/urfave/cli/v2"
 )
@@ -21,11 +20,6 @@ var Version = "development"
 
 // Tags holds the build tags used
 var Tags = ""
-
-func init() {
-	setting.AppVer = Version
-	setting.AppBuiltWith = formatBuiltWith(Tags)
-}
 
 func main() {
 	app := cli.NewApp()

@@ -15,7 +15,7 @@ import (
 var CmdLoginAdd = cli.Command{
 	Name:        "add",
 	Usage:       "Add a Gitea login",
-	Description: `Add a Gitea login`,
+	Description: `Add a Gitea login, without args it will create one interactively`,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "name",
@@ -23,12 +23,11 @@ var CmdLoginAdd = cli.Command{
 			Usage:   "Login name",
 		},
 		&cli.StringFlag{
-			Name:     "url",
-			Aliases:  []string{"u"},
-			Value:    "https://try.gitea.io",
-			EnvVars:  []string{"GITEA_SERVER_URL"},
-			Usage:    "Server URL",
-			Required: true,
+			Name:    "url",
+			Aliases: []string{"u"},
+			Value:   "https://gitea.com",
+			EnvVars: []string{"GITEA_SERVER_URL"},
+			Usage:   "Server URL",
 		},
 		&cli.StringFlag{
 			Name:    "token",
@@ -65,7 +64,12 @@ var CmdLoginAdd = cli.Command{
 }
 
 func runLoginAdd(ctx *cli.Context) error {
-	// TODO: if no args -> interactive
+	// if no args create login interactive
+	if ctx.Args().Len() == 0 {
+		return interact.CreateLogin()
+	}
+
+	// else use args to add login
 	return config.AddLogin(
 		ctx.String("name"),
 		ctx.String("token"),
@@ -74,10 +78,4 @@ func runLoginAdd(ctx *cli.Context) error {
 		ctx.String("ssh-key"),
 		ctx.String("url"),
 		ctx.Bool("insecure"))
-}
-
-// RunLoginAddInteractive create login interactive
-// TODO: should be unexported
-func RunLoginAddInteractive(_ *cli.Context) error {
-	return interact.CreateLogin()
 }
