@@ -7,7 +7,6 @@ package cmd
 import (
 	"errors"
 	"log"
-	"os"
 
 	"code.gitea.io/tea/modules/config"
 
@@ -30,34 +29,22 @@ var CmdLogout = cli.Command{
 }
 
 func runLogout(ctx *cli.Context) error {
-	var name string
-	if len(os.Args) == 3 {
-		name = os.Args[2]
-	} else if ctx.IsSet("name") {
-		name = ctx.String("name")
-	} else {
-		return errors.New("Please specify a login name")
-	}
-
 	err := config.LoadConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var idx = -1
-	for i, l := range config.Config.Logins {
-		if l.Name == name {
-			idx = i
-			break
-		}
-	}
-	if idx > -1 {
-		config.Config.Logins = append(config.Config.Logins[:idx], config.Config.Logins[idx+1:]...)
-		err = config.SaveConfig()
-		if err != nil {
-			log.Fatal(err)
-		}
+	var name string
+
+	if ctx.IsSet("name") {
+		name = ctx.String("name")
+	} else if len(ctx.Args().First()) != 0 {
+		name = ctx.Args().First()
+	} else if len(config.Config.Logins) == 1 {
+		name = config.Config.Logins[0].Name
+	} else {
+		return errors.New("Please specify a login name")
 	}
 
-	return nil
+	return config.DeleteLogin(name)
 }
