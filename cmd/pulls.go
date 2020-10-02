@@ -5,11 +5,10 @@
 package cmd
 
 import (
-	"fmt"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/pulls"
 	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
 	"github.com/urfave/cli/v2"
@@ -51,12 +50,6 @@ func runPullDetail(index string) error {
 		return err
 	}
 
-	// TODO: use glamour once #181 is merged
-	fmt.Printf("#%d %s\n%s created %s\n\n%s\n", pr.Index,
-		pr.Title,
-		pr.Poster.UserName,
-		pr.Created.Format("2006-01-02 15:04:05"),
-		pr.Body,
-	)
+	print.PullDetails(pr)
 	return nil
 }

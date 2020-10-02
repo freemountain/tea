@@ -5,10 +5,12 @@
 package issues
 
 import (
+	"fmt"
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -37,7 +39,7 @@ var CmdIssuesCreate = cli.Command{
 func runIssuesCreate(ctx *cli.Context) error {
 	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 
-	_, _, err := login.Client().CreateIssue(owner, repo, gitea.CreateIssueOption{
+	issue, _, err := login.Client().CreateIssue(owner, repo, gitea.CreateIssueOption{
 		Title: ctx.String("title"),
 		Body:  ctx.String("body"),
 		// TODO:
@@ -53,7 +55,7 @@ func runIssuesCreate(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	// TODO: Print IssueDetails
-
+	print.IssueDetails(issue)
+	fmt.Println(issue.URL)
 	return nil
 }

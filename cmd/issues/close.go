@@ -9,6 +9,7 @@ import (
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
 	"code.gitea.io/sdk/gitea"
@@ -40,7 +41,11 @@ func editIssueState(ctx *cli.Context, opts gitea.EditIssueOption) error {
 		return err
 	}
 
-	_, _, err = login.Client().EditIssue(owner, repo, index, opts)
-	// TODO: print (short)IssueDetails
-	return err
+	issue, _, err := login.Client().EditIssue(owner, repo, index, opts)
+	if err != nil {
+		return err
+	}
+
+	print.IssueDetails(issue)
+	return nil
 }
