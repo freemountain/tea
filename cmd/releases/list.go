@@ -19,6 +19,7 @@ import (
 // CmdReleaseList represents a sub command of Release to list releases
 var CmdReleaseList = cli.Command{
 	Name:        "ls",
+	Aliases:     []string{"list"},
 	Usage:       "List Releases",
 	Description: "List Releases",
 	Action:      RunReleasesList,

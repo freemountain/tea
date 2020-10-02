@@ -23,6 +23,7 @@ import (
 // CmdLabels represents to operate repositories' labels.
 var CmdLabels = cli.Command{
 	Name:        "labels",
+	Aliases:     []string{"label"},
 	Usage:       "Manage issue labels",
 	Description: `Manage issue labels`,
 	Action:      runLabels,

@@ -20,6 +20,7 @@ import (
 // CmdReposList represents a sub command of repos to list them
 var CmdReposList = cli.Command{
 	Name:        "ls",
+	Aliases:     []string{"list"},
 	Usage:       "List available repositories",
 	Description: `List available repositories`,
 	Action:      RunReposList,

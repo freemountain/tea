@@ -14,8 +14,8 @@ import (
 // CmdReleases represents to login a gitea server.
 // ToDo: ReleaseDetails
 var CmdReleases = cli.Command{
-	Name:        "release",
-	Aliases:     []string{"releases"},
+	Name:        "releases",
+	Aliases:     []string{"release"},
 	Usage:       "Manage releases",
 	Description: "Manage releases",
 	Action:      releases.RunReleasesList,

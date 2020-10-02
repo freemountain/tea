@@ -19,6 +19,7 @@ import (
 // CmdPullsList represents a sub command of issues to list pulls
 var CmdPullsList = cli.Command{
 	Name:        "ls",
+	Aliases:     []string{"list"},
 	Usage:       "List pull requests of the repository",
 	Description: `List pull requests of the repository`,
 	Action:      RunPullsList,

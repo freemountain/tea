@@ -19,7 +19,7 @@ import (
 // CmdNotifications is the main command to operate with notifications
 var CmdNotifications = cli.Command{
 	Name:        "notifications",
-	Aliases:     []string{"notif"},
+	Aliases:     []string{"notification", "notif"},
 	Usage:       "Show notifications",
 	Description: "Show notifications, by default based of the current repo and unread one",
 	Action:      runNotifications,

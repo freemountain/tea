@@ -18,6 +18,7 @@ import (
 // CmdLoginList represents to login a gitea server.
 var CmdLoginList = cli.Command{
 	Name:        "ls",
+	Aliases:     []string{"list"},
 	Usage:       "List Gitea logins",
 	Description: `List Gitea logins`,
 	Action:      runLoginList,

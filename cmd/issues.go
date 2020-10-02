@@ -17,6 +17,7 @@ import (
 // CmdIssues represents to login a gitea server.
 var CmdIssues = cli.Command{
 	Name:        "issues",
+	Aliases:     []string{"issue"},
 	Usage:       "List, create and update issues",
 	Description: "List, create and update issues",
 	ArgsUsage:   "[<issue index>]",

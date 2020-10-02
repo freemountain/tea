@@ -8,7 +8,6 @@
   - [Discuss your design](#discuss-your-design)
   - [Testing redux](#testing-redux)
   - [Vendoring](#vendoring)
-  - [Translation](#translation)
   - [Code review](#code-review)
   - [Styleguide](#styleguide)
   - [Sign-off your work](#sign-off-your-work)
@@ -21,12 +20,10 @@
 ## Introduction
 
 This document explains how to contribute changes to the Gitea project.
-It assumes you have followed the
-[installation instructions](https://docs.gitea.io/en-us/).
 Sensitive security-related issues should be reported to
 [security@gitea.io](mailto:security@gitea.io).
 
-For configuring IDE or code editor to develop Gitea see [IDE and code editor configuration](contrib/ide/)
+For configuring IDE or code editor to develop Gitea see [IDE and code editor configuration](https://github.com/go-gitea/gitea/tree/master/contrib/ide)
 
 ## Bug reports
 
@@ -49,7 +46,7 @@ getting free help.
 ## Discuss your design
 
 The project welcomes submissions. If you want to change or add something,
-please let everyone know what you're working on—[file an issue](https://github.com/go-gitea/gitea/issues/new)!
+please let everyone know what you're working on—[file an issue](https://gitea.com/gitea/tea/issues/new)!
 Significant changes must go through the change proposal process
 before they can be accepted. To create a proposal, file an issue with
 your proposed changes documented, and make sure to note in the title
@@ -87,16 +84,7 @@ an existing upstream commit.
 
 You can find more information on how to get started with it on the [dep project website](https://golang.github.io/dep/docs/introduction.html).
 
-## Translation
-
-We do all translation work inside [Crowdin](https://crowdin.com/project/gitea).
-The only translation that is maintained in this git repository is
-[`en_US.ini`](https://github.com/go-gitea/gitea/blob/master/options/locale/locale_en-US.ini)
-and is synced regularily to Crowdin. Once a translation has reached
-A SATISFACTORY PERCENTAGE it will be synced back into this repo and
-included in the next released version.
-
-## Building Gitea
+## Building tea
 
 Generally, the go build tools are installed as-needed in the `Makefile`.
 An exception are the tools to build the CSS and images.
@@ -128,6 +116,27 @@ Some of the key points:
 
 ## Styleguide
 
+### Command naming
+- Subcommands should follow the following structure:
+    ```
+    tea <noun> <verb> [<noun>] [<flags>]
+    ```
+
+    for example:
+
+    ```
+    tea issues list
+    tea pulls create
+    tea teams add user --team x --user y
+    ```
+- Commands should accept nouns as singular & plural by making use of the `Aliases` field.
+- The default action without a verb is `list`.
+- `list` commands always apply pagination where provided by the API.
+- Try to reuse as many flag definitions as possible, see `cmd/flags.go`.
+- Always make sure that the help texts are properly set, and as concise as possible.
+
+### Code style
+Use `go fmt`, check with `make lint`.
 For imports you should use the following format (_without_ the comments)
 ```go
 import (
@@ -202,7 +211,7 @@ to the maintainers team. If a maintainer is inactive for more than 3
 months and forgets to leave the maintainers team, the owners may move
 him or her from the maintainers team to the advisors team.
 For security reasons, Maintainers should use 2FA for their accounts and
-if possible provide gpg signed commits. 
+if possible provide gpg signed commits.
 https://help.github.com/articles/securing-your-account-with-two-factor-authentication-2fa/
 https://help.github.com/articles/signing-commits-with-gpg/
 
@@ -245,7 +254,7 @@ they served:
 
 ## Versions
 
-Gitea has the `master` branch as a tip branch and has version branches
+tea has the `master` branch as a tip branch and has version branches
 such as `release/v0.9`. `release/v0.9` is a release branch and we will
 tag `v0.9.0` for binary download. If `v0.9.0` has bugs, we will accept
 pull requests on the `release/v0.9` branch and publish a `v0.9.1` tag,

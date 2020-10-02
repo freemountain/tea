@@ -18,8 +18,9 @@ import (
 // CmdRepos represents to login a gitea server.
 var CmdRepos = cli.Command{
 	Name:        "repos",
-	Usage:       "Show repositories details",
-	Description: "Show repositories details",
+	Aliases:     []string{"repo"},
+	Usage:       "Show repository details",
+	Description: "Show repository details",
 	ArgsUsage:   "[<repo owner>/<repo name>]",
 	Action:      runRepos,
 	Subcommands: []*cli.Command{
