@@ -9,18 +9,20 @@ import (
 	"strings"
 
 	"code.gitea.io/tea/modules/config"
+
+	"github.com/AlecAivazis/survey/v2"
 )
 
 // CreateLogin create an login interactive
 func CreateLogin() error {
-	var stdin, name, token, user, passwd, sshKey, giteaURL string
+	var name, token, user, passwd, sshKey, giteaURL string
 	var insecure = false
 
-	fmt.Print("URL of Gitea instance: ")
-	if _, err := fmt.Scanln(&stdin); err != nil {
-		stdin = ""
+	promptI := &survey.Input{Message: "URL of Gitea instance: "}
+	if err := survey.AskOne(promptI, &giteaURL, survey.WithValidator(survey.Required)); err != nil {
+		return err
 	}
-	giteaURL = strings.TrimSpace(stdin)
+	giteaURL = strings.TrimSuffix(strings.TrimSpace(giteaURL), "/")
 	if len(giteaURL) == 0 {
 		fmt.Println("URL is required!")
 		return nil
@@ -31,54 +33,58 @@ func CreateLogin() error {
 		return err
 	}
 
-	fmt.Print("Name of new Login [" + name + "]: ")
-	if _, err := fmt.Scanln(&stdin); err != nil {
-		stdin = ""
-	}
-	if len(strings.TrimSpace(stdin)) != 0 {
-		name = strings.TrimSpace(stdin)
+	promptI = &survey.Input{Message: "Name of new Login [" + name + "]: "}
+	if err := survey.AskOne(promptI, &name); err != nil {
+		return err
 	}
 
-	fmt.Print("Do you have a token [Yes/no]: ")
-	if _, err := fmt.Scanln(&stdin); err != nil {
-		stdin = ""
+	var hasToken bool
+	promptYN := &survey.Confirm{
+		Message: "Do you have an access token?",
+		Default: false,
 	}
-	if len(stdin) != 0 && strings.ToLower(stdin[:1]) == "n" {
-		fmt.Print("Username: ")
-		if _, err := fmt.Scanln(&stdin); err != nil {
-			stdin = ""
-		}
-		user = strings.TrimSpace(stdin)
+	if err = survey.AskOne(promptYN, &hasToken); err != nil {
+		return err
+	}
 
-		fmt.Print("Password: ")
-		if _, err := fmt.Scanln(&stdin); err != nil {
-			stdin = ""
+	if hasToken {
+		promptI = &survey.Input{Message: "Token: "}
+		if err := survey.AskOne(promptI, &token, survey.WithValidator(survey.Required)); err != nil {
+			return err
 		}
-		passwd = strings.TrimSpace(stdin)
 	} else {
-		fmt.Print("Token: ")
-		if _, err := fmt.Scanln(&stdin); err != nil {
-			stdin = ""
+		promptI = &survey.Input{Message: "Username: "}
+		if err = survey.AskOne(promptI, &user, survey.WithValidator(survey.Required)); err != nil {
+			return err
 		}
-		token = strings.TrimSpace(stdin)
+
+		promptPW := &survey.Password{Message: "Password: "}
+		if err = survey.AskOne(promptPW, &passwd, survey.WithValidator(survey.Required)); err != nil {
+			return err
+		}
 	}
 
-	fmt.Print("Set Optional settings [yes/No]: ")
-	if _, err := fmt.Scanln(&stdin); err != nil {
-		stdin = ""
+	var optSettings bool
+	promptYN = &survey.Confirm{
+		Message: "Set Optional settings: ",
+		Default: false,
 	}
-	if len(stdin) != 0 && strings.ToLower(stdin[:1]) == "y" {
-		fmt.Print("SSH Key Path: ")
-		if _, err := fmt.Scanln(&stdin); err != nil {
-			stdin = ""
+	if err = survey.AskOne(promptYN, &optSettings); err != nil {
+		return err
+	}
+	if optSettings {
+		promptI = &survey.Input{Message: "SSH Key Path: "}
+		if err := survey.AskOne(promptI, &sshKey); err != nil {
+			return err
 		}
-		sshKey = strings.TrimSpace(stdin)
 
-		fmt.Print("Allow Insecure connections  [yes/No]: ")
-		if _, err := fmt.Scanln(&stdin); err != nil {
-			stdin = ""
+		promptYN = &survey.Confirm{
+			Message: "Allow Insecure connections: ",
+			Default: false,
 		}
-		insecure = len(stdin) != 0 && strings.ToLower(stdin[:1]) == "y"
+		if err = survey.AskOne(promptYN, &insecure); err != nil {
+			return err
+		}
 	}
 
 	return config.AddLogin(name, token, user, passwd, sshKey, giteaURL, insecure)

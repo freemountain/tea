@@ -5,6 +5,7 @@ go 1.12
 require (
 	code.gitea.io/gitea-vet v0.2.0
 	code.gitea.io/sdk/gitea v0.13.0
+	github.com/AlecAivazis/survey/v2 v2.1.1
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
 	github.com/charmbracelet/glamour v0.2.0
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
