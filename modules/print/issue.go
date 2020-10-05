@@ -18,7 +18,7 @@ func IssueDetails(issue *gitea.Issue) {
 		issue.Title,
 		issue.State,
 		issue.Poster.UserName,
-		issue.Created.Format("2006-01-02 15:04:05"),
+		FormatTime(issue.Created),
 		issue.Body,
 	))
 }

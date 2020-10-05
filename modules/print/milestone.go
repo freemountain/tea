@@ -19,6 +19,6 @@ func MilestoneDetails(milestone *gitea.Milestone) {
 		fmt.Printf("\n%s\n", milestone.Description)
 	}
 	if milestone.Deadline != nil && !milestone.Deadline.IsZero() {
-		fmt.Printf("\nDeadline: %s\n", milestone.Deadline.Format("2006-01-02 15:04:05"))
+		fmt.Printf("\nDeadline: %s\n", FormatTime(*milestone.Deadline))
 	}
 }

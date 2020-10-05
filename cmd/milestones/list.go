@@ -72,7 +72,7 @@ func RunMilestonesList(ctx *cli.Context) error {
 		var deadline = ""
 
 		if m.Deadline != nil && !m.Deadline.IsZero() {
-			deadline = m.Deadline.Format("2006-01-02 15:04:05")
+			deadline = print.FormatTime(*m.Deadline)
 		}
 
 		item := []string{

@@ -83,7 +83,7 @@ func RunIssuesList(ctx *cli.Context) error {
 				string(issue.State),
 				author,
 				mile,
-				issue.Updated.Format("2006-01-02 15:04:05"),
+				print.FormatTime(issue.Updated),
 			},
 		)
 	}

@@ -6,6 +6,7 @@ package print
 
 import (
 	"fmt"
+	"time"
 )
 
 // formatSize get kb in int and return string
@@ -22,4 +23,13 @@ func formatSize(kb int64) string {
 		return fmt.Sprintf("%d Gb", gb)
 	}
 	return fmt.Sprintf("%d Tb", gb/1024)
+}
+
+// FormatTime give a date-time in local timezone if available
+func FormatTime(t time.Time) string {
+	location, err := time.LoadLocation("Local")
+	if err != nil {
+		return t.Format("2006-01-02 15:04 UTC")
+	}
+	return t.In(location).Format("2006-01-02 15:04")
 }

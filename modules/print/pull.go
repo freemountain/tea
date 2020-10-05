@@ -18,7 +18,7 @@ func PullDetails(pr *gitea.PullRequest) {
 		pr.Title,
 		pr.State,
 		pr.Poster.UserName,
-		pr.Created.Format("2006-01-02 15:04:05"),
+		FormatTime(*pr.Created),
 		pr.Body,
 	))
 }

@@ -65,7 +65,7 @@ func RunReleasesList(ctx *cli.Context) error {
 			[]string{
 				release.TagName,
 				release.Title,
-				release.PublishedAt.Format("2006-01-02 15:04:05"),
+				print.FormatTime(release.PublishedAt),
 				status,
 				release.TarURL,
 			},

@@ -84,7 +84,7 @@ func RunPullsList(ctx *cli.Context) error {
 				string(pr.State),
 				author,
 				mile,
-				pr.Updated.Format("2006-01-02 15:04:05"),
+				print.FormatTime(*pr.Updated),
 			},
 		)
 	}
