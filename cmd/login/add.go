@@ -65,7 +65,7 @@ var CmdLoginAdd = cli.Command{
 
 func runLoginAdd(ctx *cli.Context) error {
 	// if no args create login interactive
-	if ctx.Args().Len() == 0 {
+	if ctx.NumFlags() == 0 {
 		return interact.CreateLogin()
 	}
 
