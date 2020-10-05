@@ -10,13 +10,10 @@ import (
 	"time"
 
 	"code.gitea.io/tea/modules/config"
-
-	"github.com/charmbracelet/glamour"
 )
 
 // LoginDetails print login entry to stdout
 func LoginDetails(login *config.Login) {
-
 	in := fmt.Sprintf("# %s\n\n[@%s](%s/%s)\n",
 		login.Name,
 		login.User,
@@ -31,11 +28,5 @@ func LoginDetails(login *config.Login) {
 	}
 	in += fmt.Sprintf("\nCreated: %s", time.Unix(login.Created, 0).Format(time.RFC822))
 
-	out, err := glamour.Render(in, getGlamourTheme())
-	if err != nil {
-		// TODO: better Error handling
-		fmt.Printf("Error:\n%v\n\n", err)
-		return
-	}
-	fmt.Print(out)
+	OutputMarkdown(in)
 }

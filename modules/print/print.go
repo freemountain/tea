@@ -6,16 +6,7 @@ package print
 
 import (
 	"fmt"
-
-	"github.com/muesli/termenv"
 )
-
-func getGlamourTheme() string {
-	if termenv.HasDarkBackground() {
-		return "dark"
-	}
-	return "light"
-}
 
 // formatSize get kb in int and return string
 func formatSize(kb int64) string {
