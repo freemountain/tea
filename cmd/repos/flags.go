@@ -22,6 +22,8 @@ func getTypeFilter(ctx *cli.Context) (filter gitea.RepoType, err error) {
 	t := ctx.String("type")
 	filter = gitea.RepoTypeNone
 	switch t {
+	case "":
+		filter = gitea.RepoTypeNone
 	case "fork":
 		filter = gitea.RepoTypeFork
 	case "mirror":
