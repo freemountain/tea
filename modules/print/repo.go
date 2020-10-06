@@ -9,7 +9,46 @@ import (
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
+	"code.gitea.io/tea/cmd/flags"
 )
+
+// ReposList prints a listing of the repos
+func ReposList(rps []*gitea.Repository) {
+	if len(rps) == 0 {
+		fmt.Println("No repositories found")
+		return
+	}
+
+	headers := []string{
+		"Name",
+		"Type",
+		"SSH",
+		"Owner",
+	}
+	var values [][]string
+
+	for _, rp := range rps {
+		var mode = "source"
+		if rp.Fork {
+			mode = "fork"
+		}
+		if rp.Mirror {
+			mode = "mirror"
+		}
+
+		values = append(
+			values,
+			[]string{
+				rp.FullName,
+				mode,
+				rp.SSHURL,
+				rp.Owner.UserName,
+			},
+		)
+	}
+
+	OutputList(flags.GlobalOutputValue, headers, values)
+}
 
 // RepoDetails print an repo formatted to stdout
 func RepoDetails(repo *gitea.Repository, topics []string) {

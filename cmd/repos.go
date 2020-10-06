@@ -25,9 +25,10 @@ var CmdRepos = cli.Command{
 	Action:      runRepos,
 	Subcommands: []*cli.Command{
 		&repos.CmdReposList,
+		&repos.CmdReposSearch,
 		&repos.CmdRepoCreate,
 	},
-	Flags: flags.LoginOutputFlags,
+	Flags: repos.CmdReposListFlags,
 }
 
 func runRepos(ctx *cli.Context) error {
