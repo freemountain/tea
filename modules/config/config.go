@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"path/filepath"
 	"strings"
 
 	"code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
 
+	"github.com/adrg/xdg"
 	"gopkg.in/yaml.v2"
 )
 
@@ -26,29 +26,34 @@ type LocalConfig struct {
 
 var (
 	// Config contain if loaded local tea config
-	Config         LocalConfig
-	yamlConfigPath string
+	Config LocalConfig
 )
-
-// TODO: do not use init function to detect the tea configuration, use GetConfigPath()
-func init() {
-	homeDir, err := utils.Home()
-	if err != nil {
-		log.Fatal("Retrieve home dir failed")
-	}
-
-	dir := filepath.Join(homeDir, ".tea")
-	err = os.MkdirAll(dir, os.ModePerm)
-	if err != nil {
-		log.Fatal("Init tea config dir " + dir + " failed")
-	}
-
-	yamlConfigPath = filepath.Join(dir, "tea.yml")
-}
 
 // GetConfigPath return path to tea config file
 func GetConfigPath() string {
-	return yamlConfigPath
+	configFilePath, err := xdg.ConfigFile("tea/config.yml")
+
+	var exists bool
+	if err != nil {
+		exists = false
+	} else {
+		exists, _ = utils.PathExists(configFilePath)
+	}
+
+	// fallback to old config if no new one exists
+	if !exists {
+		file := filepath.Join(xdg.Home, ".tea", "tea.yml")
+		exists, _ = utils.PathExists(file)
+		if exists {
+			return file
+		}
+	}
+
+	if err != nil {
+		log.Fatal("unable to get or create config file")
+	}
+
+	return configFilePath
 }
 
 // LoadConfig load config into global Config var
@@ -58,12 +63,12 @@ func LoadConfig() error {
 	if exist {
 		bs, err := ioutil.ReadFile(ymlPath)
 		if err != nil {
-			return err
+			return fmt.Errorf("Failed to read config file: %s", ymlPath)
 		}
 
 		err = yaml.Unmarshal(bs, &Config)
 		if err != nil {
-			return err
+			return fmt.Errorf("Failed to parse contents of config file: %s", ymlPath)
 		}
 	}
 

@@ -7,6 +7,8 @@ code.gitea.io/sdk/gitea
 github.com/AlecAivazis/survey/v2
 github.com/AlecAivazis/survey/v2/core
 github.com/AlecAivazis/survey/v2/terminal
+# github.com/adrg/xdg v0.2.1
+github.com/adrg/xdg
 # github.com/alecthomas/chroma v0.7.3
 github.com/alecthomas/chroma
 github.com/alecthomas/chroma/formatters
