@@ -27,6 +27,7 @@ var CmdReposListFlags = append([]cli.Flag{
 		Required: false,
 		Usage:    "List your starred repos instead",
 	},
+	&printFieldsFlag,
 	&typeFilterFlag,
 	&flags.PaginationPageFlag,
 	&flags.PaginationLimitFlag,
@@ -79,7 +80,7 @@ func RunReposList(ctx *cli.Context) error {
 		reposFiltered = filterReposByType(rps, typeFilter)
 	}
 
-	print.ReposList(reposFiltered)
+	print.ReposList(reposFiltered, getFields(ctx))
 	return nil
 }
 

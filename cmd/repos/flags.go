@@ -6,10 +6,27 @@ package repos
 
 import (
 	"fmt"
+	"strings"
+
+	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
 )
+
+// printFieldsFlag provides a selection of fields to print
+var printFieldsFlag = cli.StringFlag{
+	Name:    "fields",
+	Aliases: []string{"f"},
+	Usage: fmt.Sprintf(`Comma-separated list of fields to print. Available values:
+		%s
+	 `, strings.Join(print.RepoFields, ",")),
+	Value: "owner,name,type,ssh",
+}
+
+func getFields(ctx *cli.Context) []string {
+	return strings.Split(ctx.String("fields"), ",")
+}
 
 var typeFilterFlag = cli.StringFlag{
 	Name:     "type",
