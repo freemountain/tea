@@ -13,13 +13,12 @@ It uses [code.gitea.io/sdk](https://code.gitea.io/sdk) and interacts with the Gi
 
 You can use the prebuilt binaries from [dl.gitea.io](https://dl.gitea.io/tea/)
 
-
 To install from source, go 1.13 or newer is required:
+
 ```sh
 go get code.gitea.io/tea
 go install code.gitea.io/tea
 ```
-
 
 If you have `brew` installed, you can install `tea` via:
 
@@ -42,7 +41,7 @@ tea login add --name=try --url=https://try.gitea.io --token=xxxxxx
 Now you can use the following `tea` subcommands.
 Detailed usage information is available via `tea <command> --help`.
 
-```sh
+```none
 login            Log in to a Gitea server
 logout           Log out from a Gitea server
 issues           List, create and update issues
@@ -79,8 +78,8 @@ Fork -> Patch -> Push -> Pull Request
 
 ## Authors
 
-* [Maintainers](https://github.com/orgs/go-gitea/people)
-* [Contributors](https://github.com/go-gitea/tea/graphs/contributors)
+- [Maintainers](https://github.com/orgs/go-gitea/people)
+- [Contributors](https://github.com/go-gitea/tea/graphs/contributors)
 
 ## License
 
