@@ -76,10 +76,7 @@ Fork -> Patch -> Push -> Pull Request
 - `make vendor` when adding new dependencies
 - ... (for other development tasks, check the `Makefile`)
 
-## Authors
-
-- [Maintainers](https://github.com/orgs/go-gitea/people)
-- [Contributors](https://github.com/go-gitea/tea/graphs/contributors)
+**Please** read the [CONTRIBUTING](CONTRIBUTING.md) documentation, it will tell you about internal structures and concepts.
 
 ## License
 

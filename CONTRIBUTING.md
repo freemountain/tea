@@ -19,7 +19,7 @@
 
 ## Introduction
 
-This document explains how to contribute changes to the Gitea project.
+This document explains how to contribute changes to TEA.
 Sensitive security-related issues should be reported to
 [security@gitea.io](mailto:security@gitea.io).
 
@@ -30,17 +30,14 @@ For configuring IDE or code editor to develop Gitea see [IDE and code editor con
 Please search the issues on the issue tracker with a variety of keywords
 to ensure your bug is not already reported.
 
-If unique, [open an issue](https://github.com/go-gitea/gitea/issues/new)
-and answer the questions so we can understand and reproduce the
-problematic behavior.
+If unique, [open an issue](https://gitea.com/gitea/tea/issues/new).
 
-To show us that the issue you are having is in Gitea itself, please
-write clear, concise instructions so we can reproduce the behavior—
+Please write clear, concise instructions so we can reproduce the behavior—
 even if it seems obvious. The more detailed and specific you are,
 the faster we can fix the issue. Check out [How to Report Bugs
 Effectively](http://www.chiark.greenend.org.uk/~sgtatham/bugs.html).
 
-Please be kind, remember that Gitea comes at no cost to you, and you're
+Please be kind, remember that TEA comes at no cost to you, and you're
 getting free help.
 
 ## Discuss your design
@@ -60,15 +57,8 @@ high-level discussions.
 
 ## Testing redux
 
-Before sending code out for review, run all the tests for the
-whole tree to make sure the changes don't break other usage
-and keep the compatibility on upgrade. To make sure you are
-running the test suite exactly like we do, you should install
-the CLI for [Drone CI](https://github.com/drone/drone), as
-we are using the server for continous testing, following [these
-instructions](http://docs.drone.io/cli-installation/). After that,
-you can simply call `drone exec --local --build-event "pull_request"` within
-your working directory and it will try to run the test suite locally.
+Before sending code out for review, run all the test by execting: `make test`
+Since TEA is an cli tool it should be obvious to test your feature localy first.
 
 ## Vendoring
 
@@ -84,22 +74,11 @@ an existing upstream commit.
 
 You can find more information on how to get started with it on the [dep project website](https://golang.github.io/dep/docs/introduction.html).
 
-## Building tea
-
-Generally, the go build tools are installed as-needed in the `Makefile`.
-An exception are the tools to build the CSS and images.
-
-- To build CSS: Install [Node.js](https://nodejs.org/en/download/package-manager)
-  with `npm` and then run `npm install` and `make generate-stylesheets`.
-- To build Images: ImageMagick, inkscape and zopflipng binaries must be
-  available in your `PATH` to run `make generate-images`.
-
 ## Code review
 
-Changes to Gitea must be reviewed before they are accepted—no matter who
-makes the change, even if they are an owner or a maintainer. We use GitHub's
-pull request workflow to do that. And, we also use [LGTM](http://lgtm.co)
-to ensure every PR is reviewed by at least 2 maintainers.
+Changes to TEA must be reviewed before they are accepted—no matter who
+makes the change, even if they are an owner or a maintainer. We use Giteas's
+pull request & review workflow to do that. Gitea ensure every PR is reviewed by at least 2 maintainers.
 
 Please try to make your pull request easy to review for us. And, please read
 the *[How to get faster PR reviews](https://github.com/kubernetes/community/blob/261cb0fd089b64002c91e8eddceebf032462ccd6/contributors/guide/pull-requests.md#best-practices-for-faster-reviews)* guide;
@@ -116,7 +95,7 @@ Some of the key points:
 
 ## Styleguide
 
-### Command naming
+### Commands
 - Subcommands should follow the following structure:
     ```
     tea <noun> <verb> [<noun>] [<flags>]
@@ -131,12 +110,26 @@ Some of the key points:
     ```
 - Commands should accept nouns as singular & plural by making use of the `Aliases` field.
 - The default action without a verb is `list`.
-- `list` commands always apply pagination where provided by the API.
-- Try to reuse as many flag definitions as possible, see `cmd/flags.go`.
+- There is a standard set of verbs: `list/ls`, `create`, `edit`, `delete`
+  - `ls` lists objects with filter options, and applies pagination where available.
+  - `delete` should show info what is deleted and ask user again, if force flag`-y` is not set
+  - Verbs that accept large numbers of flags provide an interactive mode when called without any arguments or flags.
+- Try to reuse as many flag definitions as possible, see `cmd/flags/flags.go`.
 - Always make sure that the help texts are properly set, and as concise as possible.
 
-### Code style
-Use `go fmt`, check with `make lint`.
+### Internal Module Structure
+- `cmd`: only contains comand/flag options for `urfave/cli`
+  - subcomands are in a subpackage named after its parent comand
+- `modules/task`: contain func for doing something with gitea
+  (e.g. create token by user/passwd)
+- `modules/print`: contain all functions that print to stdout
+- `modules/config`: config tea & login things
+- `modules/interact`: contain functions to interact with user by prompts
+- `modules/git`: do git related stuff (get info/push/pull/checkout/...)
+- `modules/utils`: helper functions used by other functions
+
+### Code Style
+Use `make fmt`, check with `make lint`.
 For imports you should use the following format (_without_ the comments)
 ```go
 import (
@@ -173,25 +166,7 @@ commit automatically with `git commit -s`.
 
 ## Release Cycle
 
-We adopted a release schedule to streamline the process of working
-on, finishing, and issuing releases. The overall goal is to make a
-minor release every two months, which breaks down into one month of
-general development followed by one month of testing and polishing
-known as the release freeze. All the feature pull requests should be
-merged in the first month of one release period. And, during the frozen
-period, a corresponding release branch is open for fixes backported from
-master. Release candidates are made during this period for user testing to
-obtain a final version that is maintained in this branch. A release is
-maintained by issuing patch releases to only correct critical problems
-such as crashes or security issues.
-
-Major release cycles are bimonthly. They always begin on the 25th and end on
-the 24th (i.e., the 25th of December to February 24th).
-
-During a development cycle, we may also publish any necessary minor releases
-for the previous version. For example, if the latest, published release is
-v1.2, then minor changes for the previous release—e.g., v1.1.0 -> v1.1.1—are
-still possible.
+Before we reach v1 there is no fixed release cycle.
 
 ## Maintainers
 
@@ -217,6 +192,9 @@ https://help.github.com/articles/signing-commits-with-gpg/
 
 ## Owners
 
+This repo is part of the Gitea project and as such part of that project's
+governance.
+
 Since Gitea is a pure community organization without any company support,
 to keep the development healthy we will elect three owners every year. All
 contributors may vote to elect up to three candidates, one of which will
@@ -239,19 +217,6 @@ I'm honored to having been elected an owner of Gitea, I agree with
 and lead the development of Gitea.
 ```
 
-To honor the past owners, here's the history of the owners and the time
-they served:
-
-* 2016-11-04 ~ 2017-12-31
-  * [Lunny Xiao](https://github.com/lunny) <xiaolunwen@gmail.com>
-  * [Thomas Boerger](https://github.com/tboerger) <thomas@webhippie.de>
-  * [Kim Carlbäcker](https://github.com/bkcsoft) <kim.carlbacker@gmail.com>
-
-* 2018-01-01 ~ 2018-12-31
-  * [Lunny Xiao](https://github.com/lunny) <xiaolunwen@gmail.com>
-  * [Lauris Bukšis-Haberkorns](https://github.com/lafriks) <lauris@nix.lv>
-  * [Kim Carlbäcker](https://github.com/bkcsoft) <kim.carlbacker@gmail.com>
-
 ## Versions
 
 tea has the `master` branch as a tip branch and has version branches
@@ -270,7 +235,7 @@ be reviewed by two maintainers and must pass the automatic tests.
 Code that you contribute should use the standard copyright header:
 
 ```
-// Copyright 2018 The Gitea Authors. All rights reserved.
+// Copyright 2020 The Gitea Authors. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 ```
