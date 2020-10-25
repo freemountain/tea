@@ -108,7 +108,11 @@ func runPullsCreate(ctx *cli.Context) error {
 			log.Fatal(err)
 		}
 		owner, _ := utils.GetOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
-		head = fmt.Sprintf("%s:%s", owner, branchName)
+		if owner != repo.Owner.UserName {
+			head = fmt.Sprintf("%s:%s", owner, branchName)
+		} else {
+			head = branchName
+		}
 	}
 
 	title := ctx.String("title")
