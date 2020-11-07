@@ -13,6 +13,7 @@ import (
 	local_git "code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/utils"
 
+	"code.gitea.io/sdk/gitea"
 	"github.com/go-git/go-git/v5"
 	"github.com/urfave/cli/v2"
 )
@@ -32,40 +33,33 @@ func runPullsCheckout(ctx *cli.Context) error {
 	if ctx.Args().Len() != 1 {
 		log.Fatal("Must specify a PR index")
 	}
-
-	// fetch PR source-repo & -branch from gitea
 	idx, err := utils.ArgToIndex(ctx.Args().First())
 	if err != nil {
 		return err
 	}
-	pr, _, err := login.Client().GetPullRequest(owner, repo, idx)
+
+	localRepo, err := local_git.RepoForWorkdir()
 	if err != nil {
 		return err
 	}
-	remoteURL := pr.Head.Repository.CloneURL
-	remoteBranchName := pr.Head.Ref
 
-	// open local git repo
-	localRepo, err := local_git.RepoForWorkdir()
+	localBranchName, remoteBranchName, newRemoteName, remoteURL, err :=
+		gitConfigForPR(localRepo, login, owner, repo, idx)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	// verify related remote is in local repo, otherwise add it
-	newRemoteName := fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
 	localRemote, err := localRepo.GetOrCreateRemote(remoteURL, newRemoteName)
 	if err != nil {
 		return err
 	}
-
 	localRemoteName := localRemote.Config().Name
-	localBranchName := fmt.Sprintf("pulls/%v-%v", idx, remoteBranchName)
 
-	// fetch remote
+	// get auth & fetch remote
 	fmt.Printf("Fetching PR %v (head %s:%s) from remote '%s'\n",
 		idx, remoteURL, remoteBranchName, localRemoteName)
-
-	url, err := local_git.ParseURL(localRemote.Config().URLs[0])
+	url, err := local_git.ParseURL(remoteURL)
 	if err != nil {
 		return err
 	}
@@ -73,7 +67,6 @@ func runPullsCheckout(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-
 	err = localRemote.Fetch(&git.FetchOptions{Auth: auth})
 	if err == git.NoErrAlreadyUpToDate {
 		fmt.Println(err)
@@ -85,13 +78,38 @@ func runPullsCheckout(ctx *cli.Context) error {
 	fmt.Printf("Creating branch '%s'\n", localBranchName)
 	err = localRepo.TeaCreateBranch(localBranchName, remoteBranchName, localRemoteName)
 	if err == git.ErrBranchExists {
-		fmt.Println(err)
+		fmt.Println("There may be changes since you last checked out, run `git pull` to get them.")
 	} else if err != nil {
 		return err
 	}
 
-	fmt.Printf("Checking out PR %v\n", idx)
-	err = localRepo.TeaCheckout(localBranchName)
+	return localRepo.TeaCheckout(localBranchName)
+}
 
-	return err
+func gitConfigForPR(repo *local_git.TeaRepo, login *config.Login, owner, repoName string, idx int64) (localBranch, remoteBranch, remoteName, remoteURL string, err error) {
+	// fetch PR source-repo & -branch from gitea
+	pr, _, err := login.Client().GetPullRequest(owner, repoName, idx)
+	if err != nil {
+		return
+	}
+
+	// test if we can pull via SSH, and configure git remote accordingly
+	remoteURL = pr.Head.Repository.CloneURL
+	keys, _, err := login.Client().ListMyPublicKeys(gitea.ListPublicKeysOptions{})
+	if err != nil {
+		return
+	}
+	if len(keys) != 0 {
+		remoteURL = pr.Head.Repository.SSHURL
+	}
+
+	// try to find a matching existing branch, otherwise return branch in pulls/ namespace
+	localBranch = fmt.Sprintf("pulls/%v-%v", idx, pr.Head.Ref)
+	if b, _ := repo.TeaFindBranchBySha(pr.Head.Sha, remoteURL); b != nil {
+		localBranch = b.Name
+	}
+
+	remoteBranch = pr.Head.Ref
+	remoteName = fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
+	return
 }
