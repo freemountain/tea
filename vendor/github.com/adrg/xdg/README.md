@@ -1,9 +1,10 @@
 xdg
 ===
-[![Build Status](https://travis-ci.org/adrg/xdg.svg?branch=master)](https://travis-ci.org/adrg/xdg)
-[![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/adrg/xdg)
-[![License: MIT](https://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Go Report Card](https://goreportcard.com/badge/github.com/adrg/xdg)](https://goreportcard.com/report/github.com/adrg/xdg)
+
+[![Build Status](https://github.com/adrg/xdg/workflows/CI/badge.svg)](https://github.com/adrg/xdg/actions?query=workflow%3ACI)
+[![pkg.go.dev documentation](https://pkg.go.dev/badge/github.com/adrg/xdg)](https://pkg.go.dev/github.com/adrg/xdg)
+[![MIT license](https://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Go report card](https://goreportcard.com/badge/github.com/adrg/xdg)](https://goreportcard.com/report/github.com/adrg/xdg)
 
 Provides an implementation of the [XDG Base Directory Specification](https://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html).
 The specification defines a set of standard paths for storing application files,
@@ -169,10 +170,9 @@ func main() {
 }
 ```
 
-## References
-For more information see the
-[XDG Base Directory Specification](https://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html) and
-[XDG user directories](https://wiki.archlinux.org/index.php/XDG_user_directories).
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/adrg/xdg.svg)](https://starchart.cc/adrg/xdg)
 
 ## Contributing
 
@@ -180,7 +180,14 @@ Contributions in the form of pull requests, issues or just general feedback,
 are always welcome.
 See [CONTRIBUTING.MD](https://github.com/adrg/xdg/blob/master/CONTRIBUTING.md).
 
+## References
+
+For more information see the
+[XDG Base Directory Specification](https://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html) and
+[XDG user directories](https://wiki.archlinux.org/index.php/XDG_user_directories).
+
 ## License
+
 Copyright (c) 2014 Adrian-George Bostan.
 
 This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
