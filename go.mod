@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	code.gitea.io/gitea-vet v0.2.1
-	code.gitea.io/sdk/gitea v0.13.1
+	code.gitea.io/sdk/gitea v0.13.2-0.20201112213603-e323ee0bc434
 	github.com/AlecAivazis/survey/v2 v2.2.2
 	github.com/Microsoft/go-winio v0.4.15 // indirect
 	github.com/adrg/xdg v0.2.2
@@ -14,7 +14,6 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/go-git/go-git/v5 v5.2.0
-	github.com/hashicorp/go-version v1.2.1 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
