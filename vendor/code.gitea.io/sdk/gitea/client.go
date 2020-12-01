@@ -23,22 +23,22 @@ var jsonHeader = http.Header{"content-type": []string{"application/json"}}
 
 // Version return the library version
 func Version() string {
-	return "0.13.0"
+	return "0.14.0"
 }
 
 // Client represents a Gitea API client.
 type Client struct {
-	url           string
-	accessToken   string
-	username      string
-	password      string
-	otp           string
-	sudo          string
-	debug         bool
-	client        *http.Client
-	ctx           context.Context
-	serverVersion *version.Version
-	versionLock   sync.RWMutex
+	url            string
+	accessToken    string
+	username       string
+	password       string
+	otp            string
+	sudo           string
+	debug          bool
+	client         *http.Client
+	ctx            context.Context
+	serverVersion  *version.Version
+	getVersionOnce sync.Once
 }
 
 // Response represents the gitea response
@@ -56,7 +56,7 @@ func NewClient(url string, options ...func(*Client)) (*Client, error) {
 	for _, opt := range options {
 		opt(client)
 	}
-	if err := client.checkServerVersionGreaterThanOrEqual(version1_10_0); err != nil {
+	if err := client.checkServerVersionGreaterThanOrEqual(version1_11_0); err != nil {
 		return nil, err
 	}
 	return client, nil

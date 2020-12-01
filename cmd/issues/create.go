@@ -56,6 +56,6 @@ func runIssuesCreate(ctx *cli.Context) error {
 	}
 
 	print.IssueDetails(issue)
-	fmt.Println(issue.URL)
+	fmt.Println(issue.HTMLURL)
 	return nil
 }

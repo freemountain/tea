@@ -75,19 +75,11 @@ func runReleaseEdit(ctx *cli.Context) error {
 	}
 
 	var isDraft, isPre *bool
-	bTrue := true
-	bFalse := false
 	if ctx.IsSet("draft") {
-		isDraft = &bFalse
-		if strings.ToLower(ctx.String("draft"))[:1] == "t" {
-			isDraft = &bTrue
-		}
+		isDraft = gitea.OptionalBool(strings.ToLower(ctx.String("draft"))[:1] == "t")
 	}
 	if ctx.IsSet("prerelease") {
-		isPre = &bFalse
-		if strings.ToLower(ctx.String("prerelease"))[:1] == "t" {
-			isPre = &bTrue
-		}
+		isPre = gitea.OptionalBool(strings.ToLower(ctx.String("prerelease"))[:1] == "t")
 	}
 
 	_, _, err = client.EditRelease(owner, repo, release.ID, gitea.EditReleaseOption{
