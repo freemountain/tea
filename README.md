@@ -53,6 +53,8 @@ times            Operate on tracked times of a repositorys issues and pulls
 open             Open something of the repository on web browser
 notifications    Show notifications
 milestones       List and create milestones
+organizations    List, create, delete organizations
+help, h          Shows a list of commands or help for one command
 ```
 
 To fetch issues from different repos, use the `--remote` flag (when inside a gitea repository directory) or `--login` & `--repo` flags.
