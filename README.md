@@ -73,6 +73,7 @@ make
 Fork -> Patch -> Push -> Pull Request
 
 - `make test` run testsuite
+- `make vet`  run checks (check the order of imports; preventing failure on CI pipeline beforehand)
 - `make vendor` when adding new dependencies
 - ... (for other development tasks, check the `Makefile`)
 
