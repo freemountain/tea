@@ -78,7 +78,7 @@ call me again with the --ignore-sha flag`, pr.Head.Ref)
 	if err != nil {
 		return err
 	}
-	auth, err := local_git.GetAuthForURL(url, login.User, login.SSHKey)
+	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey)
 	if err != nil {
 		return err
 	}

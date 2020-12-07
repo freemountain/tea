@@ -60,7 +60,7 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) 
 	if err != nil {
 		return err
 	}
-	auth, err := local_git.GetAuthForURL(url, login.User, login.SSHKey)
+	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey)
 	if err != nil {
 		return err
 	}

@@ -5,12 +5,9 @@
 package git
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
 	"net/url"
-	"os"
-	"strings"
 
 	"code.gitea.io/tea/modules/utils"
 
@@ -24,31 +21,15 @@ import (
 // GetAuthForURL returns the appropriate AuthMethod to be used in Push() / Pull()
 // operations depending on the protocol, and prompts the user for credentials if
 // necessary.
-func GetAuthForURL(remoteURL *url.URL, httpUser, keyFile string) (auth git_transport.AuthMethod, err error) {
-	user := remoteURL.User.Username()
-
+func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string) (auth git_transport.AuthMethod, err error) {
 	switch remoteURL.Scheme {
-	case "https":
-		if httpUser != "" {
-			user = httpUser
-		}
-		if user == "" {
-			user, err = promptUser(remoteURL.Host)
-			if err != nil {
-				return nil, err
-			}
-		}
-		pass, isSet := remoteURL.User.Password()
-		if !isSet {
-			pass, err = promptPass(remoteURL.Host)
-			if err != nil {
-				return nil, err
-			}
-		}
-		auth = &gogit_http.BasicAuth{Password: pass, Username: user}
+	case "http", "https":
+		// gitea supports push/pull via app token as username.
+		auth = &gogit_http.BasicAuth{Password: "", Username: authToken}
 
 	case "ssh":
 		// try to select right key via ssh-agent. if it fails, try to read a key manually
+		user := remoteURL.User.Username()
 		auth, err = gogit_ssh.DefaultAuthBuilder(user)
 		if err != nil {
 			signer, err := readSSHPrivKey(keyFile)
@@ -90,13 +71,6 @@ func readSSHPrivKey(keyFile string) (sig ssh.Signer, err error) {
 		}
 	}
 	return sig, err
-}
-
-func promptUser(domain string) (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Printf("%s username: ", domain)
-	username, err := reader.ReadString('\n')
-	return strings.TrimSpace(username), err
 }
 
 func promptPass(domain string) (string, error) {
