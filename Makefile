@@ -140,45 +140,18 @@ $(EXECUTABLE): $(SOURCES)
 	$(GO) build -mod=vendor $(GOFLAGS) $(EXTRA_GOFLAGS) -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)' -o $@
 
 .PHONY: release
-release: release-dirs release-windows release-linux release-darwin release-copy release-compress release-check
+release: release-dirs release-os release-compress release-check
 
 .PHONY: release-dirs
 release-dirs:
 	mkdir -p $(DIST)/binaries $(DIST)/release
 
-.PHONY: release-windows
-release-windows:
-	@hash xgo > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		cd /tmp && $(GO) get -u src.techknowlogick.com/xgo; \
+.PHONY: release-os
+release-os:
+	@hash gox > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		cd /tmp && $(GO) get -u github.com/mitchellh/gox; \
 	fi
-	GO111MODULE=off xgo -dest $(DIST)/binaries -tags 'netgo $(TAGS)' -ldflags '-linkmode external -extldflags "-static" $(LDFLAGS)' -targets 'windows/*' -out tea-$(VERSION) .
-ifeq ($(CI),drone)
-	cp /build/* $(DIST)/binaries
-endif
-
-.PHONY: release-linux
-release-linux:
-	@hash xgo > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		cd /tmp && $(GO) get -u src.techknowlogick.com/xgo; \
-	fi
-	GO111MODULE=off xgo -dest $(DIST)/binaries -tags 'netgo $(TAGS)' -ldflags '-linkmode external -extldflags "-static" $(LDFLAGS)' -targets 'linux/amd64,linux/386,linux/arm-5,linux/arm-6,linux/arm64,linux/mips64le,linux/mips,linux/mipsle' -out tea-$(VERSION) .
-ifeq ($(CI),drone)
-	cp /build/* $(DIST)/binaries
-endif
-
-.PHONY: release-darwin
-release-darwin:
-	@hash xgo > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
-		cd /tmp && $(GO) get -u src.techknowlogick.com/xgo; \
-	fi
-	GO111MODULE=off xgo -dest $(DIST)/binaries -tags 'netgo $(TAGS)' -ldflags '$(LDFLAGS)' -targets 'darwin/*' -out tea-$(VERSION) .
-ifeq ($(CI),drone)
-	cp /build/* $(DIST)/binaries
-endif
-
-.PHONY: release-copy
-release-copy:
-	cd $(DIST); for file in `find /build -type f -name "*"`; do cp $${file} ./release/; done;
+	CGO_ENABLED=0 gox -verbose -cgo=false -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)' -osarch='!darwin/386 !darwin/arm64 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/binaries/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
 
 .PHONY: release-compress
 release-compress:

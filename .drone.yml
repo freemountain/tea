@@ -6,10 +6,6 @@ platform:
   os: linux
   arch: amd64
 
-workspace:
-  base: /go
-  path: src/code.gitea.io/tea
-
 steps:
 - name: build
   pull: always
@@ -31,7 +27,6 @@ steps:
     - pull_request
 
 - name: unit-test
-  pull: always
   image: golang:1.15
   commands:
   - make unit-test-coverage
@@ -45,7 +40,6 @@ steps:
     - pull_request
 
 - name: release-test
-  pull: always
   image: golang:1.15
   commands:
   - make test
@@ -70,8 +64,7 @@ steps:
     - tag
 
 - name: static
-  pull: always
-  image: techknowlogick/xgo:latest
+  image: golang:1.15
   environment:
     GOPROXY: https://goproxy.cn
   commands:
