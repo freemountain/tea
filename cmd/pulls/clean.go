@@ -9,6 +9,7 @@ import (
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/task"
 	"code.gitea.io/tea/modules/utils"
 
@@ -41,5 +42,5 @@ func runPullsClean(ctx *cli.Context) error {
 		return err
 	}
 
-	return task.PullClean(login, owner, repo, idx, ctx.Bool("ignore-sha"))
+	return task.PullClean(login, owner, repo, idx, ctx.Bool("ignore-sha"), interact.PromptPassword)
 }

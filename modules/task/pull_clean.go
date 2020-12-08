@@ -9,14 +9,13 @@ import (
 
 	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
-	"code.gitea.io/tea/modules/interact"
 
 	"code.gitea.io/sdk/gitea"
 	git_config "github.com/go-git/go-git/v5/config"
 )
 
 // PullClean deletes local & remote feature-branches for a closed pull
-func PullClean(login *config.Login, repoOwner, repoName string, index int64, ignoreSHA bool) error {
+func PullClean(login *config.Login, repoOwner, repoName string, index int64, ignoreSHA bool, callback func(string) (string, error)) error {
 	client := login.Client()
 
 	repo, _, err := client.GetRepo(repoOwner, repoName)
@@ -79,7 +78,7 @@ call me again with the --ignore-sha flag`, pr.Head.Ref)
 	if err != nil {
 		return err
 	}
-	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, interact.PromptPassword)
+	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, callback)
 	if err != nil {
 		return err
 	}

@@ -17,7 +17,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-type pwCallback = func(ctx string) (string, error)
+type pwCallback = func(string) (string, error)
 
 // GetAuthForURL returns the appropriate AuthMethod to be used in Push() / Pull()
 // operations depending on the protocol, and prompts the user for credentials if
@@ -32,10 +32,10 @@ func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string, passwordCallba
 		// try to select right key via ssh-agent. if it fails, try to read a key manually
 		user := remoteURL.User.Username()
 		auth, err = gogit_ssh.DefaultAuthBuilder(user)
-		if err != nil {
-			signer, err := readSSHPrivKey(keyFile, passwordCallback)
-			if err != nil {
-				return nil, err
+		if err != nil && passwordCallback != nil {
+			signer, err2 := readSSHPrivKey(keyFile, passwordCallback)
+			if err2 != nil {
+				return nil, err2
 			}
 			auth = &gogit_ssh.PublicKeys{User: user, Signer: signer}
 		}
@@ -44,7 +44,7 @@ func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string, passwordCallba
 		return nil, fmt.Errorf("don't know how to handle url scheme %v", remoteURL.Scheme)
 	}
 
-	return auth, nil
+	return
 }
 
 func readSSHPrivKey(keyFile string, passwordCallback pwCallback) (sig ssh.Signer, err error) {

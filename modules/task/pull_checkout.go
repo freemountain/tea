@@ -10,12 +10,12 @@ import (
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
-	"code.gitea.io/tea/modules/interact"
+
 	"github.com/go-git/go-git/v5"
 )
 
 // PullCheckout checkout current workdir to the head branch of specified pull request
-func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) error {
+func PullCheckout(login *config.Login, repoOwner, repoName string, index int64, callback func(string) (string, error)) error {
 	client := login.Client()
 
 	localRepo, err := local_git.RepoForWorkdir()
@@ -60,7 +60,7 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) 
 	if err != nil {
 		return err
 	}
-	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, interact.PromptPassword)
+	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, callback)
 	if err != nil {
 		return err
 	}
