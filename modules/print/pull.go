@@ -6,6 +6,7 @@ package print
 
 import (
 	"fmt"
+	"strconv"
 
 	"code.gitea.io/sdk/gitea"
 )
@@ -54,5 +55,50 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
 		out += "\nNo Conflicts"
 	}
 
-	OutputMarkdown(out)
+	outputMarkdown(out)
+}
+
+// PullsList prints a listing of pulls
+func PullsList(prs []*gitea.PullRequest, output string) {
+	var values [][]string
+	headers := []string{
+		"Index",
+		"Title",
+		"State",
+		"Author",
+		"Milestone",
+		"Updated",
+	}
+
+	if len(prs) == 0 {
+		outputList(output, headers, values)
+		return
+	}
+
+	for _, pr := range prs {
+		if pr == nil {
+			continue
+		}
+		author := pr.Poster.FullName
+		if len(author) == 0 {
+			author = pr.Poster.UserName
+		}
+		mile := ""
+		if pr.Milestone != nil {
+			mile = pr.Milestone.Title
+		}
+		values = append(
+			values,
+			[]string{
+				strconv.FormatInt(pr.Index, 10),
+				pr.Title,
+				string(pr.State),
+				author,
+				mile,
+				FormatTime(*pr.Updated),
+			},
+		)
+	}
+
+	outputList(output, headers, values)
 }

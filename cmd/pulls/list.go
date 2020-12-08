@@ -6,7 +6,6 @@ package pulls
 
 import (
 	"log"
-	"strconv"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
@@ -48,47 +47,6 @@ func RunPullsList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	headers := []string{
-		"Index",
-		"Title",
-		"State",
-		"Author",
-		"Milestone",
-		"Updated",
-	}
-
-	var values [][]string
-
-	if len(prs) == 0 {
-		print.OutputList(flags.GlobalOutputValue, headers, values)
-		return nil
-	}
-
-	for _, pr := range prs {
-		if pr == nil {
-			continue
-		}
-		author := pr.Poster.FullName
-		if len(author) == 0 {
-			author = pr.Poster.UserName
-		}
-		mile := ""
-		if pr.Milestone != nil {
-			mile = pr.Milestone.Title
-		}
-		values = append(
-			values,
-			[]string{
-				strconv.FormatInt(pr.Index, 10),
-				pr.Title,
-				string(pr.State),
-				author,
-				mile,
-				print.FormatTime(*pr.Updated),
-			},
-		)
-	}
-	print.OutputList(flags.GlobalOutputValue, headers, values)
-
+	print.PullsList(prs, flags.GlobalOutputValue)
 	return nil
 }

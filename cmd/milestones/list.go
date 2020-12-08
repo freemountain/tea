@@ -5,7 +5,6 @@
 package milestones
 
 import (
-	"fmt"
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
@@ -55,40 +54,6 @@ func RunMilestonesList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	headers := []string{
-		"Title",
-	}
-	if state == gitea.StateAll {
-		headers = append(headers, "State")
-	}
-	headers = append(headers,
-		"Open/Closed Issues",
-		"DueDate",
-	)
-
-	var values [][]string
-
-	for _, m := range milestones {
-		var deadline = ""
-
-		if m.Deadline != nil && !m.Deadline.IsZero() {
-			deadline = print.FormatTime(*m.Deadline)
-		}
-
-		item := []string{
-			m.Title,
-		}
-		if state == gitea.StateAll {
-			item = append(item, string(m.State))
-		}
-		item = append(item,
-			fmt.Sprintf("%d/%d", m.OpenIssues, m.ClosedIssues),
-			deadline,
-		)
-
-		values = append(values, item)
-	}
-	print.OutputList(flags.GlobalOutputValue, headers, values)
-
+	print.MilestonesList(milestones, flags.GlobalOutputValue, state)
 	return nil
 }

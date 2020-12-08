@@ -6,7 +6,6 @@ package issues
 
 import (
 	"log"
-	"strconv"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
@@ -50,44 +49,6 @@ func RunIssuesList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	headers := []string{
-		"Index",
-		"Title",
-		"State",
-		"Author",
-		"Milestone",
-		"Updated",
-	}
-
-	var values [][]string
-
-	if len(issues) == 0 {
-		print.OutputList(flags.GlobalOutputValue, headers, values)
-		return nil
-	}
-
-	for _, issue := range issues {
-		author := issue.Poster.FullName
-		if len(author) == 0 {
-			author = issue.Poster.UserName
-		}
-		mile := ""
-		if issue.Milestone != nil {
-			mile = issue.Milestone.Title
-		}
-		values = append(
-			values,
-			[]string{
-				strconv.FormatInt(issue.Index, 10),
-				issue.Title,
-				string(issue.State),
-				author,
-				mile,
-				print.FormatTime(issue.Updated),
-			},
-		)
-	}
-	print.OutputList(flags.GlobalOutputValue, headers, values)
-
+	print.IssuesList(issues, flags.GlobalOutputValue)
 	return nil
 }

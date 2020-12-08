@@ -13,7 +13,7 @@ import (
 )
 
 // LoginDetails print login entry to stdout
-func LoginDetails(login *config.Login) {
+func LoginDetails(login *config.Login, output string) {
 	in := fmt.Sprintf("# %s\n\n[@%s](%s/%s)\n",
 		login.Name,
 		login.User,
@@ -28,5 +28,29 @@ func LoginDetails(login *config.Login) {
 	}
 	in += fmt.Sprintf("\nCreated: %s", time.Unix(login.Created, 0).Format(time.RFC822))
 
-	OutputMarkdown(in)
+	outputMarkdown(in)
+}
+
+// LoginsList prints a listing of logins
+func LoginsList(logins []config.Login, output string) {
+	var values [][]string
+	headers := []string{
+		"Name",
+		"URL",
+		"SSHHost",
+		"User",
+		"Default",
+	}
+
+	for _, l := range logins {
+		values = append(values, []string{
+			l.Name,
+			l.URL,
+			l.GetSSHHost(),
+			l.User,
+			fmt.Sprint(l.Default),
+		})
+	}
+
+	outputList(output, headers, values)
 }

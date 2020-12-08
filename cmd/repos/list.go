@@ -80,7 +80,7 @@ func RunReposList(ctx *cli.Context) error {
 		reposFiltered = filterReposByType(rps, typeFilter)
 	}
 
-	print.ReposList(reposFiltered, getFields(ctx))
+	print.ReposList(reposFiltered, flags.GlobalOutputValue, getFields(ctx))
 	return nil
 }
 

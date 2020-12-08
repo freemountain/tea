@@ -6,7 +6,6 @@ package cmd
 
 import (
 	"log"
-	"strings"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
@@ -78,41 +77,6 @@ func runNotifications(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	headers := []string{
-		"Type",
-		"Index",
-		"Title",
-	}
-	if ctx.Bool("all") {
-		headers = append(headers, "Repository")
-	}
-
-	var values [][]string
-
-	for _, n := range news {
-		if n.Subject == nil {
-			continue
-		}
-		// if pull or Issue get Index
-		var index string
-		if n.Subject.Type == "Issue" || n.Subject.Type == "Pull" {
-			index = n.Subject.URL
-			urlParts := strings.Split(n.Subject.URL, "/")
-			if len(urlParts) != 0 {
-				index = urlParts[len(urlParts)-1]
-			}
-			index = "#" + index
-		}
-
-		item := []string{n.Subject.Type, index, n.Subject.Title}
-		if ctx.Bool("all") {
-			item = append(item, n.Repository.FullName)
-		}
-		values = append(values, item)
-	}
-
-	if len(values) != 0 {
-		print.OutputList(flags.GlobalOutputValue, headers, values)
-	}
+	print.NotificationsList(news, flags.GlobalOutputValue, ctx.Bool("all"))
 	return nil
 }

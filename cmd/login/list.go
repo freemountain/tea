@@ -5,7 +5,6 @@
 package login
 
 import (
-	"fmt"
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
@@ -32,27 +31,6 @@ func RunLoginList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	headers := []string{
-		"Name",
-		"URL",
-		"SSHHost",
-		"User",
-		"Default",
-	}
-
-	var values [][]string
-
-	for _, l := range config.Config.Logins {
-		values = append(values, []string{
-			l.Name,
-			l.URL,
-			l.GetSSHHost(),
-			l.User,
-			fmt.Sprint(l.Default),
-		})
-	}
-
-	print.OutputList(flags.GlobalOutputValue, headers, values)
-
+	print.LoginsList(config.Config.Logins, flags.GlobalOutputValue)
 	return nil
 }

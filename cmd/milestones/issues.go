@@ -6,7 +6,6 @@ package milestones
 
 import (
 	"fmt"
-	"strconv"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
@@ -105,44 +104,7 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 		return err
 	}
 
-	headers := []string{
-		"Index",
-		"State",
-		"Kind",
-		"Author",
-		"Updated",
-		"Title",
-	}
-
-	var values [][]string
-
-	if len(issues) == 0 {
-		print.OutputList(flags.GlobalOutputValue, headers, values)
-		return nil
-	}
-
-	for _, issue := range issues {
-		name := issue.Poster.FullName
-		if len(name) == 0 {
-			name = issue.Poster.UserName
-		}
-		kind := "Issue"
-		if issue.PullRequest != nil {
-			kind = "Pull"
-		}
-		values = append(
-			values,
-			[]string{
-				strconv.FormatInt(issue.Index, 10),
-				string(issue.State),
-				kind,
-				name,
-				print.FormatTime(issue.Updated),
-				issue.Title,
-			},
-		)
-	}
-	print.OutputList(flags.GlobalOutputValue, headers, values)
+	print.IssuesPullsList(issues, flags.GlobalOutputValue)
 	return nil
 }
 

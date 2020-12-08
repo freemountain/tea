@@ -72,9 +72,9 @@ func outputyaml(headers []string, values [][]string) {
 	}
 }
 
-// OutputList provides general function to convert given list of items
+// outputList provides general function to convert given list of items
 // into several outputs (table, csv, simple, tsv, yaml)
-func OutputList(output string, headers []string, values [][]string) {
+func outputList(output string, headers []string, values [][]string) {
 	switch {
 	case output == "" || output == "table":
 		outputtable(headers, values)

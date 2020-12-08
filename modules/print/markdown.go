@@ -10,10 +10,10 @@ import (
 	"github.com/charmbracelet/glamour"
 )
 
-// OutputMarkdown prints markdown to stdout, formatted for terminals.
+// outputMarkdown prints markdown to stdout, formatted for terminals.
 // If the input could not be parsed, it is printed unformatted, the error
 // is returned anyway.
-func OutputMarkdown(markdown string) error {
+func outputMarkdown(markdown string) error {
 	out, err := glamour.Render(markdown, "auto")
 	if err != nil {
 		fmt.Printf(markdown)

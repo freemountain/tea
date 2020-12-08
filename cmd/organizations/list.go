@@ -40,7 +40,7 @@ func RunOrganizationList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	print.OrganizationsList(userOrganizations)
+	print.OrganizationsList(userOrganizations, flags.GlobalOutputValue)
 
 	return nil
 }

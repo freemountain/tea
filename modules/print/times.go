@@ -59,5 +59,5 @@ func TrackedTimesList(times []*gitea.TrackedTime, outputType string, from, until
 		"User",
 		"Duration",
 	}
-	OutputList(outputType, headers, outputValues)
+	outputList(outputType, headers, outputValues)
 }

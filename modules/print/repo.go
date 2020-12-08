@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"code.gitea.io/sdk/gitea"
-	"code.gitea.io/tea/cmd/flags"
 )
 
 type rp = *gitea.Repository
@@ -60,7 +59,7 @@ func init() {
 }
 
 // ReposList prints a listing of the repos
-func ReposList(repos []*gitea.Repository, fields []string) {
+func ReposList(repos []*gitea.Repository, output string, fields []string) {
 	if len(repos) == 0 {
 		fmt.Println("No repositories found")
 		return
@@ -91,7 +90,7 @@ func ReposList(repos []*gitea.Repository, fields []string) {
 		}
 	}
 
-	OutputList(flags.GlobalOutputValue, fields, values)
+	outputList(output, fields, values)
 }
 
 // RepoDetails print an repo formatted to stdout
@@ -150,7 +149,7 @@ func RepoDetails(repo *gitea.Repository, topics []string) {
 		tops = fmt.Sprintf("- Topics:\t%s\n", strings.Join(topics, ", "))
 	}
 
-	OutputMarkdown(fmt.Sprintf(
+	outputMarkdown(fmt.Sprintf(
 		"%s%s\n%s\n%s%s%s%s",
 		title,
 		desc,

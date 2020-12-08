@@ -8,11 +8,10 @@ import (
 	"fmt"
 
 	"code.gitea.io/sdk/gitea"
-	"code.gitea.io/tea/cmd/flags"
 )
 
 // OrganizationsList prints a listing of the organizations
-func OrganizationsList(organizations []*gitea.Organization) {
+func OrganizationsList(organizations []*gitea.Organization, output string) {
 	if len(organizations) == 0 {
 		fmt.Println("No organizations found")
 		return
@@ -41,5 +40,5 @@ func OrganizationsList(organizations []*gitea.Organization) {
 		)
 	}
 
-	OutputList(flags.GlobalOutputValue, headers, values)
+	outputList(output, headers, values)
 }

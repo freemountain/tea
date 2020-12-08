@@ -123,6 +123,6 @@ func runReposSearch(ctx *cli.Context) error {
 		return err
 	}
 
-	print.ReposList(rps, getFields(ctx))
+	print.ReposList(rps, flags.GlobalOutputValue, getFields(ctx))
 	return nil
 }

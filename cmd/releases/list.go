@@ -38,41 +38,7 @@ func RunReleasesList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	headers := []string{
-		"Tag-Name",
-		"Title",
-		"Published At",
-		"Status",
-		"Tar URL",
-	}
-
-	var values [][]string
-
-	if len(releases) == 0 {
-		print.OutputList(flags.GlobalOutputValue, headers, values)
-		return nil
-	}
-
-	for _, release := range releases {
-		status := "released"
-		if release.IsDraft {
-			status = "draft"
-		} else if release.IsPrerelease {
-			status = "prerelease"
-		}
-		values = append(
-			values,
-			[]string{
-				release.TagName,
-				release.Title,
-				print.FormatTime(release.PublishedAt),
-				status,
-				release.TarURL,
-			},
-		)
-	}
-	print.OutputList(flags.GlobalOutputValue, headers, values)
-
+	print.ReleasesList(releases, flags.GlobalOutputValue)
 	return nil
 }
 
