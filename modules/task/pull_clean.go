@@ -7,10 +7,11 @@ package task
 import (
 	"fmt"
 
-	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
+	"code.gitea.io/tea/modules/interact"
 
+	"code.gitea.io/sdk/gitea"
 	git_config "github.com/go-git/go-git/v5/config"
 )
 
@@ -78,7 +79,7 @@ call me again with the --ignore-sha flag`, pr.Head.Ref)
 	if err != nil {
 		return err
 	}
-	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey)
+	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, interact.PromptPassword)
 	if err != nil {
 		return err
 	}

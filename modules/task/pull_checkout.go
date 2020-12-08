@@ -10,7 +10,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
-
+	"code.gitea.io/tea/modules/interact"
 	"github.com/go-git/go-git/v5"
 )
 
@@ -60,7 +60,7 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64) 
 	if err != nil {
 		return err
 	}
-	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey)
+	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, interact.PromptPassword)
 	if err != nil {
 		return err
 	}

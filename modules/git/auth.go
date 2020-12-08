@@ -15,13 +15,14 @@ import (
 	gogit_http "github.com/go-git/go-git/v5/plumbing/transport/http"
 	gogit_ssh "github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/terminal"
 )
+
+type pwCallback = func(ctx string) (string, error)
 
 // GetAuthForURL returns the appropriate AuthMethod to be used in Push() / Pull()
 // operations depending on the protocol, and prompts the user for credentials if
 // necessary.
-func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string) (auth git_transport.AuthMethod, err error) {
+func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string, passwordCallback pwCallback) (auth git_transport.AuthMethod, err error) {
 	switch remoteURL.Scheme {
 	case "http", "https":
 		// gitea supports push/pull via app token as username.
@@ -32,7 +33,7 @@ func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string) (auth git_tran
 		user := remoteURL.User.Username()
 		auth, err = gogit_ssh.DefaultAuthBuilder(user)
 		if err != nil {
-			signer, err := readSSHPrivKey(keyFile)
+			signer, err := readSSHPrivKey(keyFile, passwordCallback)
 			if err != nil {
 				return nil, err
 			}
@@ -46,7 +47,7 @@ func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string) (auth git_tran
 	return auth, nil
 }
 
-func readSSHPrivKey(keyFile string) (sig ssh.Signer, err error) {
+func readSSHPrivKey(keyFile string, passwordCallback pwCallback) (sig ssh.Signer, err error) {
 	if keyFile != "" {
 		keyFile, err = utils.AbsPathWithExpansion(keyFile)
 	} else {
@@ -60,21 +61,19 @@ func readSSHPrivKey(keyFile string) (sig ssh.Signer, err error) {
 		return nil, err
 	}
 	sig, err = ssh.ParsePrivateKey(sshKey)
-	if err != nil {
-		pass, err := promptPass(keyFile)
-		if err != nil {
-			return nil, err
-		}
-		sig, err = ssh.ParsePrivateKeyWithPassphrase(sshKey, []byte(pass))
-		if err != nil {
-			return nil, err
+	if _, ok := err.(*ssh.PassphraseMissingError); ok {
+		// allow for up to 3 password attempts
+		for i := 0; i < 3; i++ {
+			var pass string
+			pass, err = passwordCallback(keyFile)
+			if err != nil {
+				return nil, err
+			}
+			sig, err = ssh.ParsePrivateKeyWithPassphrase(sshKey, []byte(pass))
+			if err == nil {
+				break
+			}
 		}
 	}
 	return sig, err
-}
-
-func promptPass(domain string) (string, error) {
-	fmt.Printf("%s password: ", domain)
-	pass, err := terminal.ReadPassword(0)
-	return string(pass), err
 }
