@@ -29,10 +29,6 @@ func runTrackedTimesReset(ctx *cli.Context) error {
 	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 
-	if err := client.CheckServerVersionConstraint(">= 1.11"); err != nil {
-		return err
-	}
-
 	if ctx.Args().Len() != 1 {
 		return fmt.Errorf("No issue specified.\nUsage:\t%s", ctx.Command.UsageText)
 	}
