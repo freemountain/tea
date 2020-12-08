@@ -13,7 +13,7 @@ import (
 // IssueDetails print an issue rendered to stdout
 func IssueDetails(issue *gitea.Issue) {
 	OutputMarkdown(fmt.Sprintf(
-		"# #%d %s (%s)\n%s created %s\n\n%s\n",
+		"# #%d %s (%s)\n@%s created %s\n\n%s\n",
 		issue.Index,
 		issue.Title,
 		issue.State,

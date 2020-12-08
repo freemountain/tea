@@ -143,7 +143,7 @@ func runPullsCreate(ctx *cli.Context) error {
 		log.Fatalf("could not create PR from %s to %s:%s: %s", head, ownerArg, base, err)
 	}
 
-	print.PullDetails(pr)
+	print.PullDetails(pr, nil)
 
 	fmt.Println(pr.HTMLURL)
 	return err
