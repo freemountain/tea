@@ -33,24 +33,23 @@ func LoginDetails(login *config.Login, output string) {
 
 // LoginsList prints a listing of logins
 func LoginsList(logins []config.Login, output string) {
-	var values [][]string
-	headers := []string{
+	t := tableWithHeader(
 		"Name",
 		"URL",
 		"SSHHost",
 		"User",
 		"Default",
-	}
+	)
 
 	for _, l := range logins {
-		values = append(values, []string{
+		t.addRow(
 			l.Name,
 			l.URL,
 			l.GetSSHHost(),
 			l.User,
 			fmt.Sprint(l.Default),
-		})
+		)
 	}
 
-	outputList(output, headers, values)
+	t.print(output)
 }

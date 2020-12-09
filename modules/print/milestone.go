@@ -25,7 +25,6 @@ func MilestoneDetails(milestone *gitea.Milestone) {
 
 // MilestonesList prints a listing of milestones
 func MilestonesList(miles []*gitea.Milestone, output string, state gitea.StateType) {
-
 	headers := []string{
 		"Title",
 	}
@@ -37,7 +36,7 @@ func MilestonesList(miles []*gitea.Milestone, output string, state gitea.StateTy
 		"DueDate",
 	)
 
-	var values [][]string
+	t := table{headers: headers}
 
 	for _, m := range miles {
 		var deadline = ""
@@ -56,8 +55,9 @@ func MilestonesList(miles []*gitea.Milestone, output string, state gitea.StateTy
 			fmt.Sprintf("%d/%d", m.OpenIssues, m.ClosedIssues),
 			deadline,
 		)
-
-		values = append(values, item)
+		t.addRowSlice(item)
 	}
-	outputList(output, headers, values)
+
+	t.sort(0, true)
+	t.print(output)
 }

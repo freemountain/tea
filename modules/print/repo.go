@@ -90,7 +90,8 @@ func ReposList(repos []*gitea.Repository, output string, fields []string) {
 		}
 	}
 
-	outputList(output, fields, values)
+	t := table{headers: fields, values: values}
+	t.print(output)
 }
 
 // RepoDetails print an repo formatted to stdout

@@ -12,7 +12,6 @@ import (
 
 // NotificationsList prints a listing of notification threads
 func NotificationsList(news []*gitea.NotificationThread, output string, showRepository bool) {
-	var values [][]string
 	headers := []string{
 		"Type",
 		"Index",
@@ -21,6 +20,8 @@ func NotificationsList(news []*gitea.NotificationThread, output string, showRepo
 	if showRepository {
 		headers = append(headers, "Repository")
 	}
+
+	t := table{headers: headers}
 
 	for _, n := range news {
 		if n.Subject == nil {
@@ -41,11 +42,10 @@ func NotificationsList(news []*gitea.NotificationThread, output string, showRepo
 		if showRepository {
 			item = append(item, n.Repository.FullName)
 		}
-		values = append(values, item)
+		t.addRowSlice(item)
 	}
 
-	if len(values) != 0 {
-		outputList(output, headers, values)
+	if t.Len() != 0 {
+		t.print(output)
 	}
-	return
 }

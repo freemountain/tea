@@ -17,28 +17,23 @@ func OrganizationsList(organizations []*gitea.Organization, output string) {
 		return
 	}
 
-	headers := []string{
+	t := tableWithHeader(
 		"Name",
 		"FullName",
 		"Website",
 		"Location",
 		"Description",
-	}
-
-	var values [][]string
+	)
 
 	for _, org := range organizations {
-		values = append(
-			values,
-			[]string{
-				org.UserName,
-				org.FullName,
-				org.Website,
-				org.Location,
-				org.Description,
-			},
+		t.addRow(
+			org.UserName,
+			org.FullName,
+			org.Website,
+			org.Location,
+			org.Description,
 		)
 	}
 
-	outputList(output, headers, values)
+	t.print(output)
 }

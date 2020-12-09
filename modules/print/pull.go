@@ -60,20 +60,14 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
 
 // PullsList prints a listing of pulls
 func PullsList(prs []*gitea.PullRequest, output string) {
-	var values [][]string
-	headers := []string{
+	t := tableWithHeader(
 		"Index",
 		"Title",
 		"State",
 		"Author",
 		"Milestone",
 		"Updated",
-	}
-
-	if len(prs) == 0 {
-		outputList(output, headers, values)
-		return
-	}
+	)
 
 	for _, pr := range prs {
 		if pr == nil {
@@ -87,18 +81,15 @@ func PullsList(prs []*gitea.PullRequest, output string) {
 		if pr.Milestone != nil {
 			mile = pr.Milestone.Title
 		}
-		values = append(
-			values,
-			[]string{
-				strconv.FormatInt(pr.Index, 10),
-				pr.Title,
-				string(pr.State),
-				author,
-				mile,
-				FormatTime(*pr.Updated),
-			},
+		t.addRow(
+			strconv.FormatInt(pr.Index, 10),
+			pr.Title,
+			string(pr.State),
+			author,
+			mile,
+			FormatTime(*pr.Updated),
 		)
 	}
 
-	outputList(output, headers, values)
+	t.print(output)
 }

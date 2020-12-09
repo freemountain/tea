@@ -23,7 +23,12 @@ func formatDuration(seconds int64, outputType string) string {
 
 // TrackedTimesList print list of tracked times to stdout
 func TrackedTimesList(times []*gitea.TrackedTime, outputType string, from, until time.Time, printTotal bool) {
-	var outputValues [][]string
+	tab := tableWithHeader(
+		"Created",
+		"Issue",
+		"User",
+		"Duration",
+	)
 	var totalDuration int64
 
 	for _, t := range times {
@@ -35,29 +40,16 @@ func TrackedTimesList(times []*gitea.TrackedTime, outputType string, from, until
 		}
 
 		totalDuration += t.Time
-
-		outputValues = append(
-			outputValues,
-			[]string{
-				FormatTime(t.Created),
-				"#" + strconv.FormatInt(t.Issue.Index, 10),
-				t.UserName,
-				formatDuration(t.Time, outputType),
-			},
+		tab.addRow(
+			FormatTime(t.Created),
+			"#"+strconv.FormatInt(t.Issue.Index, 10),
+			t.UserName,
+			formatDuration(t.Time, outputType),
 		)
 	}
 
 	if printTotal {
-		outputValues = append(outputValues, []string{
-			"TOTAL", "", "", formatDuration(totalDuration, outputType),
-		})
+		tab.addRow("TOTAL", "", "", formatDuration(totalDuration, outputType))
 	}
-
-	headers := []string{
-		"Created",
-		"Issue",
-		"User",
-		"Duration",
-	}
-	outputList(outputType, headers, outputValues)
+	tab.print(outputType)
 }

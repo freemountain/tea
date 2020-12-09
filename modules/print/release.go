@@ -10,19 +10,13 @@ import (
 
 // ReleasesList prints a listing of releases
 func ReleasesList(releases []*gitea.Release, output string) {
-	var values [][]string
-	headers := []string{
+	t := tableWithHeader(
 		"Tag-Name",
 		"Title",
 		"Published At",
 		"Status",
 		"Tar URL",
-	}
-
-	if len(releases) == 0 {
-		outputList(output, headers, values)
-		return
-	}
+	)
 
 	for _, release := range releases {
 		status := "released"
@@ -31,17 +25,14 @@ func ReleasesList(releases []*gitea.Release, output string) {
 		} else if release.IsPrerelease {
 			status = "prerelease"
 		}
-		values = append(
-			values,
-			[]string{
-				release.TagName,
-				release.Title,
-				FormatTime(release.PublishedAt),
-				status,
-				release.TarURL,
-			},
+		t.addRow(
+			release.TagName,
+			release.Title,
+			FormatTime(release.PublishedAt),
+			status,
+			release.TarURL,
 		)
 	}
 
-	outputList(output, headers, values)
+	t.print(output)
 }

@@ -14,33 +14,24 @@ import (
 
 // LabelsList prints a listing of labels
 func LabelsList(labels []*gitea.Label, output string) {
-	var values [][]string
-	headers := []string{
+	t := tableWithHeader(
 		"Index",
 		"Color",
 		"Name",
 		"Description",
-	}
-
-	if len(labels) == 0 {
-		outputList(output, headers, values)
-		return
-	}
+	)
 
 	p := termenv.ColorProfile()
 
 	for _, label := range labels {
 		color := termenv.String(label.Color)
 
-		values = append(
-			values,
-			[]string{
-				strconv.FormatInt(label.ID, 10),
-				fmt.Sprint(color.Background(p.Color("#" + label.Color))),
-				label.Name,
-				label.Description,
-			},
+		t.addRow(
+			strconv.FormatInt(label.ID, 10),
+			fmt.Sprint(color.Background(p.Color("#"+label.Color))),
+			label.Name,
+			label.Description,
 		)
 	}
-	outputList(output, headers, values)
+	t.print(output)
 }
