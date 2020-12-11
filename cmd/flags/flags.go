@@ -34,7 +34,7 @@ var LoginFlag = cli.StringFlag{
 var RepoFlag = cli.StringFlag{
 	Name:        "repo",
 	Aliases:     []string{"r"},
-	Usage:       "Repository to interact with. Optional",
+	Usage:       "Override local repository path or gitea repository slug to interact with. Optional",
 	Destination: &GlobalRepoValue,
 }
 

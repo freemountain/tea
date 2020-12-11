@@ -30,8 +30,7 @@ var CmdOrganizationList = cli.Command{
 
 // RunOrganizationList list user organizations
 func RunOrganizationList(ctx *cli.Context) error {
-	//TODO: Reconsider the usage InitCommandLoginOnly related to #200
-	login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
+	login, _, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 
 	client := login.Client()
 

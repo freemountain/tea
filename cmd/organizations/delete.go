@@ -24,8 +24,7 @@ var CmdOrganizationDelete = cli.Command{
 
 // RunOrganizationDelete delete user organization
 func RunOrganizationDelete(ctx *cli.Context) error {
-	//TODO: Reconsider the usage InitCommandLoginOnly related to #200
-	login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
+	login, _, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 
 	client := login.Client()
 

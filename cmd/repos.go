@@ -39,9 +39,9 @@ func runRepos(ctx *cli.Context) error {
 }
 
 func runRepoDetail(path string) error {
-	login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
+	login, ownerFallback, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
-	repoOwner, repoName := utils.GetOwnerAndRepo(path, login.User)
+	repoOwner, repoName := utils.GetOwnerAndRepo(path, ownerFallback)
 	repo, _, err := client.GetRepo(repoOwner, repoName)
 	if err != nil {
 		return err

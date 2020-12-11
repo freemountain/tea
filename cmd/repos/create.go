@@ -83,7 +83,7 @@ var CmdRepoCreate = cli.Command{
 }
 
 func runRepoCreate(ctx *cli.Context) error {
-	login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
+	login, _, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 	var (
 		repo *gitea.Repository

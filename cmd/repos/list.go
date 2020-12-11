@@ -45,7 +45,7 @@ var CmdReposList = cli.Command{
 
 // RunReposList list repositories
 func RunReposList(ctx *cli.Context) error {
-	login := config.InitCommandLoginOnly(flags.GlobalLoginValue)
+	login, _, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
 	client := login.Client()
 
 	typeFilter, err := getTypeFilter(ctx)

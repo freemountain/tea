@@ -16,18 +16,14 @@ type TeaRepo struct {
 // RepoForWorkdir tries to open the git repository in the local directory
 // for reading or modification.
 func RepoForWorkdir() (*TeaRepo, error) {
-	repo, err := git.PlainOpenWithOptions("./", &git.PlainOpenOptions{
-		DetectDotGit: true,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &TeaRepo{repo}, nil
+	return RepoFromPath("")
 }
 
 // RepoFromPath tries to open the git repository by path
 func RepoFromPath(path string) (*TeaRepo, error) {
+	if len(path) == 0 {
+		path = "./"
+	}
 	repo, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{
 		DetectDotGit: true,
 	})
