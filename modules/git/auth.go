@@ -22,29 +22,26 @@ type pwCallback = func(string) (string, error)
 // GetAuthForURL returns the appropriate AuthMethod to be used in Push() / Pull()
 // operations depending on the protocol, and prompts the user for credentials if
 // necessary.
-func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string, passwordCallback pwCallback) (auth git_transport.AuthMethod, err error) {
+func GetAuthForURL(remoteURL *url.URL, authToken, keyFile string, passwordCallback pwCallback) (git_transport.AuthMethod, error) {
 	switch remoteURL.Scheme {
 	case "http", "https":
 		// gitea supports push/pull via app token as username.
-		auth = &gogit_http.BasicAuth{Password: "", Username: authToken}
+		return &gogit_http.BasicAuth{Password: "", Username: authToken}, nil
 
 	case "ssh":
 		// try to select right key via ssh-agent. if it fails, try to read a key manually
 		user := remoteURL.User.Username()
-		auth, err = gogit_ssh.DefaultAuthBuilder(user)
-		if err != nil && passwordCallback != nil {
+		auth, err := gogit_ssh.DefaultAuthBuilder(user)
+		if err != nil {
 			signer, err2 := readSSHPrivKey(keyFile, passwordCallback)
 			if err2 != nil {
 				return nil, err2
 			}
 			auth = &gogit_ssh.PublicKeys{User: user, Signer: signer}
 		}
-
-	default:
-		return nil, fmt.Errorf("don't know how to handle url scheme %v", remoteURL.Scheme)
+		return auth, nil
 	}
-
-	return
+	return nil, fmt.Errorf("don't know how to handle url scheme %v", remoteURL.Scheme)
 }
 
 func readSSHPrivKey(keyFile string, passwordCallback pwCallback) (sig ssh.Signer, err error) {
@@ -61,7 +58,7 @@ func readSSHPrivKey(keyFile string, passwordCallback pwCallback) (sig ssh.Signer
 		return nil, err
 	}
 	sig, err = ssh.ParsePrivateKey(sshKey)
-	if _, ok := err.(*ssh.PassphraseMissingError); ok {
+	if _, ok := err.(*ssh.PassphraseMissingError); ok && passwordCallback != nil {
 		// allow for up to 3 password attempts
 		for i := 0; i < 3; i++ {
 			var pass string

@@ -52,7 +52,7 @@ var CmdLoginAdd = cli.Command{
 		&cli.StringFlag{
 			Name:    "ssh-key",
 			Aliases: []string{"s"},
-			Usage:   "Path to a SSH key to use for pull/push operations",
+			Usage:   "Path to a SSH key to use, overrides auto-discovery",
 		},
 		&cli.BoolFlag{
 			Name:    "insecure",

@@ -89,6 +89,13 @@ func AddLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bool)
 	// so we just use the hostname
 	login.SSHHost = serverURL.Hostname()
 
+	if len(sshKey) == 0 {
+		login.SSHKey, err = login.FindSSHKey()
+		if err != nil {
+			fmt.Printf("Warning: problem while finding a SSH key: %s\n", err)
+		}
+	}
+
 	// save login to global var
 	Config.Logins = append(Config.Logins, login)
 

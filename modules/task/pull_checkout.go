@@ -7,7 +7,6 @@ package task
 import (
 	"fmt"
 
-	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
 
@@ -29,13 +28,11 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64, 
 		return err
 	}
 
-	// test if we can pull via SSH, and configure git remote accordingly
 	remoteURL := pr.Head.Repository.CloneURL
-	keys, _, err := client.ListMyPublicKeys(gitea.ListPublicKeysOptions{})
-	if err != nil {
-		return err
-	}
-	if len(keys) != 0 {
+	if len(login.SSHKey) != 0 {
+		// login.SSHKey is nonempty, if user specified a key manually or we automatically
+		// found a matching private key on this machine during login creation.
+		// this means, we are very likely to have a working ssh setup.
 		remoteURL = pr.Head.Repository.SSHURL
 	}
 
@@ -54,9 +51,8 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64, 
 	}
 	localRemoteName := localRemote.Config().Name
 
-	// get auth & fetch remote
-	fmt.Printf("Fetching PR %v (head %s:%s) from remote '%s'\n", index, remoteURL, pr.Head.Ref, localRemoteName)
-	url, err := local_git.ParseURL(remoteURL)
+	// get auth & fetch remote via its configured protocol
+	url, err := localRepo.TeaRemoteURL(localRemoteName)
 	if err != nil {
 		return err
 	}
@@ -64,6 +60,7 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64, 
 	if err != nil {
 		return err
 	}
+	fmt.Printf("Fetching PR %v (head %s:%s) from remote '%s'\n", index, url, pr.Head.Ref, localRemoteName)
 	err = localRemote.Fetch(&git.FetchOptions{Auth: auth})
 	if err == git.NoErrAlreadyUpToDate {
 		fmt.Println(err)
@@ -72,9 +69,10 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64, 
 	}
 
 	// checkout local branch
-	fmt.Printf("Creating branch '%s'\n", localBranchName)
 	err = localRepo.TeaCreateBranch(localBranchName, pr.Head.Ref, localRemoteName)
-	if err == git.ErrBranchExists {
+	if err == nil {
+		fmt.Printf("Created branch '%s'\n", localBranchName)
+	} else if err == git.ErrBranchExists {
 		fmt.Println("There may be changes since you last checked out, run `git pull` to get them.")
 	} else if err != nil {
 		return err

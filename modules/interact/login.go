@@ -73,7 +73,7 @@ func CreateLogin() error {
 		return err
 	}
 	if optSettings {
-		promptI = &survey.Input{Message: "SSH Key Path: "}
+		promptI = &survey.Input{Message: "SSH Key Path (leave empty for auto-discovery):"}
 		if err := survey.AskOne(promptI, &sshKey); err != nil {
 			return err
 		}
