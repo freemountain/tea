@@ -131,7 +131,7 @@ check: test
 
 .PHONY: install
 install: $(wildcard *.go)
-	$(GO) install -v -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)'
+	$(GO) install -mod=vendor -v -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)'
 
 .PHONY: build
 build: $(EXECUTABLE)
