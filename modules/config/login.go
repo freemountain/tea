@@ -6,21 +6,15 @@ package config
 
 import (
 	"crypto/tls"
-	"encoding/base64"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"path/filepath"
 	"strings"
 
-	"code.gitea.io/tea/modules/utils"
-
 	"code.gitea.io/sdk/gitea"
-	"golang.org/x/crypto/ssh"
 )
 
 // Login represents a login to a gitea server, you even could add multiple logins for one gitea server
@@ -39,55 +33,88 @@ type Login struct {
 	Created int64 `yaml:"created"`
 }
 
+// GetLogins return all login available by config
+func GetLogins() ([]Login, error) {
+	if err := loadConfig(); err != nil {
+		return nil, err
+	}
+	return config.Logins, nil
+}
+
 // GetDefaultLogin return the default login
 func GetDefaultLogin() (*Login, error) {
-	if len(Config.Logins) == 0 {
+	if err := loadConfig(); err != nil {
+		return nil, err
+	}
+
+	if len(config.Logins) == 0 {
 		return nil, errors.New("No available login")
 	}
-	for _, l := range Config.Logins {
+	for _, l := range config.Logins {
 		if l.Default {
 			return &l, nil
 		}
 	}
 
-	return &Config.Logins[0], nil
+	return &config.Logins[0], nil
 }
 
-// GetLoginByName get login by name
+// SetDefaultLogin set the default login by name (case insensitive)
+func SetDefaultLogin(name string) error {
+	if err := loadConfig(); err != nil {
+		return err
+	}
+
+	loginExist := false
+	for i := range config.Logins {
+		config.Logins[i].Default = false
+		if strings.ToLower(config.Logins[i].Name) == strings.ToLower(name) {
+			config.Logins[i].Default = true
+			loginExist = true
+		}
+	}
+
+	if !loginExist {
+		return fmt.Errorf("login '%s' not found", name)
+	}
+
+	return saveConfig()
+}
+
+// GetLoginByName get login by name (case insensitive)
 func GetLoginByName(name string) *Login {
-	for _, l := range Config.Logins {
-		if l.Name == name {
+	err := loadConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, l := range config.Logins {
+		if strings.ToLower(l.Name) == strings.ToLower(name) {
 			return &l
 		}
 	}
 	return nil
 }
 
-// GenerateLoginName generates a name string based on instance URL & adds username if the result is not unique
-func GenerateLoginName(url, user string) (string, error) {
-	parsedURL, err := utils.NormalizeURL(url)
+// GetLoginByToken get login by token
+func GetLoginByToken(token string) *Login {
+	err := loadConfig()
 	if err != nil {
-		return "", err
+		log.Fatal(err)
 	}
-	name := parsedURL.Host
 
-	// append user name if login name already exists
-	if len(user) != 0 {
-		for _, l := range Config.Logins {
-			if l.Name == name {
-				name += "_" + user
-				break
-			}
+	for _, l := range config.Logins {
+		if l.Token == token {
+			return &l
 		}
 	}
-
-	return name, nil
+	return nil
 }
 
-// DeleteLogin delete a login by name
+// DeleteLogin delete a login by name from config
 func DeleteLogin(name string) error {
 	var idx = -1
-	for i, l := range Config.Logins {
+	for i, l := range config.Logins {
 		if l.Name == name {
 			idx = i
 			break
@@ -97,9 +124,22 @@ func DeleteLogin(name string) error {
 		return fmt.Errorf("can not delete login '%s', does not exist", name)
 	}
 
-	Config.Logins = append(Config.Logins[:idx], Config.Logins[idx+1:]...)
+	config.Logins = append(config.Logins[:idx], config.Logins[idx+1:]...)
 
-	return SaveConfig()
+	return saveConfig()
+}
+
+// AddLogin save a login to config
+func AddLogin(login *Login) error {
+	if err := loadConfig(); err != nil {
+		return err
+	}
+
+	// save login to global var
+	config.Logins = append(config.Logins, *login)
+
+	// save login to config file
+	return saveConfig()
 }
 
 // Client returns a client to operate Gitea API
@@ -137,66 +177,4 @@ func (l *Login) GetSSHHost() string {
 	}
 
 	return u.Hostname()
-}
-
-// FindSSHKey retrieves the ssh keys registered in gitea, and tries to find
-// a matching private key in ~/.ssh/. If no match is found, path is empty.
-func (l *Login) FindSSHKey() (string, error) {
-	// get keys registered on gitea instance
-	keys, _, err := l.Client().ListMyPublicKeys(gitea.ListPublicKeysOptions{})
-	if err != nil || len(keys) == 0 {
-		return "", err
-	}
-
-	// enumerate ~/.ssh/*.pub files
-	glob, err := utils.AbsPathWithExpansion("~/.ssh/*.pub")
-	if err != nil {
-		return "", err
-	}
-	localPubkeyPaths, err := filepath.Glob(glob)
-	if err != nil {
-		return "", err
-	}
-
-	// parse each local key with present privkey & compare fingerprints to online keys
-	for _, pubkeyPath := range localPubkeyPaths {
-		var pubkeyFile []byte
-		pubkeyFile, err = ioutil.ReadFile(pubkeyPath)
-		if err != nil {
-			continue
-		}
-		fields := strings.Split(string(pubkeyFile), " ")
-		if len(fields) < 2 { // first word is key type, second word is key material
-			continue
-		}
-
-		var keymaterial []byte
-		keymaterial, err = base64.StdEncoding.DecodeString(fields[1])
-		if err != nil {
-			continue
-		}
-
-		var pubkey ssh.PublicKey
-		pubkey, err = ssh.ParsePublicKey(keymaterial)
-		if err != nil {
-			continue
-		}
-
-		privkeyPath := strings.TrimSuffix(pubkeyPath, ".pub")
-		var exists bool
-		exists, err = utils.FileExist(privkeyPath)
-		if err != nil || !exists {
-			continue
-		}
-
-		// if pubkey fingerprints match, return path to corresponding privkey.
-		fingerprint := ssh.FingerprintSHA256(pubkey)
-		for _, key := range keys {
-			if fingerprint == key.Fingerprint {
-				return privkeyPath, nil
-			}
-		}
-	}
-
-	return "", err
 }

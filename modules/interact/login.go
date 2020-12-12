@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/task"
 
 	"github.com/AlecAivazis/survey/v2"
 )
@@ -28,7 +28,7 @@ func CreateLogin() error {
 		return nil
 	}
 
-	name, err := config.GenerateLoginName(giteaURL, "")
+	name, err := task.GenerateLoginName(giteaURL, "")
 	if err != nil {
 		return err
 	}
@@ -87,5 +87,5 @@ func CreateLogin() error {
 		}
 	}
 
-	return config.AddLogin(name, token, user, passwd, sshKey, giteaURL, insecure)
+	return task.CreateLogin(name, token, user, passwd, sshKey, giteaURL, insecure)
 }

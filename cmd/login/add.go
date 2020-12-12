@@ -5,8 +5,8 @@
 package login
 
 import (
-	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/interact"
+	"code.gitea.io/tea/modules/task"
 
 	"github.com/urfave/cli/v2"
 )
@@ -70,7 +70,7 @@ func runLoginAdd(ctx *cli.Context) error {
 	}
 
 	// else use args to add login
-	return config.AddLogin(
+	return task.CreateLogin(
 		ctx.String("name"),
 		ctx.String("token"),
 		ctx.String("user"),

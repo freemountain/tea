@@ -24,9 +24,6 @@ var CmdLoginSetDefault = cli.Command{
 }
 
 func runLoginSetDefault(ctx *cli.Context) error {
-	if err := config.LoadConfig(); err != nil {
-		return err
-	}
 	if ctx.Args().Len() == 0 {
 		l, err := config.GetDefaultLogin()
 		if err != nil {
@@ -35,18 +32,7 @@ func runLoginSetDefault(ctx *cli.Context) error {
 		fmt.Printf("Default Login: %s\n", l.Name)
 		return nil
 	}
-	loginExist := false
-	for i := range config.Config.Logins {
-		config.Config.Logins[i].Default = false
-		if config.Config.Logins[i].Name == ctx.Args().First() {
-			config.Config.Logins[i].Default = true
-			loginExist = true
-		}
-	}
 
-	if !loginExist {
-		return fmt.Errorf("login '%s' not found", ctx.Args().First())
-	}
-
-	return config.SaveConfig()
+	name := ctx.Args().First()
+	return config.SetDefaultLogin(name)
 }

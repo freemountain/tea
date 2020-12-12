@@ -29,7 +29,7 @@ var CmdLogout = cli.Command{
 }
 
 func runLogout(ctx *cli.Context) error {
-	err := config.LoadConfig()
+	logins, err := config.GetLogins()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,8 +40,8 @@ func runLogout(ctx *cli.Context) error {
 		name = ctx.String("name")
 	} else if len(ctx.Args().First()) != 0 {
 		name = ctx.Args().First()
-	} else if len(config.Config.Logins) == 1 {
-		name = config.Config.Logins[0].Name
+	} else if len(logins) == 1 {
+		name = logins[0].Name
 	} else {
 		return errors.New("Please specify a login name")
 	}

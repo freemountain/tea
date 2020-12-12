@@ -21,6 +21,6 @@ var CmdLoginEdit = cli.Command{
 	Flags:       []cli.Flag{&flags.OutputFlag},
 }
 
-func runLoginEdit(ctx *cli.Context) error {
+func runLoginEdit(_ *cli.Context) error {
 	return open.Start(config.GetConfigPath())
 }

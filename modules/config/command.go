@@ -21,7 +21,7 @@ import (
 // the remotes of the .git repo specified in repoFlag or $PWD, and using overrides from
 // command flags. If a local git repo can't be found, repo slug values are unset.
 func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner string, reponame string) {
-	err := LoadConfig()
+	err := loadConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -69,7 +69,7 @@ func InitCommand(repoFlag, loginFlag, remoteFlag string) (login *Login, owner st
 	return
 }
 
-// discovers login & repo slug from the default branch remote of the given local repo
+// contextFromLocalRepo discovers login & repo slug from the default branch remote of the given local repo
 func contextFromLocalRepo(repoValue, remoteValue string) (*Login, string, error) {
 	repo, err := git.RepoFromPath(repoValue)
 	if err != nil {
@@ -106,7 +106,7 @@ func contextFromLocalRepo(repoValue, remoteValue string) (*Login, string, error)
 		return nil, "", errors.New("Remote " + remoteValue + " not found in this Git repository")
 	}
 
-	for _, l := range Config.Logins {
+	for _, l := range config.Logins {
 		for _, u := range remoteConfig.URLs {
 			p, err := git.ParseURL(strings.TrimSpace(u))
 			if err != nil {
