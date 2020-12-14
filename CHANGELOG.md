@@ -1,5 +1,42 @@
 # Changelog
 
+## [v0.6.0](https://gitea.com/gitea/tea/releases/tag/v0.6.0) - 2020-12-11
+
+* BREAKING
+  * Add `tea repos search`, improve repo listing (#215)
+  * Add Detail View for Login (#212)
+* FEATURES
+  * Add interactive mode for `tea pr create` (#279)
+  * Add organization delete command (#270)
+  * Add organization list command (#264)
+* BUGFIXES
+  * Forces needed arguments to `tea ms issues` (#297)
+  * Subcommands work outside of git repos (#285)
+  * Fix repo flag ignores local repo for login detection (#285)
+  * Improve ssh handling (#277)
+  * Issue create return web url (#257)
+  * Support prerelease gitea instances (#252)
+  * Fix `tea pr create` within same repo (#248)
+  * Handle login name case-insensitive on all comands (#227)
+* ENHANCEMENTS
+  * Add `tea login delete` (#296)
+  * Release delete: add --delete-tag & --confirm (#286)
+  * Sorted milestones list (#281)
+  * Pull clean & checkout use token for http(s) auth (#275)
+  * Show more infos in pull detail view (#271)
+  * Specify fields to print on `tea repos list` (#223)
+  * Print times in local timezone (#217)
+  * Issue create/edit print details (#214)
+  * Improve `tea logout` (#213)
+  * Added a shorthand for notifications (#209)
+  * Common subcommand naming scheme (#208)
+  * `tea pr checkout`: fetch via ssh if available (#192)
+  * Major refactor of codebase
+* BUILD
+  * Use gox to cross-compile (#274)
+* DOCS
+  * Update Docs to new code structure (#247)
+
 ## [v0.5.0](https://gitea.com/gitea/tea/releases/tag/v0.5.0) - 2020-09-27
 
 * BREAKING
