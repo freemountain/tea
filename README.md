@@ -9,6 +9,8 @@ It uses [code.gitea.io/sdk](https://code.gitea.io/sdk) and interacts with the Gi
 
 ![demo gif](https://dl.gitea.io/screenshots/tea_demo.gif)
 
+For a feature comparison with other git forge CLIs see [here](./FEATURE-COMPARISON.md).
+
 ## Installation
 
 You can use the prebuilt binaries from [dl.gitea.io](https://dl.gitea.io/tea/)
