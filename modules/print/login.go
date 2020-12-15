@@ -13,7 +13,7 @@ import (
 )
 
 // LoginDetails print login entry to stdout
-func LoginDetails(login *config.Login, output string) {
+func LoginDetails(login *config.Login) {
 	in := fmt.Sprintf("# %s\n\n[@%s](%s/%s)\n",
 		login.Name,
 		login.User,

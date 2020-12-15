@@ -7,7 +7,7 @@ package cmd
 import (
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/issues"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -33,19 +33,20 @@ var CmdIssues = cli.Command{
 
 func runIssues(ctx *cli.Context) error {
 	if ctx.Args().Len() == 1 {
-		return runIssueDetail(ctx.Args().First())
+		return runIssueDetail(ctx, ctx.Args().First())
 	}
 	return issues.RunIssuesList(ctx)
 }
 
-func runIssueDetail(index string) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runIssueDetail(cmd *cli.Context, index string) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
 	idx, err := utils.ArgToIndex(index)
 	if err != nil {
 		return err
 	}
-	issue, _, err := login.Client().GetIssue(owner, repo, idx)
+	issue, _, err := ctx.Login.Client().GetIssue(ctx.Owner, ctx.Repo, idx)
 	if err != nil {
 		return err
 	}

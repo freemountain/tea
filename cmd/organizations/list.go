@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -29,17 +29,18 @@ var CmdOrganizationList = cli.Command{
 }
 
 // RunOrganizationList list user organizations
-func RunOrganizationList(ctx *cli.Context) error {
-	login, _, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func RunOrganizationList(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	client := ctx.Login.Client()
 
-	client := login.Client()
-
-	userOrganizations, _, err := client.ListUserOrgs(login.User, gitea.ListOrgsOptions{ListOptions: flags.GetListOptions(ctx)})
+	userOrganizations, _, err := client.ListUserOrgs(ctx.Login.User, gitea.ListOrgsOptions{
+		ListOptions: ctx.GetListOptions(),
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	print.OrganizationsList(userOrganizations, flags.GlobalOutputValue)
+	print.OrganizationsList(userOrganizations, ctx.Output)
 
 	return nil
 }

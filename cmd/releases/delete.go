@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 
 	"github.com/urfave/cli/v2"
 )
@@ -33,9 +33,10 @@ var CmdReleaseDelete = cli.Command{
 	}, flags.AllDefaultFlags...),
 }
 
-func runReleaseDelete(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func runReleaseDelete(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
+	client := ctx.Login.Client()
 
 	tag := ctx.Args().First()
 	if len(tag) == 0 {
@@ -48,7 +49,7 @@ func runReleaseDelete(ctx *cli.Context) error {
 		return nil
 	}
 
-	release, err := getReleaseByTag(owner, repo, tag, client)
+	release, err := getReleaseByTag(ctx.Owner, ctx.Repo, tag, client)
 	if err != nil {
 		return err
 	}
@@ -56,13 +57,13 @@ func runReleaseDelete(ctx *cli.Context) error {
 		return nil
 	}
 
-	_, err = client.DeleteRelease(owner, repo, release.ID)
+	_, err = client.DeleteRelease(ctx.Owner, ctx.Repo, release.ID)
 	if err != nil {
 		return err
 	}
 
 	if ctx.Bool("delete-tag") {
-		_, err = client.DeleteReleaseTag(owner, repo, tag)
+		_, err = client.DeleteReleaseTag(ctx.Owner, ctx.Repo, tag)
 		return err
 	}
 

@@ -10,8 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -43,13 +42,14 @@ var CmdLabelCreate = cli.Command{
 	},
 }
 
-func runLabelCreate(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runLabelCreate(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
 	labelFile := ctx.String("file")
 	var err error
 	if len(labelFile) == 0 {
-		_, _, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
+		_, _, err = ctx.Login.Client().CreateLabel(ctx.Owner, ctx.Repo, gitea.CreateLabelOption{
 			Name:        ctx.String("name"),
 			Color:       ctx.String("color"),
 			Description: ctx.String("description"),
@@ -69,7 +69,7 @@ func runLabelCreate(ctx *cli.Context) error {
 			if color == "" || name == "" {
 				log.Printf("Line %d ignored because lack of enough fields: %s\n", i, line)
 			} else {
-				_, _, err = login.Client().CreateLabel(owner, repo, gitea.CreateLabelOption{
+				_, _, err = ctx.Login.Client().CreateLabel(ctx.Owner, ctx.Repo, gitea.CreateLabelOption{
 					Name:        name,
 					Color:       color,
 					Description: description,

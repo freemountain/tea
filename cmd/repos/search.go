@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -56,9 +56,9 @@ var CmdReposSearch = cli.Command{
 	}, flags.LoginOutputFlags...),
 }
 
-func runReposSearch(ctx *cli.Context) error {
-	login, _, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func runReposSearch(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	client := ctx.Login.Client()
 
 	var ownerID int64
 	if ctx.IsSet("owner") {
@@ -93,7 +93,7 @@ func runReposSearch(ctx *cli.Context) error {
 		isPrivate = &private
 	}
 
-	mode, err := getTypeFilter(ctx)
+	mode, err := getTypeFilter(cmd)
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,7 @@ func runReposSearch(ctx *cli.Context) error {
 	}
 
 	rps, _, err := client.SearchRepos(gitea.SearchRepoOptions{
-		ListOptions:          flags.GetListOptions(ctx),
+		ListOptions:          ctx.GetListOptions(),
 		OwnerID:              ownerID,
 		IsPrivate:            isPrivate,
 		IsArchived:           isArchived,
@@ -123,6 +123,6 @@ func runReposSearch(ctx *cli.Context) error {
 		return err
 	}
 
-	print.ReposList(rps, flags.GlobalOutputValue, getFields(ctx))
+	print.ReposList(rps, ctx.Output, getFields(cmd))
 	return nil
 }

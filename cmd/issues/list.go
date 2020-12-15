@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -26,8 +26,9 @@ var CmdIssuesList = cli.Command{
 }
 
 // RunIssuesList list issues
-func RunIssuesList(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func RunIssuesList(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
 	state := gitea.StateOpen
 	switch ctx.String("state") {
@@ -39,8 +40,8 @@ func RunIssuesList(ctx *cli.Context) error {
 		state = gitea.StateClosed
 	}
 
-	issues, _, err := login.Client().ListRepoIssues(owner, repo, gitea.ListIssueOption{
-		ListOptions: flags.GetListOptions(ctx),
+	issues, _, err := ctx.Login.Client().ListRepoIssues(ctx.Owner, ctx.Repo, gitea.ListIssueOption{
+		ListOptions: ctx.GetListOptions(),
 		State:       state,
 		Type:        gitea.IssueTypeIssue,
 	})
@@ -49,6 +50,6 @@ func RunIssuesList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	print.IssuesList(issues, flags.GlobalOutputValue)
+	print.IssuesList(issues, ctx.Output)
 	return nil
 }

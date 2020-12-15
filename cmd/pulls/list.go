@@ -8,7 +8,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -26,8 +26,9 @@ var CmdPullsList = cli.Command{
 }
 
 // RunPullsList return list of pulls
-func RunPullsList(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func RunPullsList(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
 	state := gitea.StateOpen
 	switch ctx.String("state") {
@@ -39,7 +40,7 @@ func RunPullsList(ctx *cli.Context) error {
 		state = gitea.StateClosed
 	}
 
-	prs, _, err := login.Client().ListRepoPullRequests(owner, repo, gitea.ListPullRequestsOptions{
+	prs, _, err := ctx.Login.Client().ListRepoPullRequests(ctx.Owner, ctx.Repo, gitea.ListPullRequestsOptions{
 		State: state,
 	})
 
@@ -47,6 +48,6 @@ func RunPullsList(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	print.PullsList(prs, flags.GlobalOutputValue)
+	print.PullsList(prs, ctx.Output)
 	return nil
 }

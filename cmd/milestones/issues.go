@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -65,9 +65,10 @@ var CmdMilestoneRemoveIssue = cli.Command{
 	Flags:       flags.AllDefaultFlags,
 }
 
-func runMilestoneIssueList(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func runMilestoneIssueList(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
+	client := ctx.Login.Client()
 
 	state := gitea.StateOpen
 	switch ctx.String("state") {
@@ -91,13 +92,13 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 
 	milestone := ctx.Args().First()
 	// make sure milestone exist
-	_, _, err := client.GetMilestoneByName(owner, repo, milestone)
+	_, _, err := client.GetMilestoneByName(ctx.Owner, ctx.Repo, milestone)
 	if err != nil {
 		return err
 	}
 
-	issues, _, err := client.ListRepoIssues(owner, repo, gitea.ListIssueOption{
-		ListOptions: flags.GetListOptions(ctx),
+	issues, _, err := client.ListRepoIssues(ctx.Owner, ctx.Repo, gitea.ListIssueOption{
+		ListOptions: ctx.GetListOptions(),
 		Milestones:  []string{milestone},
 		Type:        kind,
 		State:       state,
@@ -106,13 +107,14 @@ func runMilestoneIssueList(ctx *cli.Context) error {
 		return err
 	}
 
-	print.IssuesPullsList(issues, flags.GlobalOutputValue)
+	print.IssuesPullsList(issues, ctx.Output)
 	return nil
 }
 
-func runMilestoneIssueAdd(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func runMilestoneIssueAdd(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
+	client := ctx.Login.Client()
 	if ctx.Args().Len() != 2 {
 		return fmt.Errorf("need two arguments")
 	}
@@ -125,20 +127,21 @@ func runMilestoneIssueAdd(ctx *cli.Context) error {
 	}
 
 	// make sure milestone exist
-	mile, _, err := client.GetMilestoneByName(owner, repo, mileName)
+	mile, _, err := client.GetMilestoneByName(ctx.Owner, ctx.Repo, mileName)
 	if err != nil {
 		return err
 	}
 
-	_, _, err = client.EditIssue(owner, repo, idx, gitea.EditIssueOption{
+	_, _, err = client.EditIssue(ctx.Owner, ctx.Repo, idx, gitea.EditIssueOption{
 		Milestone: &mile.ID,
 	})
 	return err
 }
 
-func runMilestoneIssueRemove(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func runMilestoneIssueRemove(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
+	client := ctx.Login.Client()
 	if ctx.Args().Len() != 2 {
 		return fmt.Errorf("need two arguments")
 	}
@@ -150,7 +153,7 @@ func runMilestoneIssueRemove(ctx *cli.Context) error {
 		return err
 	}
 
-	issue, _, err := client.GetIssue(owner, repo, idx)
+	issue, _, err := client.GetIssue(ctx.Owner, ctx.Repo, idx)
 	if err != nil {
 		return err
 	}
@@ -164,7 +167,7 @@ func runMilestoneIssueRemove(ctx *cli.Context) error {
 	}
 
 	zero := int64(0)
-	_, _, err = client.EditIssue(owner, repo, idx, gitea.EditIssueOption{
+	_, _, err = client.EditIssue(ctx.Owner, ctx.Repo, idx, gitea.EditIssueOption{
 		Milestone: &zero,
 	})
 	return err

@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -56,9 +56,10 @@ var CmdReleaseEdit = cli.Command{
 	}, flags.AllDefaultFlags...),
 }
 
-func runReleaseEdit(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func runReleaseEdit(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
+	client := ctx.Login.Client()
 
 	tag := ctx.Args().First()
 	if len(tag) == 0 {
@@ -66,7 +67,7 @@ func runReleaseEdit(ctx *cli.Context) error {
 		return nil
 	}
 
-	release, err := getReleaseByTag(owner, repo, tag, client)
+	release, err := getReleaseByTag(ctx.Owner, ctx.Repo, tag, client)
 	if err != nil {
 		return err
 	}
@@ -82,7 +83,7 @@ func runReleaseEdit(ctx *cli.Context) error {
 		isPre = gitea.OptionalBool(strings.ToLower(ctx.String("prerelease"))[:1] == "t")
 	}
 
-	_, _, err = client.EditRelease(owner, repo, release.ID, gitea.EditReleaseOption{
+	_, _, err = client.EditRelease(ctx.Owner, ctx.Repo, release.ID, gitea.EditReleaseOption{
 		TagName:      ctx.String("tag"),
 		Target:       ctx.String("target"),
 		Title:        ctx.String("title"),

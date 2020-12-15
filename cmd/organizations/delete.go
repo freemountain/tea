@@ -7,8 +7,7 @@ package organizations
 import (
 	"log"
 
-	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"github.com/urfave/cli/v2"
 )
 
@@ -23,10 +22,10 @@ var CmdOrganizationDelete = cli.Command{
 }
 
 // RunOrganizationDelete delete user organization
-func RunOrganizationDelete(ctx *cli.Context) error {
-	login, _, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func RunOrganizationDelete(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
 
-	client := login.Client()
+	client := ctx.Login.Client()
 
 	if ctx.Args().Len() < 1 {
 		log.Fatal("You have to specify the organization name you want to delete.")

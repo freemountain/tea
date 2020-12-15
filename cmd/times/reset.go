@@ -9,7 +9,7 @@ import (
 	"log"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/utils"
 
 	"github.com/urfave/cli/v2"
@@ -25,9 +25,10 @@ var CmdTrackedTimesReset = cli.Command{
 	Flags:     flags.LoginRepoFlags,
 }
 
-func runTrackedTimesReset(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func runTrackedTimesReset(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
+	client := ctx.Login.Client()
 
 	if ctx.Args().Len() != 1 {
 		return fmt.Errorf("No issue specified.\nUsage:\t%s", ctx.Command.UsageText)
@@ -38,7 +39,7 @@ func runTrackedTimesReset(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	_, err = client.ResetIssueTime(owner, repo, issue)
+	_, err = client.ResetIssueTime(ctx.Owner, ctx.Repo, issue)
 	if err != nil {
 		log.Fatal(err)
 	}

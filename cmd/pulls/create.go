@@ -6,7 +6,7 @@ package pulls
 
 import (
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/task"
 
@@ -42,19 +42,20 @@ var CmdPullsCreate = cli.Command{
 	}, flags.AllDefaultFlags...),
 }
 
-func runPullsCreate(ctx *cli.Context) error {
-	login, ownerArg, repoArg := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runPullsCreate(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{LocalRepo: true})
 
 	// no args -> interactive mode
 	if ctx.NumFlags() == 0 {
-		return interact.CreatePull(login, ownerArg, repoArg)
+		return interact.CreatePull(ctx.Login, ctx.Owner, ctx.Repo)
 	}
 
 	// else use args to create PR
 	return task.CreatePull(
-		login,
-		ownerArg,
-		repoArg,
+		ctx.Login,
+		ctx.Owner,
+		ctx.Repo,
 		ctx.String("base"),
 		ctx.String("head"),
 		ctx.String("title"),

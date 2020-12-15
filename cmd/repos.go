@@ -5,9 +5,8 @@
 package cmd
 
 import (
-	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/repos"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -33,20 +32,20 @@ var CmdRepos = cli.Command{
 
 func runRepos(ctx *cli.Context) error {
 	if ctx.Args().Len() == 1 {
-		return runRepoDetail(ctx.Args().First())
+		return runRepoDetail(ctx, ctx.Args().First())
 	}
 	return repos.RunReposList(ctx)
 }
 
-func runRepoDetail(path string) error {
-	login, ownerFallback, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
-	repoOwner, repoName := utils.GetOwnerAndRepo(path, ownerFallback)
+func runRepoDetail(cmd *cli.Context, path string) error {
+	ctx := context.InitCommand(cmd)
+	client := ctx.Login.Client()
+	repoOwner, repoName := utils.GetOwnerAndRepo(path, ctx.Owner)
 	repo, _, err := client.GetRepo(repoOwner, repoName)
 	if err != nil {
 		return err
 	}
-	topics, _, err := client.ListRepoTopics(repo.Owner.UserName, repo.Name, gitea.ListRepoTopicsOptions{})
+	topics, _, err := client.ListRepoTopics(repoOwner, repoName, gitea.ListRepoTopicsOptions{})
 	if err != nil {
 		return err
 	}

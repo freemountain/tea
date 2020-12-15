@@ -7,7 +7,6 @@ package cmd
 import (
 	"fmt"
 
-	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/login"
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/print"
@@ -46,6 +45,6 @@ func runLoginDetail(name string) error {
 		return nil
 	}
 
-	print.LoginDetails(l, flags.GlobalOutputValue)
+	print.LoginDetails(l)
 	return nil
 }

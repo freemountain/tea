@@ -6,7 +6,7 @@ package issues
 
 import (
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/task"
 
@@ -33,17 +33,18 @@ var CmdIssuesCreate = cli.Command{
 	}, flags.LoginRepoFlags...),
 }
 
-func runIssuesCreate(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runIssuesCreate(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
 	if ctx.NumFlags() == 0 {
-		return interact.CreateIssue(login, owner, repo)
+		return interact.CreateIssue(ctx.Login, ctx.Owner, ctx.Repo)
 	}
 
 	return task.CreateIssue(
-		login,
-		owner,
-		repo,
+		ctx.Login,
+		ctx.Owner,
+		ctx.Repo,
 		ctx.String("title"),
 		ctx.String("body"),
 	)

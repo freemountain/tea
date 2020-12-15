@@ -5,53 +5,35 @@
 package flags
 
 import (
-	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
-)
-
-// create global variables for global Flags to simplify
-// access to the options without requiring cli.Context
-var (
-	// GlobalLoginValue contain value of --login|-l arg
-	GlobalLoginValue string
-	// GlobalRepoValue contain value of --repo|-r arg
-	GlobalRepoValue string
-	// GlobalOutputValue contain value of --output|-o arg
-	GlobalOutputValue string
-	// GlobalRemoteValue contain value of --remote|-R arg
-	GlobalRemoteValue string
 )
 
 // LoginFlag provides flag to specify tea login profile
 var LoginFlag = cli.StringFlag{
-	Name:        "login",
-	Aliases:     []string{"l"},
-	Usage:       "Use a different Gitea login. Optional",
-	Destination: &GlobalLoginValue,
+	Name:    "login",
+	Aliases: []string{"l"},
+	Usage:   "Use a different Gitea Login. Optional",
 }
 
 // RepoFlag provides flag to specify repository
 var RepoFlag = cli.StringFlag{
-	Name:        "repo",
-	Aliases:     []string{"r"},
-	Usage:       "Override local repository path or gitea repository slug to interact with. Optional",
-	Destination: &GlobalRepoValue,
+	Name:    "repo",
+	Aliases: []string{"r"},
+	Usage:   "Override local repository path or gitea repository slug to interact with. Optional",
 }
 
 // RemoteFlag provides flag to specify remote repository
 var RemoteFlag = cli.StringFlag{
-	Name:        "remote",
-	Aliases:     []string{"R"},
-	Usage:       "Discover Gitea login from remote. Optional",
-	Destination: &GlobalRemoteValue,
+	Name:    "remote",
+	Aliases: []string{"R"},
+	Usage:   "Discover Gitea login from remote. Optional",
 }
 
 // OutputFlag provides flag to specify output type
 var OutputFlag = cli.StringFlag{
-	Name:        "output",
-	Aliases:     []string{"o"},
-	Usage:       "Output format. (csv, simple, table, tsv, yaml)",
-	Destination: &GlobalOutputValue,
+	Name:    "output",
+	Aliases: []string{"o"},
+	Usage:   "Output format. (csv, simple, table, tsv, yaml)",
 }
 
 // StateFlag provides flag to specify issue/pr state, defaulting to "open"
@@ -109,16 +91,3 @@ var IssuePRFlags = append([]cli.Flag{
 	&PaginationPageFlag,
 	&PaginationLimitFlag,
 }, AllDefaultFlags...)
-
-// GetListOptions return ListOptions based on PaginationFlags
-func GetListOptions(ctx *cli.Context) gitea.ListOptions {
-	page := ctx.Int("page")
-	limit := ctx.Int("limit")
-	if limit != 0 && page == 0 {
-		page = 1
-	}
-	return gitea.ListOptions{
-		Page:     page,
-		PageSize: limit,
-	}
-}

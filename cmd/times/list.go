@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -50,9 +50,10 @@ var CmdTrackedTimesList = cli.Command{
 }
 
 // RunTimesList list repositories
-func RunTimesList(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func RunTimesList(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
+	client := ctx.Login.Client()
 
 	var times []*gitea.TrackedTime
 	var err error
@@ -61,17 +62,17 @@ func RunTimesList(ctx *cli.Context) error {
 	fmt.Println(ctx.Command.ArgsUsage)
 	if user == "" {
 		// get all tracked times on the repo
-		times, _, err = client.GetRepoTrackedTimes(owner, repo)
+		times, _, err = client.GetRepoTrackedTimes(ctx.Owner, ctx.Repo)
 	} else if strings.HasPrefix(user, "#") {
 		// get all tracked times on the specified issue
 		issue, err := utils.ArgToIndex(user)
 		if err != nil {
 			return err
 		}
-		times, _, err = client.ListTrackedTimes(owner, repo, issue, gitea.ListTrackedTimesOptions{})
+		times, _, err = client.ListTrackedTimes(ctx.Owner, ctx.Repo, issue, gitea.ListTrackedTimesOptions{})
 	} else {
 		// get all tracked times by the specified user
-		times, _, err = client.GetUserTrackedTimes(owner, repo, user)
+		times, _, err = client.GetUserTrackedTimes(ctx.Owner, ctx.Repo, user)
 	}
 
 	if err != nil {
@@ -92,6 +93,6 @@ func RunTimesList(ctx *cli.Context) error {
 		}
 	}
 
-	print.TrackedTimesList(times, flags.GlobalOutputValue, from, until, ctx.Bool("total"))
+	print.TrackedTimesList(times, ctx.Output, from, until, ctx.Bool("total"))
 	return nil
 }

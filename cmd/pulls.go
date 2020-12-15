@@ -9,7 +9,7 @@ import (
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/pulls"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -36,25 +36,26 @@ var CmdPulls = cli.Command{
 
 func runPulls(ctx *cli.Context) error {
 	if ctx.Args().Len() == 1 {
-		return runPullDetail(ctx.Args().First())
+		return runPullDetail(ctx, ctx.Args().First())
 	}
 	return pulls.RunPullsList(ctx)
 }
 
-func runPullDetail(index string) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
+func runPullDetail(cmd *cli.Context, index string) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	idx, err := utils.ArgToIndex(index)
 	if err != nil {
 		return err
 	}
 
-	client := login.Client()
-	pr, _, err := client.GetPullRequest(owner, repo, idx)
+	client := ctx.Login.Client()
+	pr, _, err := client.GetPullRequest(ctx.Owner, ctx.Repo, idx)
 	if err != nil {
 		return err
 	}
 
-	reviews, _, err := client.ListPullReviews(owner, repo, idx, gitea.ListPullReviewsOptions{})
+	reviews, _, err := client.ListPullReviews(ctx.Owner, ctx.Repo, idx, gitea.ListPullReviewsOptions{})
 	if err != nil {
 		fmt.Printf("error while loading reviews: %v\n", err)
 	}

@@ -18,15 +18,11 @@ var CmdTrackedTimes = cli.Command{
 		 Depending on your permissions on the repository, only your own tracked
 		 times might be listed.`,
 	ArgsUsage: "[username | #issue]",
-	Action:    runTrackedTimes,
+	Action:    times.RunTimesList,
 	Subcommands: []*cli.Command{
 		&times.CmdTrackedTimesAdd,
 		&times.CmdTrackedTimesDelete,
 		&times.CmdTrackedTimesReset,
 		&times.CmdTrackedTimesList,
 	},
-}
-
-func runTrackedTimes(ctx *cli.Context) error {
-	return times.RunTimesList(ctx)
 }

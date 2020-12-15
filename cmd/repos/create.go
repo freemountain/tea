@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
 
 	"code.gitea.io/sdk/gitea"
@@ -82,9 +82,9 @@ var CmdRepoCreate = cli.Command{
 	}, flags.LoginOutputFlags...),
 }
 
-func runRepoCreate(ctx *cli.Context) error {
-	login, _, _ := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func runRepoCreate(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	client := ctx.Login.Client()
 	var (
 		repo *gitea.Repository
 		err  error

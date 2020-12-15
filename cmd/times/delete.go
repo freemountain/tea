@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/utils"
 
 	"github.com/urfave/cli/v2"
@@ -26,9 +26,10 @@ var CmdTrackedTimesDelete = cli.Command{
 	Flags:     flags.LoginRepoFlags,
 }
 
-func runTrackedTimesDelete(ctx *cli.Context) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func runTrackedTimesDelete(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
+	client := ctx.Login.Client()
 
 	if ctx.Args().Len() < 2 {
 		return fmt.Errorf("No issue or time ID specified.\nUsage:\t%s", ctx.Command.UsageText)
@@ -44,7 +45,7 @@ func runTrackedTimesDelete(ctx *cli.Context) error {
 		log.Fatal(err)
 	}
 
-	_, err = client.DeleteTime(owner, repo, issue, timeID)
+	_, err = client.DeleteTime(ctx.Owner, ctx.Repo, issue, timeID)
 	if err != nil {
 		log.Fatal(err)
 	}

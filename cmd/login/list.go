@@ -25,12 +25,11 @@ var CmdLoginList = cli.Command{
 }
 
 // RunLoginList list all logins
-func RunLoginList(_ *cli.Context) error {
+func RunLoginList(cmd *cli.Context) error {
 	logins, err := config.GetLogins()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	print.LoginsList(logins, flags.GlobalOutputValue)
+	print.LoginsList(logins, cmd.String("output"))
 	return nil
 }

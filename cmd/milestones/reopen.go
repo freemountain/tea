@@ -6,7 +6,7 @@ package milestones
 
 import (
 	"code.gitea.io/tea/cmd/flags"
-	"code.gitea.io/tea/modules/config"
+	"code.gitea.io/tea/modules/context"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -25,15 +25,16 @@ var CmdMilestonesReopen = cli.Command{
 	Flags: flags.AllDefaultFlags,
 }
 
-func editMilestoneStatus(ctx *cli.Context, close bool) error {
-	login, owner, repo := config.InitCommand(flags.GlobalRepoValue, flags.GlobalLoginValue, flags.GlobalRemoteValue)
-	client := login.Client()
+func editMilestoneStatus(cmd *cli.Context, close bool) error {
+	ctx := context.InitCommand(cmd)
+	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
+	client := ctx.Login.Client()
 
 	state := gitea.StateOpen
 	if close {
 		state = gitea.StateClosed
 	}
-	_, _, err := client.EditMilestoneByName(owner, repo, ctx.Args().First(), gitea.EditMilestoneOption{
+	_, _, err := client.EditMilestoneByName(ctx.Owner, ctx.Repo, ctx.Args().First(), gitea.EditMilestoneOption{
 		State: &state,
 		Title: ctx.Args().First(),
 	})
