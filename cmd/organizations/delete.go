@@ -5,7 +5,7 @@
 package organizations
 
 import (
-	"log"
+	"fmt"
 
 	"code.gitea.io/tea/modules/context"
 	"github.com/urfave/cli/v2"
@@ -28,14 +28,12 @@ func RunOrganizationDelete(cmd *cli.Context) error {
 	client := ctx.Login.Client()
 
 	if ctx.Args().Len() < 1 {
-		log.Fatal("You have to specify the organization name you want to delete.")
-		return nil
+		return fmt.Errorf("You have to specify the organization name you want to delete")
 	}
 
 	response, err := client.DeleteOrg(ctx.Args().First())
 	if response != nil && response.StatusCode == 404 {
-		log.Fatal("The given organization does not exist.")
-		return nil
+		return fmt.Errorf("The given organization does not exist")
 	}
 
 	return err

@@ -6,7 +6,6 @@ package task
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"code.gitea.io/sdk/gitea"
@@ -16,7 +15,7 @@ import (
 func LabelsExport(labels []*gitea.Label, path string) error {
 	f, err := os.Create(path)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer f.Close()
 

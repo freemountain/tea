@@ -5,8 +5,6 @@
 package issues
 
 import (
-	"log"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
@@ -47,7 +45,7 @@ func RunIssuesList(cmd *cli.Context) error {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	print.IssuesList(issues, ctx.Output)

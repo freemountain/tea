@@ -5,7 +5,7 @@
 package issues
 
 import (
-	"log"
+	"fmt"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
@@ -34,7 +34,7 @@ func editIssueState(cmd *cli.Context, opts gitea.EditIssueOption) error {
 	ctx := context.InitCommand(cmd)
 	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 	if ctx.Args().Len() == 0 {
-		log.Fatal(ctx.Command.ArgsUsage)
+		return fmt.Errorf(ctx.Command.ArgsUsage)
 	}
 
 	index, err := utils.ArgToIndex(ctx.Args().First())

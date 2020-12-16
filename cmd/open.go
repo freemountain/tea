@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"log"
 	"path"
 	"strings"
 
@@ -42,12 +41,11 @@ func runOpen(cmd *cli.Context) error {
 	case strings.EqualFold(number, "commits"):
 		repo, err := local_git.RepoForWorkdir()
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		b, err := repo.Head()
 		if err != nil {
-			log.Fatal(err)
-			return nil
+			return err
 		}
 		name := b.Name()
 		switch {
@@ -74,11 +72,6 @@ func runOpen(cmd *cli.Context) error {
 		suffix = number
 	}
 
-	u := path.Join(ctx.Login.URL, ctx.RepoSlug, suffix)
-	err := open.Run(u)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	u := path.Join(ctx.Login.URL, ctx.Owner, ctx.Repo, suffix)
+	return open.Run(u)
 }

@@ -5,7 +5,7 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 
 	"code.gitea.io/tea/cmd/labels"
 	"github.com/urfave/cli/v2"
@@ -34,6 +34,5 @@ func runLabels(ctx *cli.Context) error {
 }
 
 func runLabelsDetails(ctx *cli.Context) error {
-	log.Fatal("Not yet implemented.")
-	return nil
+	return fmt.Errorf("Not yet implemented")
 }

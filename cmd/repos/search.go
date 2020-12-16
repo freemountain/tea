@@ -5,7 +5,7 @@
 package repos
 
 import (
-	"log"
+	"fmt"
 	"strings"
 
 	"code.gitea.io/tea/cmd/flags"
@@ -67,7 +67,7 @@ func runReposSearch(cmd *cli.Context) error {
 		if err != nil {
 			// HACK: the client does not return a response on 404, so we can't check res.StatusCode
 			if err.Error() != "404 Not Found" {
-				log.Fatal("could not find owner: ", err)
+				return fmt.Errorf("Could not find owner: %s", err)
 			}
 
 			// if owner is no org, its a user

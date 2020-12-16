@@ -6,7 +6,6 @@ package times
 
 import (
 	"fmt"
-	"log"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
@@ -36,13 +35,9 @@ func runTrackedTimesReset(cmd *cli.Context) error {
 
 	issue, err := utils.ArgToIndex(ctx.Args().First())
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	_, err = client.ResetIssueTime(ctx.Owner, ctx.Repo, issue)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	return err
 }

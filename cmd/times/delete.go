@@ -6,7 +6,6 @@ package times
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 
 	"code.gitea.io/tea/cmd/flags"
@@ -37,18 +36,14 @@ func runTrackedTimesDelete(cmd *cli.Context) error {
 
 	issue, err := utils.ArgToIndex(ctx.Args().First())
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	timeID, err := strconv.ParseInt(ctx.Args().Get(1), 10, 64)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	_, err = client.DeleteTime(ctx.Owner, ctx.Repo, issue, timeID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	return err
 }

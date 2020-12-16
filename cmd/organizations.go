@@ -5,7 +5,7 @@
 package cmd
 
 import (
-	"log"
+	"fmt"
 
 	"code.gitea.io/tea/cmd/organizations"
 
@@ -34,7 +34,5 @@ func runOrganizations(ctx *cli.Context) error {
 }
 
 func runOrganizationDetail(path string) error {
-
-	log.Fatal("Not yet implemented.")
-	return nil
+	return fmt.Errorf("Not yet implemented")
 }

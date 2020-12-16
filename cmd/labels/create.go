@@ -80,11 +80,7 @@ func runLabelCreate(cmd *cli.Context) error {
 		}
 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	return err
 }
 
 func splitLabelLine(line string) (string, string, string) {

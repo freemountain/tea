@@ -5,8 +5,6 @@
 package labels
 
 import (
-	"log"
-
 	"code.gitea.io/tea/modules/context"
 
 	"github.com/urfave/cli/v2"
@@ -31,9 +29,5 @@ func runLabelDelete(cmd *cli.Context) error {
 	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
 	_, err := ctx.Login.Client().DeleteLabel(ctx.Owner, ctx.Repo, ctx.Int64("id"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nil
+	return err
 }

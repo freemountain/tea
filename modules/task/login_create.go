@@ -6,7 +6,6 @@ package task
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -21,7 +20,7 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bo
 	// checks ...
 	// ... if we have a url
 	if len(giteaURL) == 0 {
-		log.Fatal("You have to input Gitea server URL")
+		return fmt.Errorf("You have to input Gitea server URL")
 	}
 
 	// ... if there already exist a login with same name
@@ -35,17 +34,17 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bo
 
 	// .. if we have enough information to authenticate
 	if len(token) == 0 && (len(user)+len(passwd)) == 0 {
-		log.Fatal("No token set")
+		return fmt.Errorf("No token set")
 	} else if len(user) != 0 && len(passwd) == 0 {
-		log.Fatal("No password set")
+		return fmt.Errorf("No password set")
 	} else if len(user) == 0 && len(passwd) != 0 {
-		log.Fatal("No user set")
+		return fmt.Errorf("No user set")
 	}
 
 	// Normalize URL
 	serverURL, err := utils.NormalizeURL(giteaURL)
 	if err != nil {
-		log.Fatal("Unable to parse URL", err)
+		return fmt.Errorf("Unable to parse URL: %s", err)
 	}
 
 	login := config.Login{
@@ -60,23 +59,21 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bo
 	client := login.Client()
 
 	if len(token) == 0 {
-		login.Token, err = generateToken(client, user, passwd)
-		if err != nil {
-			log.Fatal(err)
+		if login.Token, err = generateToken(client, user, passwd); err != nil {
+			return err
 		}
 	}
 
 	// Verify if authentication works and get user info
 	u, _, err := client.GetMyUserInfo()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	login.User = u.UserName
 
 	if len(login.Name) == 0 {
-		login.Name, err = GenerateLoginName(giteaURL, login.User)
-		if err != nil {
-			log.Fatal(err)
+		if login.Name, err = GenerateLoginName(giteaURL, login.User); err != nil {
+			return err
 		}
 	}
 
@@ -91,9 +88,8 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bo
 		}
 	}
 
-	err = config.AddLogin(&login)
-	if err != nil {
-		log.Fatal(err)
+	if err = config.AddLogin(&login); err != nil {
+		return err
 	}
 
 	fmt.Printf("Login as %s on %s successful. Added this login as %s\n", login.User, login.URL, login.Name)

@@ -5,7 +5,7 @@
 package pulls
 
 import (
-	"log"
+	"fmt"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
@@ -30,7 +30,7 @@ func runPullsCheckout(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
 	ctx.Ensure(context.CtxRequirement{LocalRepo: true})
 	if ctx.Args().Len() != 1 {
-		log.Fatal("Must specify a PR index")
+		return fmt.Errorf("Must specify a PR index")
 	}
 	idx, err := utils.ArgToIndex(ctx.Args().First())
 	if err != nil {

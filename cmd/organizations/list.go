@@ -5,8 +5,6 @@
 package organizations
 
 import (
-	"log"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
@@ -37,7 +35,7 @@ func RunOrganizationList(cmd *cli.Context) error {
 		ListOptions: ctx.GetListOptions(),
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	print.OrganizationsList(userOrganizations, ctx.Output)

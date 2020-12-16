@@ -5,8 +5,6 @@
 package login
 
 import (
-	"log"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/print"
@@ -28,7 +26,7 @@ var CmdLoginList = cli.Command{
 func RunLoginList(cmd *cli.Context) error {
 	logins, err := config.GetLogins()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	print.LoginsList(logins, cmd.String("output"))
 	return nil

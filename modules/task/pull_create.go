@@ -6,7 +6,6 @@ package task
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
@@ -24,14 +23,14 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 	// open local git repo
 	localRepo, err := local_git.RepoForWorkdir()
 	if err != nil {
-		log.Fatal("could not open local repo: ", err)
+		return fmt.Errorf("Could not open local repo: %s", err)
 	}
 
 	// push if possible
-	log.Println("git push")
+	fmt.Println("git push")
 	err = localRepo.Push(&git.PushOptions{})
 	if err != nil && err != git.NoErrAlreadyUpToDate {
-		log.Printf("Error occurred during 'git push':\n%s\n", err.Error())
+		fmt.Printf("Error occurred during 'git push':\n%s\n", err.Error())
 	}
 
 	// default is default branch
@@ -74,7 +73,7 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 	})
 
 	if err != nil {
-		log.Fatalf("could not create PR from %s to %s:%s: %s", head, repoOwner, base, err)
+		return fmt.Errorf("Could not create PR from %s to %s:%s: %s", head, repoOwner, base, err)
 	}
 
 	print.PullDetails(pr, nil)

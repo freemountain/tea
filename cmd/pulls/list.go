@@ -5,8 +5,6 @@
 package pulls
 
 import (
-	"log"
-
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
@@ -45,7 +43,7 @@ func RunPullsList(cmd *cli.Context) error {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	print.PullsList(prs, ctx.Output)

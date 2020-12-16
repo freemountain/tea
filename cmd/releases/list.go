@@ -6,7 +6,6 @@ package releases
 
 import (
 	"fmt"
-	"log"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
@@ -38,7 +37,7 @@ func RunReleasesList(cmd *cli.Context) error {
 		ListOptions: ctx.GetListOptions(),
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	print.ReleasesList(releases, ctx.Output)

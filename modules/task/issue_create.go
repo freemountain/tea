@@ -6,7 +6,6 @@ package task
 
 import (
 	"fmt"
-	"log"
 
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/config"
@@ -34,12 +33,12 @@ func CreateIssue(login *config.Login, repoOwner, repoName, title, description st
 	})
 
 	if err != nil {
-		log.Fatalf("could not create issue: %s", err)
+		return fmt.Errorf("could not create issue: %s", err)
 	}
 
 	print.IssueDetails(issue)
 
 	fmt.Println(issue.HTMLURL)
 
-	return err
+	return nil
 }

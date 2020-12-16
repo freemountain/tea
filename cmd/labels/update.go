@@ -5,8 +5,6 @@
 package labels
 
 import (
-	"log"
-
 	"code.gitea.io/tea/modules/context"
 
 	"code.gitea.io/sdk/gitea"
@@ -68,7 +66,7 @@ func runLabelUpdate(cmd *cli.Context) error {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return nil
