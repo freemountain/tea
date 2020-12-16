@@ -16,8 +16,8 @@ import (
 
 // CmdLabelsList represents a sub command of labels to list labels
 var CmdLabelsList = cli.Command{
-	Name:        "ls",
-	Aliases:     []string{"list"},
+	Name:        "list",
+	Aliases:     []string{"ls"},
 	Usage:       "List labels",
 	Description: "List labels",
 	Action:      RunLabelsList,

@@ -18,6 +18,7 @@ import (
 // CmdMilestonesCreate represents a sub command of milestones to create milestone
 var CmdMilestonesCreate = cli.Command{
 	Name:        "create",
+	Aliases:     []string{"c"},
 	Usage:       "Create an milestone on repository",
 	Description: `Create an milestone on repository`,
 	Action:      runMilestonesCreate,

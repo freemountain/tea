@@ -15,6 +15,7 @@ import (
 // CmdLoginEdit represents to login a gitea server.
 var CmdLoginEdit = cli.Command{
 	Name:        "edit",
+	Aliases:     []string{"e"},
 	Usage:       "Edit Gitea logins",
 	Description: `Edit Gitea logins`,
 	Action:      runLoginEdit,

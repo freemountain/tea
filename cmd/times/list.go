@@ -21,8 +21,8 @@ import (
 
 // CmdTrackedTimesList represents a sub command of times to list them
 var CmdTrackedTimesList = cli.Command{
-	Name:    "ls",
-	Aliases: []string{"list"},
+	Name:    "list",
+	Aliases: []string{"ls"},
 	Action:  RunTimesList,
 	Usage:   "Operate on tracked times of a repository's issues & pulls",
 	Description: `Operate on tracked times of a repository's issues & pulls.

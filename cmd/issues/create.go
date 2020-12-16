@@ -16,6 +16,7 @@ import (
 // CmdIssuesCreate represents a sub command of issues to create issue
 var CmdIssuesCreate = cli.Command{
 	Name:        "create",
+	Aliases:     []string{"c"},
 	Usage:       "Create an issue on repository",
 	Description: `Create an issue on repository`,
 	Action:      runIssuesCreate,

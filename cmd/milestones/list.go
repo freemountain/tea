@@ -15,8 +15,8 @@ import (
 
 // CmdMilestonesList represents a sub command of milestones to list milestones
 var CmdMilestonesList = cli.Command{
-	Name:        "ls",
-	Aliases:     []string{"list"},
+	Name:        "list",
+	Aliases:     []string{"ls"},
 	Usage:       "List milestones of the repository",
 	Description: `List milestones of the repository`,
 	Action:      RunMilestonesList,

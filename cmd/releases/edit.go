@@ -18,6 +18,7 @@ import (
 // CmdReleaseEdit represents a sub command of Release to edit releases
 var CmdReleaseEdit = cli.Command{
 	Name:        "edit",
+	Aliases:     []string{"e"},
 	Usage:       "Edit a release",
 	Description: `Edit a release`,
 	ArgsUsage:   "<release tag>",

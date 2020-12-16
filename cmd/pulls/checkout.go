@@ -19,6 +19,7 @@ import (
 // CmdPullsCheckout is a command to locally checkout the given PR
 var CmdPullsCheckout = cli.Command{
 	Name:        "checkout",
+	Aliases:     []string{"co"},
 	Usage:       "Locally check out the given PR",
 	Description: `Locally check out the given PR`,
 	Action:      runPullsCheckout,

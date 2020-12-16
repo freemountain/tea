@@ -16,6 +16,7 @@ import (
 // CmdReleaseDelete represents a sub command of Release to delete a release
 var CmdReleaseDelete = cli.Command{
 	Name:        "delete",
+	Aliases:     []string{"rm"},
 	Usage:       "Delete a release",
 	Description: `Delete a release`,
 	ArgsUsage:   "<release tag>",

@@ -35,8 +35,8 @@ var CmdReposListFlags = append([]cli.Flag{
 
 // CmdReposList represents a sub command of repos to list them
 var CmdReposList = cli.Command{
-	Name:        "ls",
-	Aliases:     []string{"list"},
+	Name:        "list",
+	Aliases:     []string{"ls"},
 	Usage:       "List repositories you have access to",
 	Description: "List repositories you have access to",
 	Action:      RunReposList,

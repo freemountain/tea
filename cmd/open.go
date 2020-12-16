@@ -19,8 +19,9 @@ import (
 // CmdOpen represents a sub command of issues to open issue on the web browser
 var CmdOpen = cli.Command{
 	Name:        "open",
-	Usage:       "Open something of the repository on web browser",
-	Description: `Open something of the repository on web browser`,
+	Aliases:     []string{"o"},
+	Usage:       "Open something of the repository in web browser",
+	Description: `Open something of the repository in web browser`,
 	Action:      runOpen,
 	Flags:       append([]cli.Flag{}, flags.LoginRepoFlags...),
 }

@@ -20,6 +20,7 @@ import (
 // CmdTrackedTimesAdd represents a sub command of times to add time to an issue
 var CmdTrackedTimesAdd = cli.Command{
 	Name:      "add",
+	Aliases:   []string{"a"},
 	Usage:     "Track spent time on an issue",
 	UsageText: "tea times add <issue> <duration>",
 	Description: `Track spent time on an issue

@@ -15,8 +15,8 @@ import (
 
 // CmdIssuesList represents a sub command of issues to list issues
 var CmdIssuesList = cli.Command{
-	Name:        "ls",
-	Aliases:     []string{"list"},
+	Name:        "list",
+	Aliases:     []string{"ls"},
 	Usage:       "List issues of the repository",
 	Description: `List issues of the repository`,
 	Action:      RunIssuesList,

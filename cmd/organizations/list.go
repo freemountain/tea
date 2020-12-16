@@ -15,8 +15,8 @@ import (
 
 // CmdOrganizationList represents a sub command of organizations to list users organizations
 var CmdOrganizationList = cli.Command{
-	Name:        "ls",
-	Aliases:     []string{"list"},
+	Name:        "list",
+	Aliases:     []string{"ls"},
 	Usage:       "List Organizations",
 	Description: "List users organizations",
 	Action:      RunOrganizationList,

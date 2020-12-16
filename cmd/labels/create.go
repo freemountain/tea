@@ -19,6 +19,7 @@ import (
 // CmdLabelCreate represents a sub command of labels to create label.
 var CmdLabelCreate = cli.Command{
 	Name:        "create",
+	Aliases:     []string{"c"},
 	Usage:       "Create a label",
 	Description: `Create a label`,
 	Action:      runLabelCreate,

@@ -16,6 +16,7 @@ import (
 // CmdPullsCreate creates a pull request
 var CmdPullsCreate = cli.Command{
 	Name:        "create",
+	Aliases:     []string{"c"},
 	Usage:       "Create a pull-request",
 	Description: "Create a pull-request",
 	Action:      runPullsCreate,

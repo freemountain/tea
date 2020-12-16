@@ -20,6 +20,7 @@ import (
 // CmdReleaseCreate represents a sub command of Release to create release
 var CmdReleaseCreate = cli.Command{
 	Name:        "create",
+	Aliases:     []string{"c"},
 	Usage:       "Create a release",
 	Description: `Create a release`,
 	Action:      runReleaseCreate,
