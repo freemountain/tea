@@ -76,7 +76,7 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 		return fmt.Errorf("Could not create PR from %s to %s:%s: %s", head, repoOwner, base, err)
 	}
 
-	print.PullDetails(pr, nil)
+	print.PullDetails(pr, nil, nil)
 
 	fmt.Println(pr.HTMLURL)
 

@@ -7,12 +7,21 @@ package print
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"code.gitea.io/sdk/gitea"
 )
 
+var ciStatusSymbols = map[gitea.StatusState]string{
+	gitea.StatusSuccess: "✓ ",
+	gitea.StatusPending: "⭮ ",
+	gitea.StatusWarning: "⚠ ",
+	gitea.StatusError:   "✘ ",
+	gitea.StatusFailure: "❌ ",
+}
+
 // PullDetails print an pull rendered to stdout
-func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
+func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *gitea.CombinedStatus) {
 	base := pr.Base.Name
 	head := pr.Head.Name
 	if pr.Head.RepoID != pr.Base.RepoID {
@@ -23,11 +32,16 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
 		}
 	}
 
+	state := pr.State
+	if pr.Merged != nil {
+		state = "merged"
+	}
+
 	out := fmt.Sprintf(
-		"# #%d %s (%s)\n@%s created %s\t**%s** <- **%s**\n\n%s\n",
+		"# #%d %s (%s)\n@%s created %s\t**%s** <- **%s**\n\n%s\n\n",
 		pr.Index,
 		pr.Title,
-		pr.State,
+		state,
 		pr.Poster.UserName,
 		FormatTime(*pr.Created),
 		base,
@@ -35,27 +49,68 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview) {
 		pr.Body,
 	)
 
-	if len(reviews) != 0 {
-		out += "\n"
-		revMap := make(map[string]gitea.ReviewStateType)
-		for _, review := range reviews {
-			switch review.State {
-			case gitea.ReviewStateApproved,
-				gitea.ReviewStateRequestChanges,
-				gitea.ReviewStateRequestReview:
-				revMap[review.Reviewer.UserName] = review.State
+	if ciStatus != nil || len(reviews) != 0 || pr.State == gitea.StateOpen {
+		out += "---\n"
+	}
+
+	out += formatReviews(reviews)
+
+	if ciStatus != nil {
+		var summary, errors string
+		for _, s := range ciStatus.Statuses {
+			summary += ciStatusSymbols[s.State]
+			if s.State != gitea.StatusSuccess {
+				errors += fmt.Sprintf("  - [**%s**:\t%s](%s)\n", s.Context, s.Description, s.TargetURL)
 			}
 		}
-		for k, v := range revMap {
-			out += fmt.Sprintf("\n  @%s: %s", k, v)
+		if len(ciStatus.Statuses) != 0 {
+			out += fmt.Sprintf("- CI: %s\n%s", summary, errors)
 		}
 	}
 
-	if pr.State == gitea.StateOpen && pr.Mergeable {
-		out += "\nNo Conflicts"
+	if pr.State == gitea.StateOpen {
+		if pr.Mergeable {
+			out += "- No Conflicts\n"
+		} else {
+			out += "- **Conflicting files**\n"
+		}
 	}
 
 	outputMarkdown(out)
+}
+
+func formatReviews(reviews []*gitea.PullReview) string {
+	result := ""
+	if len(reviews) == 0 {
+		return result
+	}
+
+	// deduplicate reviews by user (via review time & userID),
+	reviewByUser := make(map[int64]*gitea.PullReview)
+	for _, review := range reviews {
+		switch review.State {
+		case gitea.ReviewStateApproved,
+			gitea.ReviewStateRequestChanges,
+			gitea.ReviewStateRequestReview:
+			if r, ok := reviewByUser[review.Reviewer.ID]; !ok || review.Submitted.After(r.Submitted) {
+				reviewByUser[review.Reviewer.ID] = review
+			}
+		}
+	}
+
+	// group reviews by type
+	usersByState := make(map[gitea.ReviewStateType][]string)
+	for _, r := range reviewByUser {
+		u := r.Reviewer.UserName
+		users := usersByState[r.State]
+		usersByState[r.State] = append(users, u)
+	}
+
+	// stringify
+	for state, user := range usersByState {
+		result += fmt.Sprintf("- %s by @%s\n", state, strings.Join(user, ", @"))
+	}
+	return result
 }
 
 // PullsList prints a listing of pulls
