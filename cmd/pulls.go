@@ -21,8 +21,8 @@ import (
 var CmdPulls = cli.Command{
 	Name:        "pulls",
 	Aliases:     []string{"pull", "pr"},
-	Usage:       "List, create, checkout and clean pull requests",
-	Description: `List, create, checkout and clean pull requests`,
+	Usage:       "Manage and checkout pull requests",
+	Description: `Manage and checkout pull requests`,
 	ArgsUsage:   "[<pull index>]",
 	Action:      runPulls,
 	Flags:       flags.IssuePRFlags,
@@ -31,6 +31,8 @@ var CmdPulls = cli.Command{
 		&pulls.CmdPullsCheckout,
 		&pulls.CmdPullsClean,
 		&pulls.CmdPullsCreate,
+		&pulls.CmdPullsClose,
+		&pulls.CmdPullsReopen,
 	},
 }
 
