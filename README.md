@@ -31,6 +31,9 @@ brew install tea
 
 Distribution packages exist for: **alpinelinux ([tea](https://pkgs.alpinelinux.org/packages?name=tea&branch=edge))** and **archlinux ([gitea-tea](https://aur.archlinux.org/packages/gitea-tea))**
 
+
+Shell completion can be added via `tea autocomplete --install`.
+
 ## Usage
 
 First of all, you have to create a token on your `personal settings -> application` page of your gitea instance.
