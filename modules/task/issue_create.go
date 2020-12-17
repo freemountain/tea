@@ -12,7 +12,7 @@ import (
 	"code.gitea.io/tea/modules/print"
 )
 
-// CreateIssue creates a PR in the given repo and prints the result
+// CreateIssue creates an issue in the given repo and prints the result
 func CreateIssue(login *config.Login, repoOwner, repoName, title, description string) error {
 
 	// title is required

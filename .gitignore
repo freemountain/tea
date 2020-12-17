@@ -4,3 +4,5 @@ tea
 .idea/
 .history/
 dist/
+
+.vscode/

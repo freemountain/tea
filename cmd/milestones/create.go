@@ -5,13 +5,15 @@
 package milestones
 
 import (
-	"fmt"
+	"time"
 
 	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
-	"code.gitea.io/tea/modules/print"
+	"code.gitea.io/tea/modules/interact"
+	"code.gitea.io/tea/modules/task"
 
 	"code.gitea.io/sdk/gitea"
+	"github.com/araddon/dateparse"
 	"github.com/urfave/cli/v2"
 )
 
@@ -34,6 +36,11 @@ var CmdMilestonesCreate = cli.Command{
 			Usage:   "milestone description to create",
 		},
 		&cli.StringFlag{
+			Name:    "deadline",
+			Aliases: []string{"expires", "x"},
+			Usage:   "set milestone deadline (default is no due date)",
+		},
+		&cli.StringFlag{
 			Name:        "state",
 			Usage:       "set milestone state (default is open)",
 			DefaultText: "open",
@@ -43,12 +50,15 @@ var CmdMilestonesCreate = cli.Command{
 
 func runMilestonesCreate(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
-	ctx.Ensure(context.CtxRequirement{RemoteRepo: true})
 
-	title := ctx.String("title")
-	if len(title) == 0 {
-		fmt.Printf("Title is required\n")
-		return nil
+	date := ctx.String("deadline")
+	deadline := &time.Time{}
+	if date != "" {
+		t, err := dateparse.ParseAny(date)
+		if err == nil {
+			return err
+		}
+		deadline = &t
 	}
 
 	state := gitea.StateOpen
@@ -56,15 +66,17 @@ func runMilestonesCreate(cmd *cli.Context) error {
 		state = gitea.StateClosed
 	}
 
-	mile, _, err := ctx.Login.Client().CreateMilestone(ctx.Owner, ctx.Repo, gitea.CreateMilestoneOption{
-		Title:       title,
-		Description: ctx.String("description"),
-		State:       state,
-	})
-	if err != nil {
-		return err
+	if ctx.NumFlags() == 0 {
+		return interact.CreateMilestone(ctx.Login, ctx.Owner, ctx.Repo)
 	}
 
-	print.MilestoneDetails(mile)
-	return nil
+	return task.CreateMilestone(
+		ctx.Login,
+		ctx.Owner,
+		ctx.Repo,
+		ctx.String("title"),
+		ctx.String("description"),
+		deadline,
+		state,
+	)
 }

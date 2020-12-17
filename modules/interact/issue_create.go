@@ -11,7 +11,7 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 )
 
-// CreateIssue interactively creates a PR
+// CreateIssue interactively creates an issue
 func CreateIssue(login *config.Login, owner, repo string) error {
 	var title, description string
 
