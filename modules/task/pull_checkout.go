@@ -27,6 +27,10 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64, 
 	if err != nil {
 		return err
 	}
+	remoteDeleted := pr.Head.Ref == fmt.Sprintf("refs/pull/%d/head", pr.Index)
+	if remoteDeleted {
+		return fmt.Errorf("Can't checkout: remote head branch was already deleted")
+	}
 
 	remoteURL := pr.Head.Repository.CloneURL
 	if len(login.SSHKey) != 0 {

@@ -19,6 +19,9 @@ func PullClean(login *config.Login, repoOwner, repoName string, index int64, ign
 	client := login.Client()
 
 	repo, _, err := client.GetRepo(repoOwner, repoName)
+	if err != nil {
+		return err
+	}
 	defaultBranch := repo.DefaultBranch
 	if len(defaultBranch) == 0 {
 		defaultBranch = "master"
@@ -33,7 +36,13 @@ func PullClean(login *config.Login, repoOwner, repoName string, index int64, ign
 		return fmt.Errorf("PR is still open, won't delete branches")
 	}
 
-	// IDEA: abort if PR.Head.Repository.CloneURL does not match login.URL?
+	// if remote head branch is already deleted, pr.Head.Ref points to "pulls/<idx>/head"
+	remoteBranch := pr.Head.Ref
+	remoteDeleted := remoteBranch == fmt.Sprintf("refs/pull/%d/head", pr.Index)
+	if remoteDeleted {
+		remoteBranch = pr.Head.Name // this still holds the original branch name
+		fmt.Printf("Remote branch '%s' already deleted.\n", remoteBranch)
+	}
 
 	r, err := local_git.RepoForWorkdir()
 	if err != nil {
@@ -43,7 +52,7 @@ func PullClean(login *config.Login, repoOwner, repoName string, index int64, ign
 	// find a branch with matching sha or name, that has a remote matching the repo url
 	var branch *git_config.Branch
 	if ignoreSHA {
-		branch, err = r.TeaFindBranchByName(pr.Head.Ref, pr.Head.Repository.CloneURL)
+		branch, err = r.TeaFindBranchByName(remoteBranch, pr.Head.Repository.CloneURL)
 	} else {
 		branch, err = r.TeaFindBranchBySha(pr.Head.Sha, pr.Head.Repository.CloneURL)
 	}
@@ -52,12 +61,12 @@ func PullClean(login *config.Login, repoOwner, repoName string, index int64, ign
 	}
 	if branch == nil {
 		if ignoreSHA {
-			return fmt.Errorf("Remote branch %s not found in local repo", pr.Head.Ref)
+			return fmt.Errorf("Remote branch %s not found in local repo", remoteBranch)
 		}
 		return fmt.Errorf(`Remote branch %s not found in local repo.
 Either you don't track this PR, or the local branch has diverged from the remote.
 If you still want to continue & are sure you don't loose any important commits,
-call me again with the --ignore-sha flag`, pr.Head.Ref)
+call me again with the --ignore-sha flag`, remoteBranch)
 	}
 
 	// prepare deletion of local branch:
@@ -73,14 +82,23 @@ call me again with the --ignore-sha flag`, pr.Head.Ref)
 	}
 
 	// remove local & remote branch
-	fmt.Printf("Deleting local branch %s and remote branch %s\n", branch.Name, pr.Head.Ref)
-	url, err := r.TeaRemoteURL(branch.Remote)
+	fmt.Printf("Deleting local branch %s\n", branch.Name)
+	err = r.TeaDeleteLocalBranch(branch)
 	if err != nil {
 		return err
 	}
-	auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, callback)
-	if err != nil {
-		return err
+
+	if !remoteDeleted && pr.Head.Repository.Permissions.Push {
+		fmt.Printf("Deleting remote branch %s\n", remoteBranch)
+		url, err := r.TeaRemoteURL(branch.Remote)
+		if err != nil {
+			return err
+		}
+		auth, err := local_git.GetAuthForURL(url, login.Token, login.SSHKey, callback)
+		if err != nil {
+			return err
+		}
+		err = r.TeaDeleteRemoteBranch(branch.Remote, remoteBranch, auth)
 	}
-	return r.TeaDeleteBranch(branch, pr.Head.Ref, auth)
+	return err
 }
