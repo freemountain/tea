@@ -22,6 +22,24 @@ type table struct {
 	sortColumn uint // ↑
 }
 
+// printable can be implemented for structs to put fields dynamically into a table
+type printable interface {
+	FormatField(field string) string
+}
+
+// high level api to print a table of items with dynamic fields
+func tableFromItems(fields []string, values []printable) table {
+	t := table{headers: fields}
+	for _, v := range values {
+		row := make([]string, len(fields))
+		for i, f := range fields {
+			row[i] = v.FormatField(f)
+		}
+		t.addRowSlice(row)
+	}
+	return t
+}
+
 func tableWithHeader(header ...string) table {
 	return table{headers: header}
 }
@@ -54,16 +72,16 @@ func (t table) Less(i, j int) bool {
 }
 
 func (t *table) print(output string) {
-	switch {
-	case output == "" || output == "table":
+	switch output {
+	case "", "table":
 		outputtable(t.headers, t.values)
-	case output == "csv":
+	case "csv":
 		outputdsv(t.headers, t.values, ",")
-	case output == "simple":
+	case "simple":
 		outputsimple(t.headers, t.values)
-	case output == "tsv":
+	case "tsv":
 		outputdsv(t.headers, t.values, "\t")
-	case output == "yaml":
+	case "yml", "yaml":
 		outputyaml(t.headers, t.values)
 	default:
 		fmt.Printf("unknown output type '" + output + "', available types are:\n- csv: comma-separated values\n- simple: space-separated values\n- table: auto-aligned table format (default)\n- tsv: tab-separated values\n- yaml: YAML format\n")
@@ -118,4 +136,12 @@ func outputyaml(headers []string, values [][]string) {
 			}
 		}
 	}
+}
+
+func isMachineReadable(outputFormat string) bool {
+	switch outputFormat {
+	case "yml", "yaml", "csv":
+		return true
+	}
+	return false
 }

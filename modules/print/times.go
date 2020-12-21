@@ -5,21 +5,11 @@
 package print
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
 	"code.gitea.io/sdk/gitea"
 )
-
-func formatDuration(seconds int64, outputType string) string {
-	switch outputType {
-	case "yaml":
-	case "csv":
-		return fmt.Sprint(seconds)
-	}
-	return time.Duration(1e9 * seconds).String()
-}
 
 // TrackedTimesList print list of tracked times to stdout
 func TrackedTimesList(times []*gitea.TrackedTime, outputType string, from, until time.Time, printTotal bool) {

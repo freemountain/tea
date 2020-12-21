@@ -5,6 +5,11 @@
 package flags
 
 import (
+	"fmt"
+	"strings"
+
+	"code.gitea.io/tea/modules/utils"
+
 	"github.com/urfave/cli/v2"
 )
 
@@ -91,3 +96,30 @@ var IssuePRFlags = append([]cli.Flag{
 	&PaginationPageFlag,
 	&PaginationLimitFlag,
 }, AllDefaultFlags...)
+
+// FieldsFlag generates a flag selecting printable fields.
+// To retrieve the value, use GetFields()
+func FieldsFlag(availableFields, defaultFields []string) *cli.StringFlag {
+	return &cli.StringFlag{
+		Name:    "fields",
+		Aliases: []string{"f"},
+		Usage: fmt.Sprintf(`Comma-separated list of fields to print. Available values:
+			%s
+		`, strings.Join(availableFields, ",")),
+		Value: strings.Join(defaultFields, ","),
+	}
+}
+
+// GetFields parses the values provided in a fields flag, and
+// optionally validates against valid values.
+func GetFields(ctx *cli.Context, validFields []string) ([]string, error) {
+	selection := strings.Split(ctx.String("fields"), ",")
+	if validFields != nil {
+		for _, field := range selection {
+			if !utils.Contains(validFields, field) {
+				return nil, fmt.Errorf("Invalid field '%s'", field)
+			}
+		}
+	}
+	return selection, nil
+}

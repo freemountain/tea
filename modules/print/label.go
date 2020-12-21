@@ -5,11 +5,9 @@
 package print
 
 import (
-	"fmt"
 	"strconv"
 
 	"code.gitea.io/sdk/gitea"
-	"github.com/muesli/termenv"
 )
 
 // LabelsList prints a listing of labels
@@ -21,14 +19,10 @@ func LabelsList(labels []*gitea.Label, output string) {
 		"Description",
 	)
 
-	p := termenv.ColorProfile()
-
 	for _, label := range labels {
-		color := termenv.String(label.Color)
-
 		t.addRow(
 			strconv.FormatInt(label.ID, 10),
-			fmt.Sprint(color.Background(p.Color("#"+label.Color))),
+			formatLabel(label, !isMachineReadable(output), label.Color),
 			label.Name,
 			label.Description,
 		)

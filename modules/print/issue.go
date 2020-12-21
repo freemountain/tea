@@ -6,7 +6,7 @@ package print
 
 import (
 	"fmt"
-	"strconv"
+	"strings"
 
 	"code.gitea.io/sdk/gitea"
 )
@@ -24,68 +24,103 @@ func IssueDetails(issue *gitea.Issue) {
 	))
 }
 
-// IssuesList prints a listing of issues
-func IssuesList(issues []*gitea.Issue, output string) {
-	t := tableWithHeader(
-		"Index",
-		"Title",
-		"State",
-		"Author",
-		"Milestone",
-		"Updated",
-	)
+// IssuesPullsList prints a listing of issues & pulls
+func IssuesPullsList(issues []*gitea.Issue, output string, fields []string) {
+	printIssues(issues, output, fields)
+}
 
-	for _, issue := range issues {
-		author := issue.Poster.FullName
-		if len(author) == 0 {
-			author = issue.Poster.UserName
+// IssueFields are all available fields to print with IssuesList()
+var IssueFields = []string{
+	"index",
+	"state",
+	"kind",
+	"author",
+	"author-id",
+	"url",
+
+	"title",
+	"body",
+
+	"created",
+	"updated",
+	"deadline",
+
+	"assignees",
+	"milestone",
+	"labels",
+	"comments",
+}
+
+func printIssues(issues []*gitea.Issue, output string, fields []string) {
+	labelMap := map[int64]string{}
+	var printables = make([]printable, len(issues))
+
+	for i, x := range issues {
+		// pre-serialize labels for performance
+		for _, label := range x.Labels {
+			if _, ok := labelMap[label.ID]; !ok {
+				labelMap[label.ID] = formatLabel(label, !isMachineReadable(output), "")
+			}
 		}
-		mile := ""
-		if issue.Milestone != nil {
-			mile = issue.Milestone.Title
-		}
-		t.addRow(
-			strconv.FormatInt(issue.Index, 10),
-			issue.Title,
-			string(issue.State),
-			author,
-			mile,
-			FormatTime(issue.Updated),
-		)
+		// store items with printable interface
+		printables[i] = &printableIssue{x, &labelMap}
 	}
+
+	t := tableFromItems(fields, printables)
 	t.print(output)
 }
 
-// IssuesPullsList prints a listing of issues & pulls
-// TODO combine with IssuesList
-func IssuesPullsList(issues []*gitea.Issue, output string) {
-	t := tableWithHeader(
-		"Index",
-		"State",
-		"Kind",
-		"Author",
-		"Updated",
-		"Title",
-	)
+type printableIssue struct {
+	*gitea.Issue
+	formattedLabels *map[int64]string
+}
 
-	for _, issue := range issues {
-		name := issue.Poster.FullName
-		if len(name) == 0 {
-			name = issue.Poster.UserName
+func (x printableIssue) FormatField(field string) string {
+	switch field {
+	case "index":
+		return fmt.Sprintf("%d", x.Index)
+	case "state":
+		return string(x.State)
+	case "kind":
+		if x.PullRequest != nil {
+			return "Pull"
 		}
-		kind := "Issue"
-		if issue.PullRequest != nil {
-			kind = "Pull"
+		return "Issue"
+	case "author":
+		return formatUserName(x.Poster)
+	case "author-id":
+		return x.Poster.UserName
+	case "url":
+		return x.HTMLURL
+	case "title":
+		return x.Title
+	case "body":
+		return x.Body
+	case "created":
+		return FormatTime(x.Created)
+	case "updated":
+		return FormatTime(x.Updated)
+	case "deadline":
+		return FormatTime(*x.Deadline)
+	case "milestone":
+		if x.Milestone != nil {
+			return x.Milestone.Title
 		}
-		t.addRow(
-			strconv.FormatInt(issue.Index, 10),
-			string(issue.State),
-			kind,
-			name,
-			FormatTime(issue.Updated),
-			issue.Title,
-		)
+		return ""
+	case "labels":
+		var labels = make([]string, len(x.Labels))
+		for i, l := range x.Labels {
+			labels[i] = (*x.formattedLabels)[l.ID]
+		}
+		return strings.Join(labels, " ")
+	case "assignees":
+		var assignees = make([]string, len(x.Assignees))
+		for i, a := range x.Assignees {
+			assignees[i] = formatUserName(a)
+		}
+		return strings.Join(assignees, " ")
+	case "comments":
+		return fmt.Sprintf("%d", x.Comments)
 	}
-
-	t.print(output)
+	return ""
 }

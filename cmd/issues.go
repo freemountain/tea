@@ -5,7 +5,6 @@
 package cmd
 
 import (
-	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/cmd/issues"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
@@ -29,7 +28,7 @@ var CmdIssues = cli.Command{
 		&issues.CmdIssuesReopen,
 		&issues.CmdIssuesClose,
 	},
-	Flags: flags.IssuePRFlags,
+	Flags: issues.CmdIssuesList.Flags,
 }
 
 func runIssues(ctx *cli.Context) error {

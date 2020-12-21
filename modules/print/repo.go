@@ -6,91 +6,19 @@ package print
 
 import (
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
 	"code.gitea.io/sdk/gitea"
 )
 
-type rp = *gitea.Repository
-type fieldFormatter = func(*gitea.Repository) string
-
-var (
-	fieldFormatters map[string]fieldFormatter
-
-	// RepoFields are the available fields to print with ReposList()
-	RepoFields []string
-)
-
-func init() {
-	fieldFormatters = map[string]fieldFormatter{
-		"description": func(r rp) string { return r.Description },
-		"forks":       func(r rp) string { return fmt.Sprintf("%d", r.Forks) },
-		"id":          func(r rp) string { return r.FullName },
-		"name":        func(r rp) string { return r.Name },
-		"owner":       func(r rp) string { return r.Owner.UserName },
-		"stars":       func(r rp) string { return fmt.Sprintf("%d", r.Stars) },
-		"ssh":         func(r rp) string { return r.SSHURL },
-		"updated":     func(r rp) string { return FormatTime(r.Updated) },
-		"url":         func(r rp) string { return r.HTMLURL },
-		"permission": func(r rp) string {
-			if r.Permissions.Admin {
-				return "admin"
-			} else if r.Permissions.Push {
-				return "write"
-			}
-			return "read"
-		},
-		"type": func(r rp) string {
-			if r.Fork {
-				return "fork"
-			}
-			if r.Mirror {
-				return "mirror"
-			}
-			return "source"
-		},
-	}
-
-	for f := range fieldFormatters {
-		RepoFields = append(RepoFields, f)
-	}
-}
-
 // ReposList prints a listing of the repos
 func ReposList(repos []*gitea.Repository, output string, fields []string) {
-	if len(repos) == 0 {
-		fmt.Println("No repositories found")
-		return
+	var printables = make([]printable, len(repos))
+	for i, r := range repos {
+		printables[i] = &printableRepo{r}
 	}
-
-	if len(fields) == 0 {
-		fmt.Println("No fields to print")
-		return
-	}
-
-	formatters := make([]fieldFormatter, len(fields))
-	values := make([][]string, len(repos))
-
-	// find field format functions by header name
-	for i, f := range fields {
-		if formatter, ok := fieldFormatters[strings.ToLower(f)]; ok {
-			formatters[i] = formatter
-		} else {
-			log.Fatalf("invalid field '%s'", f)
-		}
-	}
-
-	// extract values from each repo and store them in 2D table
-	for i, repo := range repos {
-		values[i] = make([]string, len(formatters))
-		for j, format := range formatters {
-			values[i][j] = format(repo)
-		}
-	}
-
-	t := table{headers: fields, values: values}
+	t := tableFromItems(fields, printables)
 	t.print(output)
 }
 
@@ -142,7 +70,7 @@ func RepoDetails(repo *gitea.Repository, topics []string) {
 
 	perm := fmt.Sprintf(
 		"- Permission:\t%s\n",
-		fieldFormatters["permission"](repo),
+		formatPermission(repo.Permissions),
 	)
 
 	var tops string
@@ -160,4 +88,55 @@ func RepoDetails(repo *gitea.Repository, topics []string) {
 		perm,
 		tops,
 	))
+}
+
+// RepoFields are the available fields to print with ReposList()
+var RepoFields = []string{
+	"description",
+	"forks",
+	"id",
+	"name",
+	"owner",
+	"stars",
+	"ssh",
+	"updated",
+	"url",
+	"permission",
+	"type",
+}
+
+type printableRepo struct{ *gitea.Repository }
+
+func (x printableRepo) FormatField(field string) string {
+	switch field {
+	case "description":
+		return x.Description
+	case "forks":
+		return fmt.Sprintf("%d", x.Forks)
+	case "id":
+		return x.FullName
+	case "name":
+		return x.Name
+	case "owner":
+		return x.Owner.UserName
+	case "stars":
+		return fmt.Sprintf("%d", x.Stars)
+	case "ssh":
+		return x.SSHURL
+	case "updated":
+		return FormatTime(x.Updated)
+	case "url":
+		return x.HTMLURL
+	case "permission":
+		return formatPermission(x.Permissions)
+	case "type":
+		if x.Fork {
+			return "fork"
+		}
+		if x.Mirror {
+			return "mirror"
+		}
+		return "source"
+	}
+	return ""
 }
