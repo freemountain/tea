@@ -2,18 +2,22 @@ xdg
 ===
 
 [![Build Status](https://github.com/adrg/xdg/workflows/CI/badge.svg)](https://github.com/adrg/xdg/actions?query=workflow%3ACI)
+[![Code coverage](https://codecov.io/gh/adrg/xdg/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/gh/adrg/xdg)
 [![pkg.go.dev documentation](https://pkg.go.dev/badge/github.com/adrg/xdg)](https://pkg.go.dev/github.com/adrg/xdg)
 [![MIT license](https://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Go report card](https://goreportcard.com/badge/github.com/adrg/xdg)](https://goreportcard.com/report/github.com/adrg/xdg)
+[![GitHub issues](https://img.shields.io/github/issues/adrg/xdg)](https://github.com/adrg/xdg/issues)
+[![Buy me a coffee](https://img.shields.io/static/v1.svg?label=%20&message=Buy%20me%20a%20coffee&color=FF813F&logo=buy%20me%20a%20coffee&logoColor=white)](https://www.buymeacoffee.com/adrg)
+[![GitHub stars](https://img.shields.io/github/stars/adrg/xdg?style=social)](https://github.com/adrg/xdg/stargazers)
 
-Provides an implementation of the [XDG Base Directory Specification](https://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html).
+Provides an implementation of the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html).
 The specification defines a set of standard paths for storing application files,
 including data and configuration files. For portability and flexibility reasons,
 applications should use the XDG defined locations instead of hardcoding paths.
-The package also includes the locations of well known user directories.
+The package also includes the locations of well known [user directories](https://wiki.archlinux.org/index.php/XDG_user_directories).
 The current implementation supports Windows, Mac OS and most flavors of Unix.
 
-Full documentation can be found at: https://godoc.org/github.com/adrg/xdg
+Full documentation can be found at: https://pkg.go.dev/github.com/adrg/xdg.
 
 ## Installation
     go get github.com/adrg/xdg
@@ -103,7 +107,7 @@ import (
 
 func main() {
 	// XDG Base Directory paths.
-	log.Println("Home config directory:", xdg.DataHome)
+	log.Println("Home data directory:", xdg.DataHome)
 	log.Println("Data directories:", xdg.DataDirs)
 	log.Println("Home config directory:", xdg.ConfigHome)
 	log.Println("Config directories:", xdg.ConfigDirs)
@@ -117,7 +121,7 @@ func main() {
 	// Obtain a suitable location for application config files.
 	// ConfigFile takes one parameter which must contain the name of the file,
 	// but it can also contain a set of parent directories. If the directories
-	// don't exists, they will be created relative to the base config directory.
+	// don't exist, they will be created relative to the base config directory.
 	configFilePath, err := xdg.ConfigFile("appname/config.yaml")
 	if err != nil {
 		log.Fatal(err)
@@ -180,11 +184,24 @@ Contributions in the form of pull requests, issues or just general feedback,
 are always welcome.
 See [CONTRIBUTING.MD](https://github.com/adrg/xdg/blob/master/CONTRIBUTING.md).
 
+**Contributors**:
+[adrg](https://github.com/adrg),
+[wichert](https://github.com/wichert),
+[bouncepaw](https://github.com/bouncepaw),
+[gabriel-vasile](https://github.com/gabriel-vasile).
+
 ## References
 
-For more information see the
-[XDG Base Directory Specification](https://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html) and
-[XDG user directories](https://wiki.archlinux.org/index.php/XDG_user_directories).
+For more information see:
+* [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
+* [XDG user directories](https://wiki.archlinux.org/index.php/XDG_user_directories)
+
+## Buy me a coffee
+
+If you found this project useful and want to support it, consider buying me a coffee.  
+<a href="https://www.buymeacoffee.com/adrg">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/arial-orange.png" alt="Buy Me A Coffee" height="42px">
+</a>
 
 ## License
 

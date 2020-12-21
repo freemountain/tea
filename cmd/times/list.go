@@ -60,17 +60,19 @@ func RunTimesList(cmd *cli.Context) error {
 	user := ctx.Args().First()
 	if user == "" {
 		// get all tracked times on the repo
-		times, _, err = client.GetRepoTrackedTimes(ctx.Owner, ctx.Repo)
+		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, gitea.ListTrackedTimesOptions{})
 	} else if strings.HasPrefix(user, "#") {
 		// get all tracked times on the specified issue
 		issue, err := utils.ArgToIndex(user)
 		if err != nil {
 			return err
 		}
-		times, _, err = client.ListTrackedTimes(ctx.Owner, ctx.Repo, issue, gitea.ListTrackedTimesOptions{})
+		times, _, err = client.ListIssueTrackedTimes(ctx.Owner, ctx.Repo, issue, gitea.ListTrackedTimesOptions{})
 	} else {
 		// get all tracked times by the specified user
-		times, _, err = client.GetUserTrackedTimes(ctx.Owner, ctx.Repo, user)
+		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, gitea.ListTrackedTimesOptions{
+			User: user,
+		})
 	}
 
 	if err != nil {
