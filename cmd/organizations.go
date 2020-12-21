@@ -16,6 +16,7 @@ import (
 var CmdOrgs = cli.Command{
 	Name:        "organizations",
 	Aliases:     []string{"organization", "org"},
+	Category:    catEntities,
 	Usage:       "List, create, delete organizations",
 	Description: "Show organization details",
 	ArgsUsage:   "[<organization>]",

@@ -18,6 +18,7 @@ import (
 var CmdRepos = cli.Command{
 	Name:        "repos",
 	Aliases:     []string{"repo"},
+	Category:    catEntities,
 	Usage:       "Show repository details",
 	Description: "Show repository details",
 	ArgsUsage:   "[<repo owner>/<repo name>]",

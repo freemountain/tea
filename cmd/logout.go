@@ -13,6 +13,7 @@ import (
 // CmdLogout represents to logout a gitea server.
 var CmdLogout = cli.Command{
 	Name:        "logout",
+	Category:    catSetup,
 	Usage:       "Log out from a Gitea server",
 	Description: `Log out from a Gitea server`,
 	ArgsUsage:   "<login name>",

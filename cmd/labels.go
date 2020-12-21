@@ -15,6 +15,7 @@ import (
 var CmdLabels = cli.Command{
 	Name:        "labels",
 	Aliases:     []string{"label"},
+	Category:    catEntities,
 	Usage:       "Manage issue labels",
 	Description: `Manage issue labels`,
 	Action:      runLabels,

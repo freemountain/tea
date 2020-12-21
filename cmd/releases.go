@@ -16,6 +16,7 @@ import (
 var CmdReleases = cli.Command{
 	Name:        "releases",
 	Aliases:     []string{"release", "r"},
+	Category:    catEntities,
 	Usage:       "Manage releases",
 	Description: "Manage releases",
 	Action:      releases.RunReleasesList,

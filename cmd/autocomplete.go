@@ -19,6 +19,7 @@ import (
 var CmdAutocomplete = cli.Command{
 	Name:        "shellcompletion",
 	Aliases:     []string{"autocomplete"},
+	Category:    catSetup,
 	Usage:       "Install shell completion for tea",
 	Description: "Install shell completion for tea",
 	ArgsUsage:   "<shell type> (bash, zsh, powershell)",

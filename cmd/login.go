@@ -18,6 +18,7 @@ import (
 var CmdLogin = cli.Command{
 	Name:        "logins",
 	Aliases:     []string{"login"},
+	Category:    catSetup,
 	Usage:       "Log in to a Gitea server",
 	Description: `Log in to a Gitea server`,
 	ArgsUsage:   "[<login name>]",

@@ -20,6 +20,7 @@ import (
 var CmdOpen = cli.Command{
 	Name:        "open",
 	Aliases:     []string{"o"},
+	Category:    catHelpers,
 	Usage:       "Open something of the repository in web browser",
 	Description: `Open something of the repository in web browser`,
 	Action:      runOpen,
