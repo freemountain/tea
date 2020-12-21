@@ -11,6 +11,12 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 )
 
+// PromptMultiline runs a textfield-style prompt and blocks until input was made.
+func PromptMultiline(message string) (content string, err error) {
+	err = survey.AskOne(&survey.Multiline{Message: message}, &content)
+	return
+}
+
 // PromptPassword asks for a password and blocks until input was made.
 func PromptPassword(name string) (pass string, err error) {
 	promptPW := &survey.Password{Message: name + " password:"}

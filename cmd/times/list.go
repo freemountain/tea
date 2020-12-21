@@ -5,7 +5,6 @@
 package times
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -59,7 +58,6 @@ func RunTimesList(cmd *cli.Context) error {
 	var err error
 
 	user := ctx.Args().First()
-	fmt.Println(ctx.Command.ArgsUsage)
 	if user == "" {
 		// get all tracked times on the repo
 		times, _, err = client.GetRepoTrackedTimes(ctx.Owner, ctx.Repo)

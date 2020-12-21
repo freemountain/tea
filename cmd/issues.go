@@ -5,8 +5,11 @@
 package cmd
 
 import (
+	"fmt"
+
 	"code.gitea.io/tea/cmd/issues"
 	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
 
@@ -19,7 +22,7 @@ var CmdIssues = cli.Command{
 	Aliases:     []string{"issue", "i"},
 	Category:    catEntities,
 	Usage:       "List, create and update issues",
-	Description: "List, create and update issues",
+	Description: `Lists issues when called without argument. If issue index is provided, will show it in detail.`,
 	ArgsUsage:   "[<issue index>]",
 	Action:      runIssues,
 	Subcommands: []*cli.Command{
@@ -28,7 +31,12 @@ var CmdIssues = cli.Command{
 		&issues.CmdIssuesReopen,
 		&issues.CmdIssuesClose,
 	},
-	Flags: issues.CmdIssuesList.Flags,
+	Flags: append([]cli.Flag{
+		&cli.BoolFlag{
+			Name:  "comments",
+			Usage: "Wether to display comments (will prompt if not provided & run interactively)",
+		},
+	}, issues.CmdIssuesList.Flags...),
 }
 
 func runIssues(ctx *cli.Context) error {
@@ -51,5 +59,13 @@ func runIssueDetail(cmd *cli.Context, index string) error {
 		return err
 	}
 	print.IssueDetails(issue)
+
+	if issue.Comments > 0 {
+		err = interact.ShowCommentsMaybeInteractive(ctx, idx, issue.Comments)
+		if err != nil {
+			return fmt.Errorf("error loading comments: %v", err)
+		}
+	}
+
 	return nil
 }
