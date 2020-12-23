@@ -26,4 +26,5 @@ var CmdTrackedTimes = cli.Command{
 		&times.CmdTrackedTimesReset,
 		&times.CmdTrackedTimesList,
 	},
+	Flags: times.CmdTrackedTimesList.Flags,
 }

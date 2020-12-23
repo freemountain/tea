@@ -5,6 +5,7 @@
 package times
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -23,10 +24,12 @@ var CmdTrackedTimesList = cli.Command{
 	Name:    "list",
 	Aliases: []string{"ls"},
 	Action:  RunTimesList,
-	Usage:   "Operate on tracked times of a repository's issues & pulls",
-	Description: `Operate on tracked times of a repository's issues & pulls.
-		 Depending on your permissions on the repository, only your own tracked
-		 times might be listed.`,
+	Usage:   "List tracked times on issues & pulls",
+	Description: `List tracked times, across repos, or on a single repo or issue:
+- given a username all times on a repo by that user are shown,
+- given a issue index with '#' prefix, all times on that issue are listed,
+- given --mine, your times are listed across all repositories.
+Depending on your permissions on the repository, only your own tracked times might be listed.`,
 	ArgsUsage: "[username | #issue]",
 
 	Flags: append([]cli.Flag{
@@ -45,6 +48,17 @@ var CmdTrackedTimesList = cli.Command{
 			Aliases: []string{"t"},
 			Usage:   "Print the total duration at the end",
 		},
+		&cli.BoolFlag{
+			Name:    "mine",
+			Aliases: []string{"m"},
+			Usage:   "Show all times tracked by you across all repositories (overrides command arguments)",
+		},
+		&cli.StringFlag{
+			Name: "fields",
+			Usage: fmt.Sprintf(`Comma-separated list of fields to print. Available values:
+			%s
+		`, strings.Join(print.TrackedTimeFields, ",")),
+		},
 	}, flags.AllDefaultFlags...),
 }
 
@@ -56,43 +70,57 @@ func RunTimesList(cmd *cli.Context) error {
 
 	var times []*gitea.TrackedTime
 	var err error
-
-	user := ctx.Args().First()
-	if user == "" {
-		// get all tracked times on the repo
-		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, gitea.ListTrackedTimesOptions{})
-	} else if strings.HasPrefix(user, "#") {
-		// get all tracked times on the specified issue
-		issue, err := utils.ArgToIndex(user)
-		if err != nil {
-			return err
-		}
-		times, _, err = client.ListIssueTrackedTimes(ctx.Owner, ctx.Repo, issue, gitea.ListTrackedTimesOptions{})
-	} else {
-		// get all tracked times by the specified user
-		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, gitea.ListTrackedTimesOptions{
-			User: user,
-		})
-	}
-
-	if err != nil {
-		return err
-	}
-
 	var from, until time.Time
-	if ctx.String("from") != "" {
+	var fields []string
+
+	if ctx.IsSet("from") {
 		from, err = dateparse.ParseLocal(ctx.String("from"))
 		if err != nil {
 			return err
 		}
 	}
-	if ctx.String("until") != "" {
+	if ctx.IsSet("until") {
 		until, err = dateparse.ParseLocal(ctx.String("until"))
 		if err != nil {
 			return err
 		}
 	}
 
-	print.TrackedTimesList(times, ctx.Output, from, until, ctx.Bool("total"))
+	opts := gitea.ListTrackedTimesOptions{Since: from, Before: until}
+
+	user := ctx.Args().First()
+	if ctx.Bool("mine") {
+		times, _, err = client.GetMyTrackedTimes()
+		fields = []string{"created", "repo", "issue", "duration"}
+	} else if user == "" {
+		// get all tracked times on the repo
+		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, opts)
+		fields = []string{"created", "issue", "user", "duration"}
+	} else if strings.HasPrefix(user, "#") {
+		// get all tracked times on the specified issue
+		issue, err := utils.ArgToIndex(user)
+		if err != nil {
+			return err
+		}
+		times, _, err = client.ListIssueTrackedTimes(ctx.Owner, ctx.Repo, issue, opts)
+		fields = []string{"created", "user", "duration"}
+	} else {
+		// get all tracked times by the specified user
+		opts.User = user
+		times, _, err = client.ListRepoTrackedTimes(ctx.Owner, ctx.Repo, opts)
+		fields = []string{"created", "issue", "duration"}
+	}
+
+	if err != nil {
+		return err
+	}
+
+	if ctx.IsSet("fields") {
+		if fields, err = flags.GetFields(cmd, print.TrackedTimeFields); err != nil {
+			return err
+		}
+	}
+
+	print.TrackedTimesList(times, ctx.Output, fields, ctx.Bool("total"))
 	return nil
 }

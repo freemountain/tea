@@ -5,41 +5,60 @@
 package print
 
 import (
-	"strconv"
-	"time"
+	"fmt"
 
 	"code.gitea.io/sdk/gitea"
 )
 
 // TrackedTimesList print list of tracked times to stdout
-func TrackedTimesList(times []*gitea.TrackedTime, outputType string, from, until time.Time, printTotal bool) {
-	tab := tableWithHeader(
-		"Created",
-		"Issue",
-		"User",
-		"Duration",
-	)
+func TrackedTimesList(times []*gitea.TrackedTime, outputType string, fields []string, printTotal bool) {
+	var printables = make([]printable, len(times))
 	var totalDuration int64
-
-	for _, t := range times {
-		if !from.IsZero() && from.After(t.Created) {
-			continue
-		}
-		if !until.IsZero() && until.Before(t.Created) {
-			continue
-		}
-
+	for i, t := range times {
 		totalDuration += t.Time
-		tab.addRow(
-			FormatTime(t.Created),
-			"#"+strconv.FormatInt(t.Issue.Index, 10),
-			t.UserName,
-			formatDuration(t.Time, outputType),
-		)
+		printables[i] = &printableTrackedTime{t, outputType}
 	}
+	t := tableFromItems(fields, printables)
 
 	if printTotal {
-		tab.addRow("TOTAL", "", "", formatDuration(totalDuration, outputType))
+		total := make([]string, len(fields))
+		total[0] = "TOTAL"
+		total[len(fields)-1] = formatDuration(totalDuration, outputType)
+		t.addRowSlice(total)
 	}
-	tab.print(outputType)
+
+	t.print(outputType)
+}
+
+// TrackedTimeFields contains all available fields for printing of tracked times.
+var TrackedTimeFields = []string{
+	"id",
+	"created",
+	"repo",
+	"issue",
+	"user",
+	"duration",
+}
+
+type printableTrackedTime struct {
+	*gitea.TrackedTime
+	outputFormat string
+}
+
+func (t printableTrackedTime) FormatField(field string) string {
+	switch field {
+	case "id":
+		return fmt.Sprintf("%d", t.ID)
+	case "created":
+		return FormatTime(t.Created)
+	case "repo":
+		return t.Issue.Repository.FullName
+	case "issue":
+		return fmt.Sprintf("#%d", t.Issue.Index)
+	case "user":
+		return t.UserName
+	case "duration":
+		return formatDuration(t.Time, t.outputFormat)
+	}
+	return ""
 }
