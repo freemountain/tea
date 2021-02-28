@@ -26,7 +26,7 @@ func ShowCommentsMaybeInteractive(ctx *context.TeaContext, idx int64, totalComme
 			return err
 		}
 		print.Comments(comments)
-	} else if isInteractive() && !ctx.IsSet("comments") {
+	} else if IsInteractive() && !ctx.IsSet("comments") {
 		// if we're interactive, but --comments hasn't been explicitly set to false
 		if err := ShowCommentsPaginated(ctx, idx, totalComments); err != nil {
 			fmt.Printf("error while loading comments: %v\n", err)
@@ -70,6 +70,11 @@ func ShowCommentsPaginated(ctx *context.TeaContext, idx int64, totalComments int
 }
 
 // IsInteractive checks if the output is piped, but NOT if the session is run interactively..
-func isInteractive() bool {
+func IsInteractive() bool {
 	return terminal.IsTerminal(int(os.Stdout.Fd()))
+}
+
+// IsStdinPiped checks if stdin is piped
+func IsStdinPiped() bool {
+	return !terminal.IsTerminal(int(os.Stdin.Fd()))
 }

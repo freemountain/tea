@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"strings"
 
 	"code.gitea.io/tea/modules/interact"
@@ -45,10 +46,21 @@ func runAddComment(cmd *cli.Context) error {
 	}
 
 	body := strings.Join(ctx.Args().Tail(), " ")
-	if len(body) == 0 {
+	if interact.IsStdinPiped() {
+		// custom solution until https://github.com/AlecAivazis/survey/issues/328 is fixed
+		if bodyStdin, err := ioutil.ReadAll(ctx.App.Reader); err != nil {
+			return err
+		} else if len(bodyStdin) != 0 {
+			body = strings.Join([]string{body, string(bodyStdin)}, "\n\n")
+		}
+	} else if len(body) == 0 {
 		if body, err = interact.PromptMultiline("Content"); err != nil {
 			return err
 		}
+	}
+
+	if len(body) == 0 {
+		return fmt.Errorf("No comment body provided")
 	}
 
 	client := ctx.Login.Client()
