@@ -26,15 +26,31 @@ func PathExists(path string) (bool, error) {
 
 // FileExist returns whether the given file exists or not
 func FileExist(fileName string) (bool, error) {
-	f, err := os.Stat(fileName)
+	return exists(fileName, false)
+}
+
+// DirExists returns whether the given file exists or not
+func DirExists(path string) (bool, error) {
+	return exists(path, true)
+}
+
+func exists(path string, expectDir bool) (bool, error) {
+	f, err := os.Stat(path)
 	if err != nil {
-		if os.IsNotExist(err) {
+		if errors.Is(err, os.ErrNotExist) {
+			return false, nil
+		} else if err.(*os.PathError).Err.Error() == "not a directory" {
+			// some middle segment of path is a file, cannot traverse
+			// FIXME: catches error on linux; go does not provide a way to catch this properly..
 			return false, nil
 		}
 		return false, err
 	}
-	if f.IsDir() {
+	isDir := f.IsDir()
+	if isDir && !expectDir {
 		return false, errors.New("A directory with the same name exists")
+	} else if !isDir && expectDir {
+		return false, errors.New("A file with the same name exists")
 	}
 	return true, nil
 }
