@@ -24,7 +24,13 @@ var CmdPullsCheckout = cli.Command{
 	Description: `Locally check out the given PR`,
 	Action:      runPullsCheckout,
 	ArgsUsage:   "<pull index>",
-	Flags:       flags.AllDefaultFlags,
+	Flags: append([]cli.Flag{
+		&cli.BoolFlag{
+			Name:    "branch",
+			Aliases: []string{"b"},
+			Usage:   "Create a local branch if it doesn't exist yet",
+		},
+	}, flags.AllDefaultFlags...),
 }
 
 func runPullsCheckout(cmd *cli.Context) error {
@@ -38,5 +44,5 @@ func runPullsCheckout(cmd *cli.Context) error {
 		return err
 	}
 
-	return task.PullCheckout(ctx.Login, ctx.Owner, ctx.Repo, idx, interact.PromptPassword)
+	return task.PullCheckout(ctx.Login, ctx.Owner, ctx.Repo, ctx.Bool("branch"), idx, interact.PromptPassword)
 }

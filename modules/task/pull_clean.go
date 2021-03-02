@@ -12,6 +12,7 @@ import (
 
 	"code.gitea.io/sdk/gitea"
 	git_config "github.com/go-git/go-git/v5/config"
+	git_plumbing "github.com/go-git/go-git/v5/plumbing"
 )
 
 // PullClean deletes local & remote feature-branches for a closed pull
@@ -76,7 +77,8 @@ call me again with the --ignore-sha flag`, remoteBranch)
 	}
 	if headRef.Name().Short() == branch.Name {
 		fmt.Printf("Checking out '%s' to delete local branch '%s'\n", defaultBranch, branch.Name)
-		if err = r.TeaCheckout(defaultBranch); err != nil {
+		ref := git_plumbing.NewBranchReferenceName(defaultBranch)
+		if err = r.TeaCheckout(ref); err != nil {
 			return err
 		}
 	}

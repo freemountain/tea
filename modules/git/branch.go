@@ -38,13 +38,12 @@ func (r TeaRepo) TeaCreateBranch(localBranchName, remoteBranchName, remoteName s
 }
 
 // TeaCheckout checks out the given branch in the worktree.
-func (r TeaRepo) TeaCheckout(branchName string) error {
+func (r TeaRepo) TeaCheckout(ref git_plumbing.ReferenceName) error {
 	tree, err := r.Worktree()
 	if err != nil {
 		return err
 	}
-	localBranchRefName := git_plumbing.NewBranchReferenceName(branchName)
-	return tree.Checkout(&git.CheckoutOptions{Branch: localBranchRefName})
+	return tree.Checkout(&git.CheckoutOptions{Branch: ref})
 }
 
 // TeaDeleteLocalBranch removes the given branch locally

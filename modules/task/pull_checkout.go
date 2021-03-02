@@ -11,10 +11,11 @@ import (
 	local_git "code.gitea.io/tea/modules/git"
 
 	"github.com/go-git/go-git/v5"
+	git_plumbing "github.com/go-git/go-git/v5/plumbing"
 )
 
 // PullCheckout checkout current workdir to the head branch of specified pull request
-func PullCheckout(login *config.Login, repoOwner, repoName string, index int64, callback func(string) (string, error)) error {
+func PullCheckout(login *config.Login, repoOwner, repoName string, forceCreateBranch bool, index int64, callback func(string) (string, error)) error {
 	client := login.Client()
 
 	localRepo, err := local_git.RepoForWorkdir()
@@ -38,12 +39,6 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64, 
 		// found a matching private key on this machine during login creation.
 		// this means, we are very likely to have a working ssh setup.
 		remoteURL = pr.Head.Repository.SSHURL
-	}
-
-	// try to find a matching existing branch, otherwise return branch in pulls/ namespace
-	localBranchName := fmt.Sprintf("pulls/%v-%v", index, pr.Head.Ref)
-	if b, _ := localRepo.TeaFindBranchBySha(pr.Head.Sha, remoteURL); b != nil {
-		localBranchName = b.Name
 	}
 
 	newRemoteName := fmt.Sprintf("pulls/%v", pr.Head.Repository.Owner.UserName)
@@ -72,15 +67,32 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, index int64, 
 		return err
 	}
 
-	// checkout local branch
-	err = localRepo.TeaCreateBranch(localBranchName, pr.Head.Ref, localRemoteName)
-	if err == nil {
-		fmt.Printf("Created branch '%s'\n", localBranchName)
-	} else if err == git.ErrBranchExists {
-		fmt.Println("There may be changes since you last checked out, run `git pull` to get them.")
-	} else if err != nil {
-		return err
+	var info string
+	var checkoutRef git_plumbing.ReferenceName
+
+	if b, _ := localRepo.TeaFindBranchBySha(pr.Head.Sha, remoteURL); b != nil {
+		// if a matching branch exists, use that
+		checkoutRef = git_plumbing.NewBranchReferenceName(b.Name)
+		info = fmt.Sprintf("Found matching local branch %s, checking it out", checkoutRef.Short())
+	} else if forceCreateBranch {
+		// create a branch if wanted
+		localBranchName := fmt.Sprintf("pulls/%v-%v", index, pr.Head.Ref)
+		checkoutRef = git_plumbing.NewBranchReferenceName(localBranchName)
+		if err = localRepo.TeaCreateBranch(localBranchName, pr.Head.Ref, localRemoteName); err == nil {
+			info = fmt.Sprintf("Created branch '%s'\n", localBranchName)
+		} else if err == git.ErrBranchExists {
+			info = "There may be changes since you last checked out, run `git pull` to get them."
+		} else {
+			return err
+		}
+	} else {
+		// use the remote tracking branch
+		checkoutRef = git_plumbing.NewRemoteReferenceName(localRemoteName, pr.Head.Ref)
+		info = fmt.Sprintf(
+			"Checking out remote tracking branch %s. To make changes, create a new branch:\n  git checkout %s",
+			checkoutRef.String(), pr.Head.Ref)
 	}
 
-	return localRepo.TeaCheckout(localBranchName)
+	fmt.Println(info)
+	return localRepo.TeaCheckout(checkoutRef)
 }
