@@ -20,15 +20,19 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var (
+	errNotAGiteaRepo = errors.New("No Gitea login found. You might want to specify --repo (and --login) to work outside of a repository")
+)
+
 // TeaContext contains all context derived during command initialization and wraps cli.Context
 type TeaContext struct {
 	*cli.Context
-	Login     *config.Login
-	RepoSlug  string       // <owner>/<repo>
-	Owner     string       // repo owner as derived from context
-	Repo      string       // repo name as derived from context or provided in flag
-	Output    string       // value of output flag
-	LocalRepo *git.TeaRepo // maybe, we have opened it already anyway
+	Login     *config.Login // config data & client for selected login
+	RepoSlug  string        // <owner>/<repo>, optional
+	Owner     string        // repo owner as derived from context or provided in flag, optional
+	Repo      string        // repo name as derived from context or provided in flag, optional
+	Output    string        // value of output flag
+	LocalRepo *git.TeaRepo  // is set if flags specified a local repo via --repo, or if $PWD is a git repo
 }
 
 // GetListOptions return ListOptions based on PaginationFlags
@@ -84,8 +88,7 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 
 	// check if repoFlag can be interpreted as path to local repo.
 	if len(repoFlag) != 0 {
-		repoFlagPathExists, err = utils.DirExists(repoFlag)
-		if err != nil {
+		if repoFlagPathExists, err = utils.DirExists(repoFlag); err != nil {
 			log.Fatal(err.Error())
 		}
 		if repoFlagPathExists {
@@ -95,9 +98,12 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 
 	if len(repoFlag) == 0 || repoFlagPathExists {
 		// try to read git repo & extract context, ignoring if PWD is not a repo
-		c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath, remoteFlag)
-		if err != nil && err != gogit.ErrRepositoryNotExists {
-			log.Fatal(err.Error())
+		if c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath, remoteFlag); err != nil {
+			if err == errNotAGiteaRepo || err == gogit.ErrRepositoryNotExists {
+				// we can deal with that, commands needing the optional values use ctx.Ensure()
+			} else {
+				log.Fatal(err.Error())
+			}
 		}
 	}
 
@@ -187,5 +193,5 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 		}
 	}
 
-	return repo, nil, "", errors.New("No Gitea login found. You might want to specify --repo (and --login) to work outside of a repository")
+	return repo, nil, "", errNotAGiteaRepo
 }
