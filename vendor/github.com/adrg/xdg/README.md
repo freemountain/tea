@@ -1,21 +1,50 @@
-xdg
-===
+<h1 align="center">
+  <div>
+    <img src="https://raw.githubusercontent.com/adrg/adrg.github.io/master/assets/projects/xdg/logo.png" height="80px" alt="xdg logo"/>
+  </div>
+</h1>
 
-[![Build Status](https://github.com/adrg/xdg/workflows/CI/badge.svg)](https://github.com/adrg/xdg/actions?query=workflow%3ACI)
-[![Code coverage](https://codecov.io/gh/adrg/xdg/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/gh/adrg/xdg)
-[![pkg.go.dev documentation](https://pkg.go.dev/badge/github.com/adrg/xdg)](https://pkg.go.dev/github.com/adrg/xdg)
-[![MIT license](https://img.shields.io/badge/license-MIT-red.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Go report card](https://goreportcard.com/badge/github.com/adrg/xdg)](https://goreportcard.com/report/github.com/adrg/xdg)
-[![GitHub issues](https://img.shields.io/github/issues/adrg/xdg)](https://github.com/adrg/xdg/issues)
-[![Buy me a coffee](https://img.shields.io/static/v1.svg?label=%20&message=Buy%20me%20a%20coffee&color=FF813F&logo=buy%20me%20a%20coffee&logoColor=white)](https://www.buymeacoffee.com/adrg)
-[![GitHub stars](https://img.shields.io/github/stars/adrg/xdg?style=social)](https://github.com/adrg/xdg/stargazers)
+<h4 align="center">Go implementation of the XDG Base Directory Specification and XDG user directories.</h4>
+
+<p align="center">
+    <a href="https://github.com/adrg/xdg/actions?query=workflow%3ACI">
+        <img alt="Build status" src="https://github.com/adrg/xdg/workflows/CI/badge.svg">
+    </a>
+    <a href="https://app.codecov.io/gh/adrg/xdg">
+        <img alt="Code coverage" src="https://codecov.io/gh/adrg/xdg/branch/master/graphs/badge.svg?branch=master">
+    </a>
+    <a href="https://pkg.go.dev/github.com/adrg/xdg">
+        <img alt="pkg.go.dev documentation" src="https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white">
+    </a>
+    <a href="https://opensource.org/licenses/MIT" rel="nofollow">
+        <img alt="MIT license" src="https://img.shields.io/github/license/adrg/xdg">
+    </a>
+    <br />
+    <a href="https://goreportcard.com/report/github.com/adrg/xdg">
+        <img alt="Go report card" src="https://goreportcard.com/badge/github.com/adrg/xdg">
+    </a>
+    <a href="https://github.com/avelino/awesome-go#configuration">
+        <img alt="Awesome Go" src="https://awesome.re/mentioned-badge.svg">
+    </a>
+    <a href="https://github.com/adrg/xdg/graphs/contributors">
+        <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/adrg/xdg" />
+    </a>
+    <a href="https://github.com/adrg/xdg/issues">
+        <img alt="GitHub open issues" src="https://img.shields.io/github/issues-raw/adrg/xdg">
+    </a>
+    <a href="https://ko-fi.com/T6T72WATK">
+        <img alt="Buy me a coffee" src="https://img.shields.io/static/v1.svg?label=%20&message=Buy%20me%20a%20coffee&color=579fbf&logo=buy%20me%20a%20coffee&logoColor=white">
+    </a>
+</p>
 
 Provides an implementation of the [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html).
 The specification defines a set of standard paths for storing application files,
 including data and configuration files. For portability and flexibility reasons,
 applications should use the XDG defined locations instead of hardcoding paths.
-The package also includes the locations of well known [user directories](https://wiki.archlinux.org/index.php/XDG_user_directories).
-The current implementation supports Windows, Mac OS and most flavors of Unix.
+
+The package also includes the locations of well known [user directories](https://wiki.archlinux.org/index.php/XDG_user_directories)
+and an implementation of the [state directory](https://wiki.debian.org/XDGBaseDirectorySpecification#Proposal:_STATE_directory) proposal.
+Windows, macOS and most flavors of Unix are supported.
 
 Full documentation can be found at: https://pkg.go.dev/github.com/adrg/xdg.
 
@@ -29,19 +58,19 @@ present in the environment.
 
 #### XDG Base Directory
 
-|                 | Unix                                | Mac OS                          | Windows                                 |
-| :---            | :---                                | :-----                          | :---                                    |
-| XDG_DATA_HOME   | `~/.local/share`                    | `~/Library/Application Support` | `%LOCALAPPDATA%`                        |
-| XDG_DATA_DIRS   | `/usr/local/share`<br/>`/usr/share` | `/Library/Application Support`  | `%APPDATA%\Roaming`<br/>`%PROGRAMDATA%` |
-| XDG_CONFIG_HOME | `~/.config`                         | `~/Library/Preferences`         | `%LOCALAPPDATA%`                        |
-| XDG_CONFIG_DIRS | `/etc/xdg`                          | `/Library/Preferences`          | `%PROGRAMDATA%`                         |
-| XDG_CACHE_HOME  | `~/.cache`                          | `~/Library/Caches`              | `%LOCALAPPDATA%\cache`                  |
-| XDG_RUNTIME_DIR | `/run/user/UID`                     | `~/Library/Application Support` | `%LOCALAPPDATA%`                        |
+|                 | Unix                                | macOS                                                                                 | Windows                                 |
+| :-------------- | :---------------------------------- | :------------------------------------------------------------------------------------ | :-------------------------------------- |
+| XDG_DATA_HOME   | `~/.local/share`                    | `~/Library/Application Support`                                                       | `%LOCALAPPDATA%`                        |
+| XDG_DATA_DIRS   | `/usr/local/share`<br/>`/usr/share` | `/Library/Application Support`                                                        | `%APPDATA%\Roaming`<br/>`%PROGRAMDATA%` |
+| XDG_CONFIG_HOME | `~/.config`                         | `~/Library/Application Support`                                                       | `%LOCALAPPDATA%`                        |
+| XDG_CONFIG_DIRS | `/etc/xdg`                          | `~/Library/Preferences`<br/>`/Library/Application Support`<br/>`/Library/Preferences` | `%PROGRAMDATA%`                         |
+| XDG_CACHE_HOME  | `~/.cache`                          | `~/Library/Caches`                                                                    | `%LOCALAPPDATA%\cache`                  |
+| XDG_RUNTIME_DIR | `/run/user/UID`                     | `~/Library/Application Support`                                                       | `%LOCALAPPDATA%`                        |
 
 #### XDG user directories
 
-|                     | Unix          | Mac OS        | Windows                   |
-| :---                | :---          | :-----        | :---                      |
+|                     | Unix          | macOS         | Windows                   |
+| :------------------ | :------------ | :------------ | :------------------------ |
 | XDG_DESKTOP_DIR     | `~/Desktop`   | `~/Desktop`   | `%USERPROFILE%/Desktop`   |
 | XDG_DOWNLOAD_DIR    | `~/Downloads` | `~/Downloads` | `%USERPROFILE%/Downloads` |
 | XDG_DOCUMENTS_DIR   | `~/Documents` | `~/Documents` | `%USERPROFILE%/Documents` |
@@ -53,43 +82,50 @@ present in the environment.
 
 #### Non-standard directories
 
+State directory
+
+```
+Unix
+  • ~/.local/state
+macOS
+  • ~/Library/Application Support
+Windows
+  • %LOCALAPPDATA%
+```
+
 Application directories
 
 ```
-Unix:
-- $XDG_DATA_HOME/applications
-- ~/.local/share/applications
-- /usr/local/share/applications
-- /usr/share/applications
-- $XDG_DATA_DIRS/applications
-
-Mac OS:
-- /Applications
-
-Windows:
-- %APPDATA%\Roaming\Microsoft\Windows\Start Menu\Programs
+Unix
+  • $XDG_DATA_HOME/applications
+  • ~/.local/share/applications
+  • /usr/local/share/applications
+  • /usr/share/applications
+  • $XDG_DATA_DIRS/applications
+macOS
+  • /Applications
+Windows
+  • %APPDATA%\Roaming\Microsoft\Windows\Start Menu\Programs
 ```
 
-Font Directories
+Font directories
 
 ```
-Unix:
-- $XDG_DATA_HOME/fonts
-- ~/.fonts
-- ~/.local/share/fonts
-- /usr/local/share/fonts
-- /usr/share/fonts
-- $XDG_DATA_DIRS/fonts
-
-Mac OS:
-- ~/Library/Fonts
-- /Library/Fonts
-- /System/Library/Fonts
-- /Network/Library/Fonts
-
-Windows:
-- %windir%\Fonts
-- %LOCALAPPDATA%\Microsoft\Windows\Fonts
+Unix
+  • $XDG_DATA_HOME/fonts
+  • ~/.fonts
+  • ~/.local/share/fonts
+  • /usr/local/share/fonts
+  • /usr/share/fonts
+  • $XDG_DATA_DIRS/fonts
+macOS
+  • ~/Library/Fonts
+  • /Library/Fonts
+  • /System/Library/Fonts
+  • /Network/Library/Fonts
+Windows
+  • %windir%\Fonts
+  • %LOCALAPPDATA%\Microsoft\Windows\Fonts
 ```
 
 ## Usage
@@ -115,6 +151,7 @@ func main() {
 	log.Println("Runtime directory:", xdg.RuntimeDir)
 
 	// Non-standard directories.
+	log.Println("Home state directory:", xdg.StateHome)
 	log.Println("Application directories:", xdg.ApplicationDirs)
 	log.Println("Font directories:", xdg.FontDirs)
 
@@ -132,6 +169,7 @@ func main() {
 	// xdg.DataFile()
 	// xdg.CacheFile()
 	// xdg.RuntimeFile()
+	// xdg.StateFile()
 
 	// Finding application config files.
 	// SearchConfigFile takes one parameter which must contain the name of
@@ -147,6 +185,7 @@ func main() {
 	// xdg.SearchDataFile()
 	// xdg.SearchCacheFile()
 	// xdg.SearchRuntimeFile()
+	// xdg.SearchStateFile()
 }
 ```
 
@@ -181,31 +220,27 @@ func main() {
 ## Contributing
 
 Contributions in the form of pull requests, issues or just general feedback,
-are always welcome.
-See [CONTRIBUTING.MD](https://github.com/adrg/xdg/blob/master/CONTRIBUTING.md).
+are always welcome.  
+See [CONTRIBUTING.MD](CONTRIBUTING.md).
 
 **Contributors**:
 [adrg](https://github.com/adrg),
 [wichert](https://github.com/wichert),
 [bouncepaw](https://github.com/bouncepaw),
-[gabriel-vasile](https://github.com/gabriel-vasile).
+[gabriel-vasile](https://github.com/gabriel-vasile),
+[KalleDK](https://github.com/KalleDK).
 
 ## References
 
 For more information see:
 * [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
 * [XDG user directories](https://wiki.archlinux.org/index.php/XDG_user_directories)
-
-## Buy me a coffee
-
-If you found this project useful and want to support it, consider buying me a coffee.  
-<a href="https://www.buymeacoffee.com/adrg">
-    <img src="https://cdn.buymeacoffee.com/buttons/v2/arial-orange.png" alt="Buy Me A Coffee" height="42px">
-</a>
+* [XDG state directory proposal](https://wiki.debian.org/XDGBaseDirectorySpecification#Proposal:_STATE_directory)
+* [XDG_STATE_HOME proposal](https://lists.freedesktop.org/archives/xdg/2016-December/013803.html)
 
 ## License
 
 Copyright (c) 2014 Adrian-George Bostan.
 
 This project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
-See [LICENSE](https://github.com/adrg/xdg/blob/master/LICENSE) for more details.
+See [LICENSE](LICENSE) for more details.

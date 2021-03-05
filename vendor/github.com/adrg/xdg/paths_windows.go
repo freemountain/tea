@@ -43,6 +43,7 @@ func initBaseDirs(home string) {
 	baseDirs.runtime = xdgPath(envRuntimeDir, localAppDataDir)
 
 	// Initialize non-standard directories.
+	baseDirs.stateHome = xdgPath(envStateHome, localAppDataDir)
 	baseDirs.applications = []string{
 		filepath.Join(roamingAppDataDir, "Microsoft", "Windows", "Start Menu", "Programs"),
 	}

@@ -64,7 +64,7 @@ func runReleaseDelete(cmd *cli.Context) error {
 	}
 
 	if ctx.Bool("delete-tag") {
-		_, err = client.DeleteReleaseTag(ctx.Owner, ctx.Repo, tag)
+		_, err = client.DeleteTag(ctx.Owner, ctx.Repo, tag)
 		return err
 	}
 

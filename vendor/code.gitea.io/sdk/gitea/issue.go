@@ -218,11 +218,12 @@ type EditIssueOption struct {
 	Ref   *string `json:"ref"`
 	// deprecated
 	// TODO: rm on sdk 0.15.0
-	Assignee  *string    `json:"assignee"`
-	Assignees []string   `json:"assignees"`
-	Milestone *int64     `json:"milestone"`
-	State     *StateType `json:"state"`
-	Deadline  *time.Time `json:"due_date"`
+	Assignee       *string    `json:"assignee"`
+	Assignees      []string   `json:"assignees"`
+	Milestone      *int64     `json:"milestone"`
+	State          *StateType `json:"state"`
+	Deadline       *time.Time `json:"due_date"`
+	RemoveDeadline *bool      `json:"unset_due_date"`
 }
 
 // Validate the EditIssueOption struct
@@ -252,6 +253,8 @@ func (c *Client) EditIssue(owner, repo string, index int64, opt EditIssueOption)
 
 func (c *Client) issueBackwardsCompatibility(issue *Issue) {
 	if c.checkServerVersionGreaterThanOrEqual(version1_12_0) != nil {
+		c.mutex.RLock()
 		issue.HTMLURL = fmt.Sprintf("%s/%s/issues/%d", c.url, issue.Repository.FullName, issue.Index)
+		c.mutex.RUnlock()
 	}
 }

@@ -20,11 +20,6 @@ linters:
     - wsl
     - gomnd
     - gocognit
-    - goerr113
-    - nolintlint
-    - testpackage
-    - godot
-    - nestif
 
 linters-settings:
   govet:
