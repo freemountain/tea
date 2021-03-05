@@ -13,8 +13,6 @@ import (
 	local_git "code.gitea.io/tea/modules/git"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
-
-	"github.com/go-git/go-git/v5"
 )
 
 // CreatePull creates a PR in the given repo and prints the result
@@ -24,13 +22,6 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 	localRepo, err := local_git.RepoForWorkdir()
 	if err != nil {
 		return fmt.Errorf("Could not open local repo: %s", err)
-	}
-
-	// push if possible
-	fmt.Println("git push")
-	err = localRepo.Push(&git.PushOptions{})
-	if err != nil && err != git.NoErrAlreadyUpToDate {
-		fmt.Printf("Error occurred during 'git push':\n%s\n", err.Error())
 	}
 
 	// default is default branch
@@ -92,32 +83,23 @@ func GetDefaultPRBase(login *config.Login, owner, repo string) (string, error) {
 	return meta.DefaultBranch, nil
 }
 
-// GetDefaultPRHead uses the currently checked out branch, checks if
-// a remote currently holds the commit it points to, extracts the owner
-// from its URL, and assembles the result to a valid head spec for gitea.
+// GetDefaultPRHead uses the currently checked out branch, tries to find a remote
+// that has a branch with the same name, and extracts the owner from its URL.
+// If no remote matches, owner is empty, meaning same as head repo owner.
 func GetDefaultPRHead(localRepo *local_git.TeaRepo) (owner, branch string, err error) {
-	headBranch, err := localRepo.Head()
-	if err != nil {
+	if branch, err = localRepo.TeaGetCurrentBranchName(); err != nil {
 		return
 	}
-	sha := headBranch.Hash().String()
 
-	remote, err := localRepo.TeaFindBranchRemote("", sha)
+	remote, err := localRepo.TeaFindBranchRemote(branch, "")
 	if err != nil {
 		err = fmt.Errorf("could not determine remote for current branch: %s", err)
 		return
 	}
 
 	if remote == nil {
-		// if no remote branch is found for the local hash, we abort:
-		// user has probably not configured a remote for the local branch,
-		// or local branch does not represent remote state.
-		err = fmt.Errorf("no matching remote found for this branch. try git push -u <remote> <branch>")
-		return
-	}
-
-	branch, err = localRepo.TeaGetCurrentBranchName()
-	if err != nil {
+		// if no remote branch is found for the local branch,
+		// we leave owner empty, meaning "use same repo as head" to gitea.
 		return
 	}
 
