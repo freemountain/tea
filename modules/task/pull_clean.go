@@ -9,6 +9,7 @@ import (
 
 	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
+	"code.gitea.io/tea/modules/workaround"
 
 	"code.gitea.io/sdk/gitea"
 	git_config "github.com/go-git/go-git/v5/config"
@@ -33,6 +34,10 @@ func PullClean(login *config.Login, repoOwner, repoName string, index int64, ign
 	if err != nil {
 		return err
 	}
+	if err := workaround.FixPullHeadSha(client, pr); err != nil {
+		return err
+	}
+
 	if pr.State == gitea.StateOpen {
 		return fmt.Errorf("PR is still open, won't delete branches")
 	}

@@ -9,6 +9,7 @@ import (
 
 	"code.gitea.io/tea/modules/config"
 	local_git "code.gitea.io/tea/modules/git"
+	"code.gitea.io/tea/modules/workaround"
 
 	"github.com/go-git/go-git/v5"
 	git_plumbing "github.com/go-git/go-git/v5/plumbing"
@@ -28,6 +29,10 @@ func PullCheckout(login *config.Login, repoOwner, repoName string, forceCreateBr
 	if err != nil {
 		return err
 	}
+	if err := workaround.FixPullHeadSha(client, pr); err != nil {
+		return err
+	}
+
 	remoteDeleted := pr.Head.Ref == fmt.Sprintf("refs/pull/%d/head", pr.Index)
 	if remoteDeleted {
 		return fmt.Errorf("Can't checkout: remote head branch was already deleted")

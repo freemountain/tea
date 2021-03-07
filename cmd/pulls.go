@@ -12,6 +12,7 @@ import (
 	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
+	"code.gitea.io/tea/modules/workaround"
 
 	"code.gitea.io/sdk/gitea"
 	"github.com/urfave/cli/v2"
@@ -63,6 +64,9 @@ func runPullDetail(cmd *cli.Context, index string) error {
 	client := ctx.Login.Client()
 	pr, _, err := client.GetPullRequest(ctx.Owner, ctx.Repo, idx)
 	if err != nil {
+		return err
+	}
+	if err := workaround.FixPullHeadSha(client, pr); err != nil {
 		return err
 	}
 
