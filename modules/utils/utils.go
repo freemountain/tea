@@ -6,11 +6,15 @@ package utils
 
 // Contains checks containment
 func Contains(haystack []string, needle string) bool {
-	for _, s := range haystack {
+	return IndexOf(haystack, needle) != -1
+}
+
+// IndexOf returns the index of first occurrence of needle in haystack
+func IndexOf(haystack []string, needle string) int {
+	for i, s := range haystack {
 		if s == needle {
-			return true
+			return i
 		}
 	}
-
-	return false
+	return -1
 }

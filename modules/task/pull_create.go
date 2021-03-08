@@ -16,8 +16,7 @@ import (
 )
 
 // CreatePull creates a PR in the given repo and prints the result
-func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, description string) error {
-
+func CreatePull(login *config.Login, repoOwner, repoName, base, head string, opts *gitea.CreateIssueOption) error {
 	// open local git repo
 	localRepo, err := local_git.RepoForWorkdir()
 	if err != nil {
@@ -48,19 +47,23 @@ func CreatePull(login *config.Login, repoOwner, repoName, base, head, title, des
 	}
 
 	// default is head branch name
-	if len(title) == 0 {
-		title = GetDefaultPRTitle(head)
+	if len(opts.Title) == 0 {
+		opts.Title = GetDefaultPRTitle(head)
 	}
 	// title is required
-	if len(title) == 0 {
+	if len(opts.Title) == 0 {
 		return fmt.Errorf("Title is required")
 	}
 
 	pr, _, err := login.Client().CreatePullRequest(repoOwner, repoName, gitea.CreatePullRequestOption{
-		Head:  head,
-		Base:  base,
-		Title: title,
-		Body:  description,
+		Head:      head,
+		Base:      base,
+		Title:     opts.Title,
+		Body:      opts.Body,
+		Assignees: opts.Assignees,
+		Labels:    opts.Labels,
+		Milestone: opts.Milestone,
+		Deadline:  opts.Deadline,
 	})
 
 	if err != nil {

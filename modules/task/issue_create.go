@@ -13,25 +13,14 @@ import (
 )
 
 // CreateIssue creates an issue in the given repo and prints the result
-func CreateIssue(login *config.Login, repoOwner, repoName, title, description string) error {
+func CreateIssue(login *config.Login, repoOwner, repoName string, opts gitea.CreateIssueOption) error {
 
 	// title is required
-	if len(title) == 0 {
+	if len(opts.Title) == 0 {
 		return fmt.Errorf("Title is required")
 	}
 
-	issue, _, err := login.Client().CreateIssue(repoOwner, repoName, gitea.CreateIssueOption{
-		Title: title,
-		Body:  description,
-		// TODO:
-		//Assignee  string   `json:"assignee"`
-		//Assignees []string `json:"assignees"`
-		//Deadline *time.Time `json:"due_date"`
-		//Milestone int64 `json:"milestone"`
-		//Labels []int64 `json:"labels"`
-		//Closed bool    `json:"closed"`
-	})
-
+	issue, _, err := login.Client().CreateIssue(repoOwner, repoName, opts)
 	if err != nil {
 		return fmt.Errorf("could not create issue: %s", err)
 	}

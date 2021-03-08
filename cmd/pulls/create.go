@@ -30,17 +30,7 @@ var CmdPullsCreate = cli.Command{
 			Aliases: []string{"b"},
 			Usage:   "Set base branch (default is default branch)",
 		},
-		&cli.StringFlag{
-			Name:    "title",
-			Aliases: []string{"t"},
-			Usage:   "Set title of pull (default is head branch name)",
-		},
-		&cli.StringFlag{
-			Name:    "description",
-			Aliases: []string{"d"},
-			Usage:   "Set body of new pull",
-		},
-	}, flags.AllDefaultFlags...),
+	}, flags.IssuePREditFlags...),
 }
 
 func runPullsCreate(cmd *cli.Context) error {
@@ -53,13 +43,17 @@ func runPullsCreate(cmd *cli.Context) error {
 	}
 
 	// else use args to create PR
+	opts, err := flags.GetIssuePREditFlags(ctx)
+	if err != nil {
+		return err
+	}
+
 	return task.CreatePull(
 		ctx.Login,
 		ctx.Owner,
 		ctx.Repo,
 		ctx.String("base"),
 		ctx.String("head"),
-		ctx.String("title"),
-		ctx.String("description"),
+		opts,
 	)
 }

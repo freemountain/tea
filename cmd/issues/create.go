@@ -20,18 +20,7 @@ var CmdIssuesCreate = cli.Command{
 	Usage:       "Create an issue on repository",
 	Description: `Create an issue on repository`,
 	Action:      runIssuesCreate,
-	Flags: append([]cli.Flag{
-		&cli.StringFlag{
-			Name:    "title",
-			Aliases: []string{"t"},
-			Usage:   "issue title to create",
-		},
-		&cli.StringFlag{
-			Name:    "body",
-			Aliases: []string{"b"},
-			Usage:   "issue body to create",
-		},
-	}, flags.LoginRepoFlags...),
+	Flags:       flags.IssuePREditFlags,
 }
 
 func runIssuesCreate(cmd *cli.Context) error {
@@ -42,11 +31,15 @@ func runIssuesCreate(cmd *cli.Context) error {
 		return interact.CreateIssue(ctx.Login, ctx.Owner, ctx.Repo)
 	}
 
+	opts, err := flags.GetIssuePREditFlags(ctx)
+	if err != nil {
+		return err
+	}
+
 	return task.CreateIssue(
 		ctx.Login,
 		ctx.Owner,
 		ctx.Repo,
-		ctx.String("title"),
-		ctx.String("body"),
+		*opts,
 	)
 }

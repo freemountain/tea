@@ -7,8 +7,11 @@ package interact
 import (
 	"fmt"
 	"strings"
+	"time"
 
+	"code.gitea.io/tea/modules/utils"
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/araddon/dateparse"
 )
 
 // PromptMultiline runs a textfield-style prompt and blocks until input was made.
@@ -27,9 +30,10 @@ func PromptPassword(name string) (pass string, err error) {
 // promptRepoSlug interactively prompts for a Gitea repository or returns the current one
 func promptRepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err error) {
 	prompt := "Target repo:"
+	defaultVal := ""
 	required := true
 	if len(defaultOwner) != 0 && len(defaultRepo) != 0 {
-		prompt = fmt.Sprintf("Target repo [%s/%s]:", defaultOwner, defaultRepo)
+		defaultVal = fmt.Sprintf("%s/%s", defaultOwner, defaultRepo)
 		required = false
 	}
 	var repoSlug string
@@ -38,7 +42,10 @@ func promptRepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err e
 	repo = defaultRepo
 
 	err = survey.AskOne(
-		&survey.Input{Message: prompt},
+		&survey.Input{
+			Message: prompt,
+			Default: defaultVal,
+		},
 		&repoSlug,
 		survey.WithValidator(func(input interface{}) error {
 			if str, ok := input.(string); ok {
@@ -62,4 +69,97 @@ func promptRepoSlug(defaultOwner, defaultRepo string) (owner, repo string, err e
 		repo = repoSlugSplit[1]
 	}
 	return
+}
+
+// promptDatetime prompts for a date or datetime string.
+// Supports all formats understood by araddon/dateparse.
+func promptDatetime(prompt string) (val *time.Time, err error) {
+	var input string
+	err = survey.AskOne(
+		&survey.Input{Message: prompt},
+		&input,
+		survey.WithValidator(func(input interface{}) error {
+			if str, ok := input.(string); ok {
+				if len(str) == 0 {
+					return nil
+				}
+				t, err := dateparse.ParseAny(str)
+				if err != nil {
+					return err
+				}
+				val = &t
+			} else {
+				return fmt.Errorf("invalid result type")
+			}
+			return nil
+		}),
+	)
+	return
+}
+
+// promptSelect creates a generic multiselect prompt, with processing of custom values.
+func promptMultiSelect(prompt string, options []string, customVal string) ([]string, error) {
+	var selection []string
+	promptA := &survey.MultiSelect{
+		Message: prompt,
+		Options: makeSelectOpts(options, customVal, ""),
+		VimMode: true,
+	}
+	if err := survey.AskOne(promptA, &selection); err != nil {
+		return nil, err
+	}
+	return promptCustomVal(prompt, customVal, selection)
+}
+
+// promptSelect creates a generic select prompt, with processing of custom values or none-option.
+func promptSelect(prompt string, options []string, customVal, noneVal string) (string, error) {
+	var selection string
+	promptA := &survey.Select{
+		Message: prompt,
+		Options: makeSelectOpts(options, customVal, noneVal),
+		VimMode: true,
+		Default: noneVal,
+	}
+	if err := survey.AskOne(promptA, &selection); err != nil {
+		return "", err
+	}
+	if noneVal != "" && selection == noneVal {
+		return "", nil
+	}
+	if customVal != "" {
+		sel, err := promptCustomVal(prompt, customVal, []string{selection})
+		if err != nil {
+			return "", err
+		}
+		selection = sel[0]
+	}
+	return selection, nil
+}
+
+// makeSelectOpts adds cusotmVal & noneVal to opts if set.
+func makeSelectOpts(opts []string, customVal, noneVal string) []string {
+	if customVal != "" {
+		opts = append(opts, customVal)
+	}
+	if noneVal != "" {
+		opts = append(opts, noneVal)
+	}
+	return opts
+}
+
+// promptCustomVal checks if customVal is present in selection, and prompts
+// for custom input to add to the selection instead.
+func promptCustomVal(prompt, customVal string, selection []string) ([]string, error) {
+	// check for custom value & prompt again with text input
+	// HACK until https://github.com/AlecAivazis/survey/issues/339 is implemented
+	if otherIndex := utils.IndexOf(selection, customVal); otherIndex != -1 {
+		var customAssignees string
+		promptA := &survey.Input{Message: prompt, Help: "comma separated list"}
+		if err := survey.AskOne(promptA, &customAssignees); err != nil {
+			return nil, err
+		}
+		selection = append(selection[:otherIndex], selection[otherIndex+1:]...)
+		selection = append(selection, strings.Split(customAssignees, ",")...)
+	}
+	return selection, nil
 }
