@@ -1,5 +1,31 @@
 # Changelog
 
+## [v0.7.0](https://gitea.com/gitea/tea/releases/tag/v0.7.0) - 2021-03-12
+
+* BREAKING
+  * Add more issue / pr creation parameters (#331)
+  * Add more command shorthands (#307)
+* FEATURES
+  * Add commands for reviews (#315)
+  * Add `tea comment` and show comments of issues/pulls (#313)
+  * Add interactive mode for `tea milestone create` (#310)
+  * Add command to install shell completion (#309)
+  * Implement PR closing and reopening (#304)
+  * Add interactive mode for `tea issue create` (#302)
+* BUGFIXES
+  * Introduce workaround for missing pull head sha (#340)
+  * Don't exit if we can't find a local repo with a remote matching to a login (#336)
+  * Don't push before creating a pull (#334)
+  * InitCommand() robustness (#327)
+  * `tea comment`: handle piped stdin (#322)
+* ENHANCEMENTS
+  * Allow checking out PRs with deleted head branch (#341)
+  * Improve `tea time` (#319)
+  * `tea pr checkout`: dont create local branches (#314)
+  * Add `tea issues --fields`, allow printing labels (#312)
+  * Show PR CI status (#306)
+  * Make PR workflow helpers more robust (#300)
+
 ## [v0.6.0](https://gitea.com/gitea/tea/releases/tag/v0.6.0) - 2020-12-11
 
 * BREAKING
