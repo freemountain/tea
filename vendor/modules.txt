@@ -15,7 +15,7 @@ github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/pkg/guid
 # github.com/adrg/xdg v0.3.1
 github.com/adrg/xdg
-# github.com/alecthomas/chroma v0.7.3
+# github.com/alecthomas/chroma v0.8.1
 github.com/alecthomas/chroma
 github.com/alecthomas/chroma/formatters
 github.com/alecthomas/chroma/formatters/html
@@ -47,13 +47,18 @@ github.com/alecthomas/chroma/lexers/v
 github.com/alecthomas/chroma/lexers/w
 github.com/alecthomas/chroma/lexers/x
 github.com/alecthomas/chroma/lexers/y
+github.com/alecthomas/chroma/lexers/z
 github.com/alecthomas/chroma/quick
 github.com/alecthomas/chroma/styles
 # github.com/araddon/dateparse v0.0.0-20210207001429-0eec95c9db7e
 github.com/araddon/dateparse
-# github.com/charmbracelet/glamour v0.2.0
+# github.com/aymerick/douceur v0.2.0
+github.com/aymerick/douceur/css
+# github.com/charmbracelet/glamour v0.2.0 => github.com/noerw/glamour v0.2.1-0.20210305125354-f0a29f1de0c2
 github.com/charmbracelet/glamour
 github.com/charmbracelet/glamour/ansi
+# github.com/chris-ramon/douceur v0.2.0
+github.com/chris-ramon/douceur/parser
 # github.com/cpuguy83/go-md2man/v2 v2.0.0
 github.com/cpuguy83/go-md2man/v2/md2man
 # github.com/danwakefield/fnmatch v0.0.0-20160403171240-cbb64ac3d964
@@ -124,6 +129,8 @@ github.com/go-git/go-git/v5/utils/merkletrie/filesystem
 github.com/go-git/go-git/v5/utils/merkletrie/index
 github.com/go-git/go-git/v5/utils/merkletrie/internal/frame
 github.com/go-git/go-git/v5/utils/merkletrie/noder
+# github.com/gorilla/css v1.0.0
+github.com/gorilla/css/scanner
 # github.com/hashicorp/go-version v1.2.1
 github.com/hashicorp/go-version
 # github.com/imdario/mergo v0.3.11
@@ -144,11 +151,11 @@ github.com/mattn/go-isatty
 github.com/mattn/go-runewidth
 # github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d
 github.com/mgutz/ansi
-# github.com/microcosm-cc/bluemonday v1.0.2
+# github.com/microcosm-cc/bluemonday v1.0.4
 github.com/microcosm-cc/bluemonday
 # github.com/mitchellh/go-homedir v1.1.0
 github.com/mitchellh/go-homedir
-# github.com/muesli/reflow v0.1.0
+# github.com/muesli/reflow v0.2.0
 github.com/muesli/reflow/ansi
 github.com/muesli/reflow/indent
 github.com/muesli/reflow/padding
@@ -173,7 +180,7 @@ github.com/stretchr/testify/assert
 github.com/urfave/cli/v2
 # github.com/xanzy/ssh-agent v0.3.0
 github.com/xanzy/ssh-agent
-# github.com/yuin/goldmark v1.2.1
+# github.com/yuin/goldmark v1.3.1
 github.com/yuin/goldmark
 github.com/yuin/goldmark/ast
 github.com/yuin/goldmark/extension
@@ -183,6 +190,10 @@ github.com/yuin/goldmark/renderer
 github.com/yuin/goldmark/renderer/html
 github.com/yuin/goldmark/text
 github.com/yuin/goldmark/util
+# github.com/yuin/goldmark-emoji v1.0.1
+github.com/yuin/goldmark-emoji
+github.com/yuin/goldmark-emoji/ast
+github.com/yuin/goldmark-emoji/definition
 # golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/cast5

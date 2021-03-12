@@ -28,7 +28,7 @@ func LoginDetails(login *config.Login) {
 	}
 	in += fmt.Sprintf("\nCreated: %s", time.Unix(login.Created, 0).Format(time.RFC822))
 
-	outputMarkdown(in)
+	outputMarkdown(in, "")
 }
 
 // LoginsList prints a listing of logins

@@ -21,7 +21,7 @@ func IssueDetails(issue *gitea.Issue) {
 		issue.Poster.UserName,
 		FormatTime(issue.Created),
 		issue.Body,
-	))
+	), issue.HTMLURL)
 }
 
 // IssuesPullsList prints a listing of issues & pulls

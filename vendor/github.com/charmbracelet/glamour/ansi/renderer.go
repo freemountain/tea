@@ -3,9 +3,9 @@ package ansi
 import (
 	"io"
 	"net/url"
-	"strings"
 
 	"github.com/muesli/termenv"
+	east "github.com/yuin/goldmark-emoji/ast"
 	"github.com/yuin/goldmark/ast"
 	astext "github.com/yuin/goldmark/extension/ast"
 	"github.com/yuin/goldmark/renderer"
@@ -72,13 +72,16 @@ func (r *ANSIRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	reg.Register(astext.KindFootnote, r.renderNode)
 	reg.Register(astext.KindFootnoteList, r.renderNode)
 	reg.Register(astext.KindFootnoteLink, r.renderNode)
-	reg.Register(astext.KindFootnoteBackLink, r.renderNode)
+	reg.Register(astext.KindFootnoteBacklink, r.renderNode)
 
 	// checkboxes
 	reg.Register(astext.KindTaskCheckBox, r.renderNode)
 
 	// strikethrough
 	reg.Register(astext.KindStrikethrough, r.renderNode)
+
+	// emoji
+	reg.Register(east.KindEmoji, r.renderNode)
 }
 
 func (r *ANSIRenderer) renderNode(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
@@ -145,7 +148,7 @@ func isChild(node ast.Node) bool {
 	return false
 }
 
-func resolveRelativeURL(baseURL string, rel string) string {
+func resolveURL(baseURL string, rel string) string {
 	u, err := url.Parse(rel)
 	if err != nil {
 		return rel
@@ -153,7 +156,6 @@ func resolveRelativeURL(baseURL string, rel string) string {
 	if u.IsAbs() {
 		return rel
 	}
-	u.Path = strings.TrimPrefix(u.Path, "/")
 
 	base, err := url.Parse(baseURL)
 	if err != nil {

@@ -87,7 +87,7 @@ func RepoDetails(repo *gitea.Repository, topics []string) {
 		urls,
 		perm,
 		tops,
-	))
+	), repo.HTMLURL)
 }
 
 // RepoFields are the available fields to print with ReposList()
