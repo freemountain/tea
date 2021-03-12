@@ -21,7 +21,6 @@ func Comments(comments []*gitea.Comment) {
 	var out = make([]string, len(comments))
 	for i, c := range comments {
 		out[i] = formatComment(c)
-		baseURL = comments[i].HTMLURL
 	}
 
 	outputMarkdown(fmt.Sprintf(

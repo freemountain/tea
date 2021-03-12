@@ -3,8 +3,8 @@
 ## [v0.7.0](https://gitea.com/gitea/tea/releases/tag/v0.7.0) - 2021-03-12
 
 * BREAKING
-  * Add more issue / pr creation parameters (#331)
-  * Add more command shorthands (#307)
+  * `tea issue create`: move `-b` flag to `-d` (#331)
+  * Drop `tea notif` shorthand in favor of `tea n` (#307)
 * FEATURES
   * Add commands for reviews (#315)
   * Add `tea comment` and show comments of issues/pulls (#313)
@@ -20,9 +20,12 @@
   * `tea comment`: handle piped stdin (#322)
 * ENHANCEMENTS
   * Allow checking out PRs with deleted head branch (#341)
+  * Markdown renderer: detect terminal width, resolve relative URLs (#332)
+  * Add more issue / pr creation parameters (#331)
   * Improve `tea time` (#319)
   * `tea pr checkout`: dont create local branches (#314)
   * Add `tea issues --fields`, allow printing labels (#312)
+  * Add more command shorthands (#307)
   * Show PR CI status (#306)
   * Make PR workflow helpers more robust (#300)
 
