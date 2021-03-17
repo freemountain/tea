@@ -43,6 +43,7 @@ var CmdPulls = cli.Command{
 		&pulls.CmdPullsReview,
 		&pulls.CmdPullsApprove,
 		&pulls.CmdPullsReject,
+		&pulls.CmdPullsMerge,
 	},
 }
 
