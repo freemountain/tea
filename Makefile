@@ -38,6 +38,8 @@ else
 	TEA_VERSION ?= $(shell git describe --tags --always | sed 's/-/+/' | sed 's/^v//')
 endif
 
+TEA_VERSION_TAG ?= $(shell sed 's/+/_/' <<< $(TEA_VERSION))
+
 LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)"
 
 PACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/)
@@ -138,6 +140,10 @@ build: $(EXECUTABLE)
 
 $(EXECUTABLE): $(SOURCES)
 	$(GO) build -mod=vendor $(GOFLAGS) $(EXTRA_GOFLAGS) -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)' -o $@
+
+.PHONY: build-image
+build-image:
+	docker build --build-arg VERSION=$(TEA_VERSION) -t gitea/tea:$(TEA_VERSION_TAG) .
 
 .PHONY: release
 release: release-dirs release-os release-compress release-check
