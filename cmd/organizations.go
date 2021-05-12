@@ -25,6 +25,7 @@ var CmdOrgs = cli.Command{
 		&organizations.CmdOrganizationList,
 		&organizations.CmdOrganizationDelete,
 	},
+	Flags: organizations.CmdOrganizationList.Flags,
 }
 
 func runOrganizations(ctx *cli.Context) error {

@@ -25,6 +25,7 @@ var CmdLabels = cli.Command{
 		&labels.CmdLabelUpdate,
 		&labels.CmdLabelDelete,
 	},
+	Flags: labels.CmdLabelsList.Flags,
 }
 
 func runLabels(ctx *cli.Context) error {
