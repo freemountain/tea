@@ -39,6 +39,9 @@ type TeaContext struct {
 func (ctx *TeaContext) GetListOptions() gitea.ListOptions {
 	page := ctx.Int("page")
 	limit := ctx.Int("limit")
+	if limit < 0 {
+		limit = 0
+	}
 	if limit != 0 && page == 0 {
 		page = 1
 	}
