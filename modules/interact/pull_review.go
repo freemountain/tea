@@ -63,7 +63,7 @@ func ReviewPull(ctx *context.TeaContext, idx int64) error {
 	return task.CreatePullReview(ctx, idx, state, comment, codeComments)
 }
 
-// DoDiffReview (1) fetches & saves diff in tempfile, (2) starts $EDITOR to comment on diff,
+// DoDiffReview (1) fetches & saves diff in tempfile, (2) starts $VISUAL or $EDITOR to comment on diff,
 // (3) parses resulting file into code comments.
 func DoDiffReview(ctx *context.TeaContext, idx int64) ([]gitea.CreatePullReviewComment, error) {
 	tmpFile, err := task.SavePullDiff(ctx, idx)

@@ -107,10 +107,13 @@ func ParseDiffComments(diffFile string) ([]gitea.CreatePullReviewComment, error)
 
 // OpenFileInEditor opens filename in a text editor, and blocks until the editor terminates.
 func OpenFileInEditor(filename string) error {
-	editor := os.Getenv("EDITOR")
+	editor := os.Getenv("VISUAL")
 	if editor == "" {
-		fmt.Println("No $EDITOR env is set, defaulting to vim")
-		editor = "vim"
+		editor = os.Getenv("EDITOR")
+		if editor == "" {
+			fmt.Println("No $VISUAL or $EDITOR env is set, defaulting to vim")
+			editor = "vi"
+		}
 	}
 
 	// Get the full executable path for the editor.
