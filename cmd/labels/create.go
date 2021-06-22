@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 
+	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 
 	"code.gitea.io/sdk/gitea"
@@ -23,7 +24,7 @@ var CmdLabelCreate = cli.Command{
 	Usage:       "Create a label",
 	Description: `Create a label`,
 	Action:      runLabelCreate,
-	Flags: []cli.Flag{
+	Flags: append([]cli.Flag{
 		&cli.StringFlag{
 			Name:  "name",
 			Usage: "label name",
@@ -40,7 +41,7 @@ var CmdLabelCreate = cli.Command{
 			Name:  "file",
 			Usage: "indicate a label file",
 		},
-	},
+	}, flags.AllDefaultFlags...),
 }
 
 func runLabelCreate(cmd *cli.Context) error {

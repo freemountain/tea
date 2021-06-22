@@ -7,6 +7,7 @@ package organizations
 import (
 	"fmt"
 
+	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 	"github.com/urfave/cli/v2"
 )
@@ -19,6 +20,10 @@ var CmdOrganizationDelete = cli.Command{
 	Description: "Delete users organizations",
 	ArgsUsage:   "<organization name>",
 	Action:      RunOrganizationDelete,
+	Flags: []cli.Flag{
+		&flags.LoginFlag,
+		&flags.RemoteFlag,
+	},
 }
 
 // RunOrganizationDelete delete user organization

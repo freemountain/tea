@@ -5,6 +5,7 @@
 package labels
 
 import (
+	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 
 	"code.gitea.io/sdk/gitea"
@@ -17,7 +18,7 @@ var CmdLabelUpdate = cli.Command{
 	Usage:       "Update a label",
 	Description: `Update a label`,
 	Action:      runLabelUpdate,
-	Flags: []cli.Flag{
+	Flags: append([]cli.Flag{
 		&cli.IntFlag{
 			Name:  "id",
 			Usage: "label id",
@@ -34,7 +35,7 @@ var CmdLabelUpdate = cli.Command{
 			Name:  "description",
 			Usage: "label description",
 		},
-	},
+	}, flags.AllDefaultFlags...),
 }
 
 func runLabelUpdate(cmd *cli.Context) error {

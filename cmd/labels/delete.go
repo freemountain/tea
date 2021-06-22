@@ -5,6 +5,7 @@
 package labels
 
 import (
+	"code.gitea.io/tea/cmd/flags"
 	"code.gitea.io/tea/modules/context"
 
 	"github.com/urfave/cli/v2"
@@ -17,12 +18,12 @@ var CmdLabelDelete = cli.Command{
 	Usage:       "Delete a label",
 	Description: `Delete a label`,
 	Action:      runLabelDelete,
-	Flags: []cli.Flag{
+	Flags: append([]cli.Flag{
 		&cli.IntFlag{
 			Name:  "id",
 			Usage: "label id",
 		},
-	},
+	}, flags.AllDefaultFlags...),
 }
 
 func runLabelDelete(cmd *cli.Context) error {
