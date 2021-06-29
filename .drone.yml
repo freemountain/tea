@@ -99,7 +99,7 @@ steps:
   image: plugins/s3:1
   settings:
     acl: public-read
-    bucket: releases
+    bucket: gitea-artifacts
     endpoint: https://storage.gitea.io
     path_style: true
     source: "dist/release/*"
@@ -119,7 +119,7 @@ steps:
   image: plugins/s3:1
   settings:
     acl: public-read
-    bucket: releases
+    bucket: gitea-artifacts
     endpoint: https://storage.gitea.io
     path_style: true
     source: "dist/release/*"
@@ -141,7 +141,7 @@ steps:
   image: plugins/s3:1
   settings:
     acl: public-read
-    bucket: releases
+    bucket: gitea-artifacts
     endpoint: https://storage.gitea.io
     path_style: true
     source: "dist/release/*"
