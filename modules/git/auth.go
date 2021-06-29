@@ -55,7 +55,7 @@ func readSSHPrivKey(keyFile string, passwordCallback pwCallback) (sig ssh.Signer
 	}
 	sshKey, err := ioutil.ReadFile(keyFile)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can not read ssh key '%s'", keyFile)
 	}
 	sig, err = ssh.ParsePrivateKey(sshKey)
 	if _, ok := err.(*ssh.PassphraseMissingError); ok && passwordCallback != nil {
