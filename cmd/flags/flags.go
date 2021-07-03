@@ -137,7 +137,7 @@ var IssuePREditFlags = append([]cli.Flag{
 func GetIssuePREditFlags(ctx *context.TeaContext) (*gitea.CreateIssueOption, error) {
 	opts := gitea.CreateIssueOption{
 		Title:     ctx.String("title"),
-		Body:      ctx.String("body"),
+		Body:      ctx.String("description"),
 		Assignees: strings.Split(ctx.String("assignees"), ","),
 	}
 	var err error
