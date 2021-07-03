@@ -123,8 +123,16 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 		}
 	} else if c.Login == nil {
 		if c.Login, err = config.GetDefaultLogin(); err != nil {
-			log.Fatal(err.Error())
+			if err.Error() == "No available login" {
+				// TODO: maybe we can directly start interact.CreateLogin() (only if
+				// we're sure we can interactively!), as gh cli does.
+				fmt.Println(`No gitea login configured. To start using tea, first run
+  tea login add
+and then run your command again.`)
+			}
+			os.Exit(1)
 		}
+		fmt.Printf("NOTE: no gitea login detected, falling back to login '%s'\n", c.Login.Name)
 	}
 
 	// parse reposlug (owner falling back to login owner if reposlug contains only repo name)
