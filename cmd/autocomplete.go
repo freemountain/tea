@@ -40,12 +40,12 @@ func runAutocompleteAdd(ctx *cli.Context) error {
 	case "zsh":
 		remoteFile = "contrib/autocomplete.zsh"
 		localFile = "autocomplete.zsh"
-		cmds = "echo 'PROG=tea _CLI_ZSH_AUTOCOMPLETE_HACK=1 source %s' >> ~/.zshrc && source ~/.zshrc"
+		cmds = "echo 'PROG=tea _CLI_ZSH_AUTOCOMPLETE_HACK=1 source \"%s\"' >> ~/.zshrc && source ~/.zshrc"
 
 	case "bash":
 		remoteFile = "contrib/autocomplete.sh"
 		localFile = "autocomplete.sh"
-		cmds = "echo 'PROG=tea source %s' >> ~/.bashrc && source ~/.bashrc"
+		cmds = "echo 'PROG=tea source \"%s\"' >> ~/.bashrc && source ~/.bashrc"
 
 	case "powershell":
 		remoteFile = "contrib/autocomplete.ps1"
