@@ -1,7 +1,7 @@
 # code.gitea.io/gitea-vet v0.2.1
 code.gitea.io/gitea-vet
 code.gitea.io/gitea-vet/checks
-# code.gitea.io/sdk/gitea v0.13.1-0.20210304201955-ff82113459b5
+# code.gitea.io/sdk/gitea v0.15.0
 code.gitea.io/sdk/gitea
 # gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b
 gitea.com/noerw/unidiff-comments
@@ -131,7 +131,7 @@ github.com/go-git/go-git/v5/utils/merkletrie/internal/frame
 github.com/go-git/go-git/v5/utils/merkletrie/noder
 # github.com/gorilla/css v1.0.0
 github.com/gorilla/css/scanner
-# github.com/hashicorp/go-version v1.2.1
+# github.com/hashicorp/go-version v1.3.0
 github.com/hashicorp/go-version
 # github.com/imdario/mergo v0.3.11
 github.com/imdario/mergo

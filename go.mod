@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	code.gitea.io/gitea-vet v0.2.1
-	code.gitea.io/sdk/gitea v0.13.1-0.20210304201955-ff82113459b5
+	code.gitea.io/sdk/gitea v0.15.0
 	gitea.com/noerw/unidiff-comments v0.0.0-20201219085024-64aec5658f2b
 	github.com/AlecAivazis/survey/v2 v2.2.8
 	github.com/Microsoft/go-winio v0.4.16 // indirect
@@ -13,6 +13,7 @@ require (
 	github.com/charmbracelet/glamour v0.2.0
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/go-git/go-git/v5 v5.2.0
+	github.com/hashicorp/go-version v1.3.0 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
