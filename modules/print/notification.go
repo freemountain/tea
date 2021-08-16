@@ -14,6 +14,7 @@ import (
 func NotificationsList(news []*gitea.NotificationThread, output string, showRepository bool) {
 	headers := []string{
 		"Type",
+		"State",
 		"Index",
 		"Title",
 	}
@@ -38,7 +39,7 @@ func NotificationsList(news []*gitea.NotificationThread, output string, showRepo
 			index = "#" + index
 		}
 
-		item := []string{string(n.Subject.Type), index, n.Subject.Title}
+		item := []string{string(n.Subject.Type), string(n.Subject.State), index, n.Subject.Title}
 		if showRepository {
 			item = append(item, n.Repository.FullName)
 		}
