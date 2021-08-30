@@ -56,13 +56,13 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bo
 		Created:  time.Now().Unix(),
 	}
 
-	client := login.Client()
-
 	if len(token) == 0 {
-		if login.Token, err = generateToken(client, user, passwd); err != nil {
+		if login.Token, err = generateToken(login, user, passwd); err != nil {
 			return err
 		}
 	}
+
+	client := login.Client()
 
 	// Verify if authentication works and get user info
 	u, _, err := client.GetMyUserInfo()
@@ -98,16 +98,17 @@ func CreateLogin(name, token, user, passwd, sshKey, giteaURL string, insecure bo
 }
 
 // generateToken creates a new token when given BasicAuth credentials
-func generateToken(client *gitea.Client, user, pass string) (string, error) {
-	gitea.SetBasicAuth(user, pass)(client)
+func generateToken(login config.Login, user, pass string) (string, error) {
+	client := login.Client(gitea.SetBasicAuth(user, pass))
 
-	host, _ := os.Hostname()
 	tl, _, err := client.ListAccessTokens(gitea.ListAccessTokensOptions{})
 	if err != nil {
 		return "", err
 	}
+	host, _ := os.Hostname()
 	tokenName := host + "-tea"
 
+	// append timestamp, if a token with this hostname already exists
 	for i := range tl {
 		if tl[i].Name == tokenName {
 			tokenName += time.Now().Format("2006-01-02_15-04-05")
