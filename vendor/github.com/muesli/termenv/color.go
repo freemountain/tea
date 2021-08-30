@@ -3,6 +3,7 @@ package termenv
 import (
 	"errors"
 	"fmt"
+	"image/color"
 	"math"
 	"strconv"
 	"strings"
@@ -106,6 +107,11 @@ func (p Profile) Color(s string) Color {
 	return p.Convert(c)
 }
 
+func (p Profile) FromColor(c color.Color) Color {
+	col, _ := colorful.MakeColor(c)
+	return p.Color(col.Hex())
+}
+
 func (c NoColor) Sequence(bg bool) string {
 	return ""
 }
@@ -147,9 +153,21 @@ func (c RGBColor) Sequence(bg bool) string {
 }
 
 func xTermColor(s string) (RGBColor, error) {
-	if len(s) != 24 {
+	if len(s) < 24 || len(s) > 25 {
 		return RGBColor(""), ErrInvalidColor
 	}
+
+	switch {
+	case strings.HasSuffix(s, "\a"):
+		s = strings.TrimSuffix(s, "\a")
+	case strings.HasSuffix(s, "\033"):
+		s = strings.TrimSuffix(s, "\033")
+	case strings.HasSuffix(s, "\033\\"):
+		s = strings.TrimSuffix(s, "\033\\")
+	default:
+		return RGBColor(""), ErrInvalidColor
+	}
+
 	s = s[4:]
 
 	prefix := ";rgb:"
@@ -157,7 +175,6 @@ func xTermColor(s string) (RGBColor, error) {
 		return RGBColor(""), ErrInvalidColor
 	}
 	s = strings.TrimPrefix(s, prefix)
-	s = strings.TrimSuffix(s, "\a")
 
 	h := strings.Split(s, "/")
 	hex := fmt.Sprintf("#%s%s%s", h[0][:2], h[1][:2], h[2][:2])
@@ -171,7 +188,7 @@ func ansi256ToANSIColor(c ANSI256Color) ANSIColor {
 	h, _ := colorful.Hex(ansiHex[c])
 	for i := 0; i <= 15; i++ {
 		hb, _ := colorful.Hex(ansiHex[i])
-		d := h.DistanceLab(hb)
+		d := h.DistanceHSLuv(hb)
 
 		if d < md {
 			md = d
@@ -218,8 +235,8 @@ func hexToANSI256Color(c colorful.Color) ANSI256Color {
 	// Return the one which is nearer to the original input rgb value
 	c2 := colorful.Color{R: float64(cr) / 255.0, G: float64(cg) / 255.0, B: float64(cb) / 255.0}
 	g2 := colorful.Color{R: float64(gv) / 255.0, G: float64(gv) / 255.0, B: float64(gv) / 255.0}
-	colorDist := c.DistanceLab(c2)
-	grayDist := c.DistanceLab(g2)
+	colorDist := c.DistanceHSLuv(c2)
+	grayDist := c.DistanceHSLuv(g2)
 
 	if colorDist <= grayDist {
 		return ANSI256Color(16 + ci)
