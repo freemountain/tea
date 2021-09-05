@@ -13,6 +13,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var issueFieldsFlag = flags.FieldsFlag(print.IssueFields, []string{
+	"index", "title", "state", "author", "milestone", "labels",
+})
+
 // CmdIssuesList represents a sub command of issues to list issues
 var CmdIssuesList = cli.Command{
 	Name:        "list",
@@ -20,11 +24,7 @@ var CmdIssuesList = cli.Command{
 	Usage:       "List issues of the repository",
 	Description: `List issues of the repository`,
 	Action:      RunIssuesList,
-	Flags: append([]cli.Flag{
-		flags.FieldsFlag(print.IssueFields, []string{
-			"index", "title", "state", "author", "milestone", "labels",
-		}),
-	}, flags.IssuePRFlags...),
+	Flags:       append([]cli.Flag{issueFieldsFlag}, flags.IssuePRFlags...),
 }
 
 // RunIssuesList list issues
@@ -52,7 +52,7 @@ func RunIssuesList(cmd *cli.Context) error {
 		return err
 	}
 
-	fields, err := flags.GetFields(cmd, print.IssueFields)
+	fields, err := issueFieldsFlag.GetValues(cmd)
 	if err != nil {
 		return err
 	}

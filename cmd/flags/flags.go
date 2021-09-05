@@ -11,7 +11,6 @@ import (
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/task"
-	"code.gitea.io/tea/modules/utils"
 
 	"github.com/araddon/dateparse"
 	"github.com/urfave/cli/v2"
@@ -101,6 +100,27 @@ var IssuePRFlags = append([]cli.Flag{
 	&PaginationLimitFlag,
 }, AllDefaultFlags...)
 
+// NotificationFlags defines flags that should be available on notifications.
+var NotificationFlags = append([]cli.Flag{
+	NotificationStateFlag,
+	&cli.BoolFlag{
+		Name:    "mine",
+		Aliases: []string{"m"},
+		Usage:   "Show notifications across all your repositories instead of the current repository only",
+	},
+	&PaginationPageFlag,
+	&PaginationLimitFlag,
+}, AllDefaultFlags...)
+
+// NotificationStateFlag is a csv flag applied to all notification subcommands as filter
+var NotificationStateFlag = NewCsvFlag(
+	"states",
+	"notification states to filter by",
+	[]string{"s"},
+	[]string{"pinned", "unread", "read"},
+	[]string{"unread", "pinned"},
+)
+
 // IssuePREditFlags defines flags for properties of issues and PRs
 var IssuePREditFlags = append([]cli.Flag{
 	&cli.StringFlag{
@@ -178,28 +198,7 @@ func GetIssuePREditFlags(ctx *context.TeaContext) (*gitea.CreateIssueOption, err
 }
 
 // FieldsFlag generates a flag selecting printable fields.
-// To retrieve the value, use GetFields()
-func FieldsFlag(availableFields, defaultFields []string) *cli.StringFlag {
-	return &cli.StringFlag{
-		Name:    "fields",
-		Aliases: []string{"f"},
-		Usage: fmt.Sprintf(`Comma-separated list of fields to print. Available values:
-			%s
-		`, strings.Join(availableFields, ",")),
-		Value: strings.Join(defaultFields, ","),
-	}
-}
-
-// GetFields parses the values provided in a fields flag, and
-// optionally validates against valid values.
-func GetFields(ctx *cli.Context, validFields []string) ([]string, error) {
-	selection := strings.Split(ctx.String("fields"), ",")
-	if validFields != nil {
-		for _, field := range selection {
-			if !utils.Contains(validFields, field) {
-				return nil, fmt.Errorf("Invalid field '%s'", field)
-			}
-		}
-	}
-	return selection, nil
+// To retrieve the value, use f.GetValues()
+func FieldsFlag(availableFields, defaultFields []string) *CsvFlag {
+	return NewCsvFlag("fields", "fields to print", []string{"f"}, availableFields, defaultFields)
 }

@@ -5,6 +5,7 @@
 package print
 
 import (
+	"fmt"
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
@@ -13,6 +14,8 @@ import (
 // NotificationsList prints a listing of notification threads
 func NotificationsList(news []*gitea.NotificationThread, output string, showRepository bool) {
 	headers := []string{
+		"ID",
+		"Status",
 		"Type",
 		"State",
 		"Index",
@@ -39,7 +42,21 @@ func NotificationsList(news []*gitea.NotificationThread, output string, showRepo
 			index = "#" + index
 		}
 
-		item := []string{string(n.Subject.Type), string(n.Subject.State), index, n.Subject.Title}
+		status := "read"
+		if n.Pinned {
+			status = "pinned"
+		} else if n.Unread {
+			status = "unread"
+		}
+
+		item := []string{
+			fmt.Sprint(n.ID),
+			status,
+			string(n.Subject.Type),
+			string(n.Subject.State),
+			index,
+			n.Subject.Title,
+		}
 		if showRepository {
 			item = append(item, n.Repository.FullName)
 		}

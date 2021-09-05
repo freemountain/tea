@@ -19,6 +19,17 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// NOTE: not using NewCsvFlag, as we don't want an alias & default value.
+var timeFieldsFlag = &flags.CsvFlag{
+	AvailableFields: print.TrackedTimeFields,
+	StringFlag: cli.StringFlag{
+		Name: "fields",
+		Usage: fmt.Sprintf(`Comma-separated list of fields to print. Available values:
+	%s
+`, strings.Join(print.TrackedTimeFields, ",")),
+	},
+}
+
 // CmdTrackedTimesList represents a sub command of times to list them
 var CmdTrackedTimesList = cli.Command{
 	Name:    "list",
@@ -53,12 +64,7 @@ Depending on your permissions on the repository, only your own tracked times mig
 			Aliases: []string{"m"},
 			Usage:   "Show all times tracked by you across all repositories (overrides command arguments)",
 		},
-		&cli.StringFlag{
-			Name: "fields",
-			Usage: fmt.Sprintf(`Comma-separated list of fields to print. Available values:
-			%s
-		`, strings.Join(print.TrackedTimeFields, ",")),
-		},
+		timeFieldsFlag,
 	}, flags.AllDefaultFlags...),
 }
 
@@ -116,7 +122,7 @@ func RunTimesList(cmd *cli.Context) error {
 	}
 
 	if ctx.IsSet("fields") {
-		if fields, err = flags.GetFields(cmd, print.TrackedTimeFields); err != nil {
+		if fields, err = timeFieldsFlag.GetValues(cmd); err != nil {
 			return err
 		}
 	}

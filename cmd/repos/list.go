@@ -13,6 +13,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var repoFieldsFlag = flags.FieldsFlag(print.RepoFields, []string{
+	"owner", "name", "type", "ssh",
+})
+
 // CmdReposListFlags contains all flags needed for repo listing
 var CmdReposListFlags = append([]cli.Flag{
 	&cli.BoolFlag{
@@ -27,9 +31,7 @@ var CmdReposListFlags = append([]cli.Flag{
 		Required: false,
 		Usage:    "List your starred repos instead",
 	},
-	flags.FieldsFlag(print.RepoFields, []string{
-		"owner", "name", "type", "ssh",
-	}),
+	repoFieldsFlag,
 	&typeFilterFlag,
 	&flags.PaginationPageFlag,
 	&flags.PaginationLimitFlag,
@@ -82,7 +84,7 @@ func RunReposList(cmd *cli.Context) error {
 		reposFiltered = filterReposByType(rps, typeFilter)
 	}
 
-	fields, err := flags.GetFields(cmd, print.RepoFields)
+	fields, err := repoFieldsFlag.GetValues(cmd)
 	if err != nil {
 		return err
 	}

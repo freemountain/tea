@@ -16,6 +16,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var msIssuesFieldsFlag = flags.FieldsFlag(print.IssueFields, []string{
+	"index", "kind", "title", "state", "updated", "labels",
+})
+
 // CmdMilestonesIssues represents a sub command of milestones to manage issue/pull of an milestone
 var CmdMilestonesIssues = cli.Command{
 	Name:        "issues",
@@ -40,9 +44,7 @@ var CmdMilestonesIssues = cli.Command{
 		},
 		&flags.PaginationPageFlag,
 		&flags.PaginationLimitFlag,
-		flags.FieldsFlag(print.IssueFields, []string{
-			"index", "kind", "title", "state", "updated", "labels",
-		}),
+		msIssuesFieldsFlag,
 	}, flags.AllDefaultFlags...),
 }
 
@@ -110,7 +112,7 @@ func runMilestoneIssueList(cmd *cli.Context) error {
 		return err
 	}
 
-	fields, err := flags.GetFields(cmd, print.IssueFields)
+	fields, err := msIssuesFieldsFlag.GetValues(cmd)
 	if err != nil {
 		return err
 	}
