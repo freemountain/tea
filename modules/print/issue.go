@@ -101,6 +101,9 @@ func (x printableIssue) FormatField(field string) string {
 	case "updated":
 		return FormatTime(x.Updated)
 	case "deadline":
+		if x.Deadline == nil {
+			return ""
+		}
 		return FormatTime(*x.Deadline)
 	case "milestone":
 		if x.Milestone != nil {
