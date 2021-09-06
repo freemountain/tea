@@ -20,6 +20,10 @@ type URLParser struct {
 
 // Parse parses the git URL
 func (p *URLParser) Parse(rawURL string) (u *url.URL, err error) {
+	rawURL = strings.TrimSpace(rawURL)
+
+	// convert the weird git ssh url format to a canonical url:
+	// git@gitea.com:gitea/tea -> ssh://git@gitea.com/gitea/tea
 	if !protocolRe.MatchString(rawURL) &&
 		strings.Contains(rawURL, ":") &&
 		// not a Windows path

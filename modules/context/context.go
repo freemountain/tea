@@ -185,8 +185,9 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 		return repo, nil, "", err
 	}
 	for _, l := range logins {
+		sshHost := l.GetSSHHost()
 		for _, u := range remoteConfig.URLs {
-			p, err := git.ParseURL(strings.TrimSpace(u))
+			p, err := git.ParseURL(u)
 			if err != nil {
 				return repo, nil, "", fmt.Errorf("Git remote URL parse failed: %s", err.Error())
 			}
@@ -197,8 +198,8 @@ func contextFromLocalRepo(repoPath, remoteValue string) (*git.TeaRepo, *config.L
 					return repo, &l, strings.TrimSuffix(path, ".git"), nil
 				}
 			} else if strings.EqualFold(p.Scheme, "ssh") {
-				if l.GetSSHHost() == strings.Split(p.Host, ":")[0] {
-					return repo, &l, strings.TrimLeft(strings.TrimSuffix(p.Path, ".git"), "/"), nil
+				if sshHost == p.Host {
+					return repo, &l, strings.TrimLeft(p.Path, "/"), nil
 				}
 			}
 		}
