@@ -35,11 +35,10 @@ var CmdPullsCreate = cli.Command{
 
 func runPullsCreate(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
-	ctx.Ensure(context.CtxRequirement{LocalRepo: true})
 
 	// no args -> interactive mode
 	if ctx.NumFlags() == 0 {
-		return interact.CreatePull(ctx.Login, ctx.Owner, ctx.Repo)
+		return interact.CreatePull(ctx)
 	}
 
 	// else use args to create PR
@@ -49,9 +48,7 @@ func runPullsCreate(cmd *cli.Context) error {
 	}
 
 	return task.CreatePull(
-		ctx.Login,
-		ctx.Owner,
-		ctx.Repo,
+		ctx,
 		ctx.String("base"),
 		ctx.String("head"),
 		opts,

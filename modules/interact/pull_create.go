@@ -6,26 +6,23 @@ package interact
 
 import (
 	"code.gitea.io/sdk/gitea"
-	"code.gitea.io/tea/modules/config"
-	"code.gitea.io/tea/modules/git"
+	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/task"
 
 	"github.com/AlecAivazis/survey/v2"
 )
 
 // CreatePull interactively creates a PR
-func CreatePull(login *config.Login, owner, repo string) error {
+func CreatePull(ctx *context.TeaContext) (err error) {
 	var base, head string
 
 	// owner, repo
-	owner, repo, err := promptRepoSlug(owner, repo)
-	if err != nil {
+	if ctx.Owner, ctx.Repo, err = promptRepoSlug(ctx.Owner, ctx.Repo); err != nil {
 		return err
 	}
 
 	// base
-	base, err = task.GetDefaultPRBase(login, owner, repo)
-	if err != nil {
+	if base, err = task.GetDefaultPRBase(ctx.Login, ctx.Owner, ctx.Repo); err != nil {
 		return err
 	}
 	promptI := &survey.Input{Message: "Target branch:", Default: base}
@@ -34,14 +31,14 @@ func CreatePull(login *config.Login, owner, repo string) error {
 	}
 
 	// head
-	localRepo, err := git.RepoForWorkdir()
-	if err != nil {
-		return err
-	}
+	var headOwner, headBranch string
 	promptOpts := survey.WithValidator(survey.Required)
-	headOwner, headBranch, err := task.GetDefaultPRHead(localRepo)
-	if err == nil {
-		promptOpts = nil
+
+	if ctx.LocalRepo != nil {
+		headOwner, headBranch, err = task.GetDefaultPRHead(ctx.LocalRepo)
+		if err == nil {
+			promptOpts = nil
+		}
 	}
 	promptI = &survey.Input{Message: "Source repo owner:", Default: headOwner}
 	if err := survey.AskOne(promptI, &headOwner); err != nil {
@@ -52,17 +49,15 @@ func CreatePull(login *config.Login, owner, repo string) error {
 		return err
 	}
 
-	head = task.GetHeadSpec(headOwner, headBranch, owner)
+	head = task.GetHeadSpec(headOwner, headBranch, ctx.Owner)
 
 	opts := gitea.CreateIssueOption{Title: task.GetDefaultPRTitle(head)}
-	if err = promptIssueProperties(login, owner, repo, &opts); err != nil {
+	if err = promptIssueProperties(ctx.Login, ctx.Owner, ctx.Repo, &opts); err != nil {
 		return err
 	}
 
 	return task.CreatePull(
-		login,
-		owner,
-		repo,
+		ctx,
 		base,
 		head,
 		&opts)
