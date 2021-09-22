@@ -99,14 +99,13 @@ func InitCommand(ctx *cli.Context) *TeaContext {
 		}
 	}
 
-	if len(repoFlag) == 0 || repoFlagPathExists {
-		// try to read git repo & extract context, ignoring if PWD is not a repo
-		if c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath, remoteFlag); err != nil {
-			if err == errNotAGiteaRepo || err == gogit.ErrRepositoryNotExists {
-				// we can deal with that, commands needing the optional values use ctx.Ensure()
-			} else {
-				log.Fatal(err.Error())
-			}
+	// try to read local git repo & extract context: if repoFlag specifies a valid path, read repo in that dir,
+	// otherwise attempt PWD. if no repo is found, continue with default login
+	if c.LocalRepo, c.Login, c.RepoSlug, err = contextFromLocalRepo(repoPath, remoteFlag); err != nil {
+		if err == errNotAGiteaRepo || err == gogit.ErrRepositoryNotExists {
+			// we can deal with that, commands needing the optional values use ctx.Ensure()
+		} else {
+			log.Fatal(err.Error())
 		}
 	}
 
