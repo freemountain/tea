@@ -52,7 +52,7 @@ func ReviewPull(ctx *context.TeaContext, idx int64) error {
 
 	// comment
 	var promptOpts survey.AskOpt
-	if state == gitea.ReviewStateComment || state == gitea.ReviewStateRequestChanges {
+	if (state == gitea.ReviewStateComment && len(codeComments) == 0) || state == gitea.ReviewStateRequestChanges {
 		promptOpts = survey.WithValidator(survey.Required)
 	}
 	err = survey.AskOne(&survey.Multiline{Message: "Concluding comment:"}, &comment, promptOpts)
