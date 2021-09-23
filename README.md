@@ -100,7 +100,7 @@ To compile the sources yourself run the following:
 ```sh
 git clone https://gitea.com/gitea/tea.git
 cd tea
-make
+make STATIC=true
 ```
 
 ## Contributing

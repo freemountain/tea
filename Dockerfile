@@ -2,16 +2,16 @@ ARG GOVERSION="1.16.2"
 
 FROM golang:${GOVERSION}-alpine AS buildenv
 
-ARG CGO_ENABLED="0"
 ARG GOOS="linux"
 
 COPY . $GOPATH/src/
 WORKDIR $GOPATH/src
 
 RUN	apk add --quiet --no-cache \
+		build-base \
 		make \
 		git && \
-	make build
+	make clean build STATIC=true
 
 FROM scratch
 ARG VERSION="0.7.0"

@@ -1,30 +1,14 @@
 DIST := dist
-IMPORT := code.gitea.io/tea
 export GO111MODULE=on
+export CGO_ENABLED=0
 
 GO ?= go
-SED_INPLACE := sed -i
 SHASUM ?= shasum -a 256
 
 export PATH := $($(GO) env GOPATH)/bin:$(PATH)
 
-ifeq ($(OS), Windows_NT)
-	EXECUTABLE := tea.exe
-else
-	EXECUTABLE := tea
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Darwin)
-		SED_INPLACE := sed -i ''
-	endif
-endif
-
 GOFILES := $(shell find . -name "*.go" -type f ! -path "./vendor/*" ! -path "*/bindata.go")
 GOFMT ?= gofmt -s
-
-GOFLAGS := -i -v
-EXTRA_GOFLAGS ?=
-
-MAKE_VERSION := $(shell make -v | head -n 1)
 
 ifneq ($(DRONE_TAG),)
 	VERSION ?= $(subst v,,$(DRONE_TAG))
@@ -37,24 +21,30 @@ else
 	endif
 	TEA_VERSION ?= $(shell git describe --tags --always | sed 's/-/+/' | sed 's/^v//')
 endif
-
 TEA_VERSION_TAG ?= $(shell sed 's/+/_/' <<< $(TEA_VERSION))
 
-LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)"
+TAGS ?=
+LDFLAGS := -X "main.Version=$(TEA_VERSION)" -X "main.Tags=$(TAGS)" -s -w
+
+ifeq ($(STATIC),true)
+	# NOTE: clean up this mess, when https://github.com/golang/go/issues/26492 is resolved
+	# static_build is a defacto standard tag used in go packages
+	TAGS := osusergo,netgo,static_build,$(TAGS)
+	LDFLAGS := $(LDFLAGS) -linkmode=external -extldflags "-static-pie" -X "main.Tags=$(TAGS)"
+	export CGO_ENABLED=1 # needed for linkmode=external
+endif
+
+# override to allow passing additional goflags via make CLI
+override GOFLAGS := $(GOFLAGS) -mod=vendor -tags '$(TAGS)' -ldflags '$(LDFLAGS)'
 
 PACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/)
 SOURCES ?= $(shell find . -name "*.go" -type f)
-
-TAGS ?=
 
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := tea.exe
 else
 	EXECUTABLE := tea
 endif
-
-# $(call strip-suffix,filename)
-strip-suffix = $(firstword $(subst ., ,$(1)))
 
 .PHONY: all
 all: build
@@ -132,14 +122,18 @@ test-vendor: vendor
 check: test
 
 .PHONY: install
-install: $(wildcard *.go)
-	$(GO) install -mod=vendor -v -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)'
+install: $(SOURCES)
+	@echo "installing to $(GOPATH)/bin/$(EXECUTABLE)"
+	$(GO) install -v -buildmode=pie $(GOFLAGS) 
 
 .PHONY: build
 build: $(EXECUTABLE)
 
 $(EXECUTABLE): $(SOURCES)
-	$(GO) build -mod=vendor $(GOFLAGS) $(EXTRA_GOFLAGS) -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)' -o $@
+ifeq ($(STATIC),true)
+	@echo "enabling static build, make sure you have glibc-static (or equivalent) installed"
+endif
+	$(GO) build -buildmode=pie $(GOFLAGS) -o $@
 
 .PHONY: build-image
 build-image:
@@ -157,7 +151,7 @@ release-os:
 	@hash gox > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 		cd /tmp && $(GO) get -u github.com/mitchellh/gox; \
 	fi
-	CGO_ENABLED=0 gox -verbose -cgo=false -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)' -osarch='!darwin/386 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
+	CGO_ENABLED=0 gox -verbose -cgo=false $(GOFLAGS) -osarch='!darwin/386 !darwin/arm' -os="windows linux darwin" -arch="386 amd64 arm arm64" -output="$(DIST)/release/tea-$(VERSION)-{{.OS}}-{{.Arch}}"
 
 .PHONY: release-compress
 release-compress:
