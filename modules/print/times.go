@@ -18,7 +18,7 @@ func TrackedTimesList(times []*gitea.TrackedTime, outputType string, fields []st
 		totalDuration += t.Time
 		printables[i] = &printableTrackedTime{t, outputType}
 	}
-	t := tableFromItems(fields, printables)
+	t := tableFromItems(fields, printables, isMachineReadable(outputType))
 
 	if printTotal {
 		total := make([]string, len(fields))
@@ -45,7 +45,7 @@ type printableTrackedTime struct {
 	outputFormat string
 }
 
-func (t printableTrackedTime) FormatField(field string) string {
+func (t printableTrackedTime) FormatField(field string, machineReadable bool) string {
 	switch field {
 	case "id":
 		return fmt.Sprintf("%d", t.ID)

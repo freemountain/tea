@@ -6,7 +6,6 @@ package print
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
@@ -23,19 +22,8 @@ var ciStatusSymbols = map[gitea.StatusState]string{
 // PullDetails print an pull rendered to stdout
 func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *gitea.CombinedStatus) {
 	base := pr.Base.Name
-	head := pr.Head.Name
-	if pr.Head.RepoID != pr.Base.RepoID {
-		if pr.Head.Repository != nil {
-			head = pr.Head.Repository.Owner.UserName + ":" + head
-		} else {
-			head = "delete:" + head
-		}
-	}
-
-	state := pr.State
-	if pr.Merged != nil {
-		state = "merged"
-	}
+	head := formatPRHead(pr)
+	state := formatPRState(pr)
 
 	out := fmt.Sprintf(
 		"# #%d %s (%s)\n@%s created %s\t**%s** <- **%s**\n\n%s\n\n",
@@ -79,6 +67,25 @@ func PullDetails(pr *gitea.PullRequest, reviews []*gitea.PullReview, ciStatus *g
 	outputMarkdown(out, pr.HTMLURL)
 }
 
+func formatPRHead(pr *gitea.PullRequest) string {
+	head := pr.Head.Name
+	if pr.Head.RepoID != pr.Base.RepoID {
+		if pr.Head.Repository != nil {
+			head = pr.Head.Repository.Owner.UserName + ":" + head
+		} else {
+			head = "delete:" + head
+		}
+	}
+	return head
+}
+
+func formatPRState(pr *gitea.PullRequest) string {
+	if pr.Merged != nil {
+		return "merged"
+	}
+	return string(pr.State)
+}
+
 func formatReviews(reviews []*gitea.PullReview) string {
 	result := ""
 	if len(reviews) == 0 {
@@ -114,37 +121,120 @@ func formatReviews(reviews []*gitea.PullReview) string {
 }
 
 // PullsList prints a listing of pulls
-func PullsList(prs []*gitea.PullRequest, output string) {
-	t := tableWithHeader(
-		"Index",
-		"Title",
-		"State",
-		"Author",
-		"Milestone",
-		"Updated",
-	)
+func PullsList(prs []*gitea.PullRequest, output string, fields []string) {
+	printPulls(prs, output, fields)
+}
 
-	for _, pr := range prs {
-		if pr == nil {
-			continue
+// PullFields are all available fields to print with PullsList()
+var PullFields = []string{
+	"index",
+	"state",
+	"author",
+	"author-id",
+	"url",
+
+	"title",
+	"body",
+
+	"mergeable",
+	"base",
+	"base-commit",
+	"head",
+	"diff",
+	"patch",
+
+	"created",
+	"updated",
+	"deadline",
+
+	"assignees",
+	"milestone",
+	"labels",
+	"comments",
+}
+
+func printPulls(pulls []*gitea.PullRequest, output string, fields []string) {
+	labelMap := map[int64]string{}
+	var printables = make([]printable, len(pulls))
+	machineReadable := isMachineReadable(output)
+
+	for i, x := range pulls {
+		// pre-serialize labels for performance
+		for _, label := range x.Labels {
+			if _, ok := labelMap[label.ID]; !ok {
+				labelMap[label.ID] = formatLabel(label, !machineReadable, "")
+			}
 		}
-		author := pr.Poster.FullName
-		if len(author) == 0 {
-			author = pr.Poster.UserName
-		}
-		mile := ""
-		if pr.Milestone != nil {
-			mile = pr.Milestone.Title
-		}
-		t.addRow(
-			strconv.FormatInt(pr.Index, 10),
-			pr.Title,
-			string(pr.State),
-			author,
-			mile,
-			FormatTime(*pr.Updated),
-		)
+		// store items with printable interface
+		printables[i] = &printablePull{x, &labelMap}
 	}
 
+	t := tableFromItems(fields, printables, machineReadable)
 	t.print(output)
+}
+
+type printablePull struct {
+	*gitea.PullRequest
+	formattedLabels *map[int64]string
+}
+
+func (x printablePull) FormatField(field string, machineReadable bool) string {
+	switch field {
+	case "index":
+		return fmt.Sprintf("%d", x.Index)
+	case "state":
+		return formatPRState(x.PullRequest)
+	case "author":
+		return formatUserName(x.Poster)
+	case "author-id":
+		return x.Poster.UserName
+	case "url":
+		return x.HTMLURL
+	case "title":
+		return x.Title
+	case "body":
+		return x.Body
+	case "created":
+		return FormatTime(*x.Created)
+	case "updated":
+		return FormatTime(*x.Updated)
+	case "deadline":
+		if x.Deadline == nil {
+			return ""
+		}
+		return FormatTime(*x.Deadline)
+	case "milestone":
+		if x.Milestone != nil {
+			return x.Milestone.Title
+		}
+		return ""
+	case "labels":
+		var labels = make([]string, len(x.Labels))
+		for i, l := range x.Labels {
+			labels[i] = (*x.formattedLabels)[l.ID]
+		}
+		return strings.Join(labels, " ")
+	case "assignees":
+		var assignees = make([]string, len(x.Assignees))
+		for i, a := range x.Assignees {
+			assignees[i] = formatUserName(a)
+		}
+		return strings.Join(assignees, " ")
+	case "comments":
+		return fmt.Sprintf("%d", x.Comments)
+	case "mergeable":
+		isMergeable := x.Mergeable && x.State == gitea.StateOpen
+		return formatBoolean(isMergeable, !machineReadable)
+	case "base":
+		return x.Base.Ref
+	case "base-commit":
+		return x.MergeBase
+	case "head":
+		return formatPRHead(x.PullRequest)
+	case "diff":
+		return x.DiffURL
+	case "patch":
+		return x.PatchURL
+	}
+	return ""
 }

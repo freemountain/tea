@@ -54,19 +54,20 @@ var IssueFields = []string{
 func printIssues(issues []*gitea.Issue, output string, fields []string) {
 	labelMap := map[int64]string{}
 	var printables = make([]printable, len(issues))
+	machineReadable := isMachineReadable(output)
 
 	for i, x := range issues {
 		// pre-serialize labels for performance
 		for _, label := range x.Labels {
 			if _, ok := labelMap[label.ID]; !ok {
-				labelMap[label.ID] = formatLabel(label, !isMachineReadable(output), "")
+				labelMap[label.ID] = formatLabel(label, !machineReadable, "")
 			}
 		}
 		// store items with printable interface
 		printables[i] = &printableIssue{x, &labelMap}
 	}
 
-	t := tableFromItems(fields, printables)
+	t := tableFromItems(fields, printables, machineReadable)
 	t.print(output)
 }
 
@@ -75,7 +76,7 @@ type printableIssue struct {
 	formattedLabels *map[int64]string
 }
 
-func (x printableIssue) FormatField(field string) string {
+func (x printableIssue) FormatField(field string, machineReadable bool) string {
 	switch field {
 	case "index":
 		return fmt.Sprintf("%d", x.Index)

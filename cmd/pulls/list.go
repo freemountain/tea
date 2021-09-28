@@ -13,6 +13,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var pullFieldsFlag = flags.FieldsFlag(print.PullFields, []string{
+	"index", "title", "state", "author", "milestone", "updated", "labels",
+})
+
 // CmdPullsList represents a sub command of issues to list pulls
 var CmdPullsList = cli.Command{
 	Name:        "list",
@@ -20,7 +24,7 @@ var CmdPullsList = cli.Command{
 	Usage:       "List pull requests of the repository",
 	Description: `List pull requests of the repository`,
 	Action:      RunPullsList,
-	Flags:       flags.IssuePRFlags,
+	Flags:       append([]cli.Flag{pullFieldsFlag}, flags.IssuePRFlags...),
 }
 
 // RunPullsList return list of pulls
@@ -46,6 +50,11 @@ func RunPullsList(cmd *cli.Context) error {
 		return err
 	}
 
-	print.PullsList(prs, ctx.Output)
+	fields, err := pullFieldsFlag.GetValues(cmd)
+	if err != nil {
+		return err
+	}
+
+	print.PullsList(prs, ctx.Output, fields)
 	return nil
 }

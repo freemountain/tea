@@ -18,7 +18,7 @@ func ReposList(repos []*gitea.Repository, output string, fields []string) {
 	for i, r := range repos {
 		printables[i] = &printableRepo{r}
 	}
-	t := tableFromItems(fields, printables)
+	t := tableFromItems(fields, printables, isMachineReadable(output))
 	t.print(output)
 }
 
@@ -107,7 +107,7 @@ var RepoFields = []string{
 
 type printableRepo struct{ *gitea.Repository }
 
-func (x printableRepo) FormatField(field string) string {
+func (x printableRepo) FormatField(field string, machineReadable bool) string {
 	switch field {
 	case "description":
 		return x.Description

@@ -24,16 +24,16 @@ type table struct {
 
 // printable can be implemented for structs to put fields dynamically into a table
 type printable interface {
-	FormatField(field string) string
+	FormatField(field string, machineReadable bool) string
 }
 
 // high level api to print a table of items with dynamic fields
-func tableFromItems(fields []string, values []printable) table {
+func tableFromItems(fields []string, values []printable, machineReadable bool) table {
 	t := table{headers: fields}
 	for _, v := range values {
 		row := make([]string, len(fields))
 		for i, f := range fields {
-			row[i] = v.FormatField(f)
+			row[i] = v.FormatField(f, machineReadable)
 		}
 		t.addRowSlice(row)
 	}
