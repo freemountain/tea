@@ -5,9 +5,9 @@
 package cmd
 
 import (
-	"fmt"
-
 	"code.gitea.io/tea/cmd/organizations"
+	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/print"
 
 	"github.com/urfave/cli/v2"
 )
@@ -23,18 +23,26 @@ var CmdOrgs = cli.Command{
 	Action:      runOrganizations,
 	Subcommands: []*cli.Command{
 		&organizations.CmdOrganizationList,
+		&organizations.CmdOrganizationCreate,
 		&organizations.CmdOrganizationDelete,
 	},
 	Flags: organizations.CmdOrganizationList.Flags,
 }
 
-func runOrganizations(ctx *cli.Context) error {
+func runOrganizations(cmd *cli.Context) error {
+	ctx := context.InitCommand(cmd)
 	if ctx.Args().Len() == 1 {
-		return runOrganizationDetail(ctx.Args().First())
+		return runOrganizationDetail(ctx)
 	}
-	return organizations.RunOrganizationList(ctx)
+	return organizations.RunOrganizationList(cmd)
 }
 
-func runOrganizationDetail(path string) error {
-	return fmt.Errorf("Not yet implemented")
+func runOrganizationDetail(ctx *context.TeaContext) error {
+	org, _, err := ctx.Login.Client().GetOrg(ctx.Args().First())
+	if err != nil {
+		return err
+	}
+
+	print.OrganizationDetails(org)
+	return nil
 }
