@@ -79,6 +79,14 @@ var CmdRepoCreate = cli.Command{
 			Required: false,
 			Usage:    "use custom default branch (need --init)",
 		},
+		&cli.BoolFlag{
+			Name:  "template",
+			Usage: "make repo a template repo",
+		},
+		&cli.StringFlag{
+			Name:  "trustmodel",
+			Usage: "select trust model (committer,collaborator,collaborator+committer)",
+		},
 	}, flags.LoginOutputFlags...),
 }
 
@@ -86,9 +94,24 @@ func runRepoCreate(cmd *cli.Context) error {
 	ctx := context.InitCommand(cmd)
 	client := ctx.Login.Client()
 	var (
-		repo *gitea.Repository
-		err  error
+		repo       *gitea.Repository
+		err        error
+		trustmodel gitea.TrustModel
 	)
+
+	if ctx.IsSet("trustmodel") {
+		switch ctx.String("trustmodel") {
+		case "committer":
+			trustmodel = gitea.TrustModelCommitter
+		case "collaborator":
+			trustmodel = gitea.TrustModelCollaborator
+		case "collaborator+committer":
+			trustmodel = gitea.TrustModelCollaboratorCommitter
+		default:
+			return fmt.Errorf("unknown trustmodel type '%s'", ctx.String("trustmodel"))
+		}
+	}
+
 	opts := gitea.CreateRepoOption{
 		Name:          ctx.String("name"),
 		Description:   ctx.String("description"),
@@ -99,6 +122,8 @@ func runRepoCreate(cmd *cli.Context) error {
 		License:       ctx.String("license"),
 		Readme:        ctx.String("readme"),
 		DefaultBranch: ctx.String("branch"),
+		Template:      ctx.Bool("template"),
+		TrustModel:    trustmodel,
 	}
 	if len(ctx.String("owner")) != 0 {
 		repo, _, err = client.CreateOrgRepo(ctx.String("owner"), opts)
