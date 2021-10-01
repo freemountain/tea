@@ -54,11 +54,16 @@ func runIssueDetail(cmd *cli.Context, index string) error {
 	if err != nil {
 		return err
 	}
-	issue, _, err := ctx.Login.Client().GetIssue(ctx.Owner, ctx.Repo, idx)
+	client := ctx.Login.Client()
+	issue, _, err := client.GetIssue(ctx.Owner, ctx.Repo, idx)
 	if err != nil {
 		return err
 	}
-	print.IssueDetails(issue)
+	reactions, _, err := client.GetIssueReactions(ctx.Owner, ctx.Repo, idx)
+	if err != nil {
+		return err
+	}
+	print.IssueDetails(issue, reactions)
 
 	if issue.Comments > 0 {
 		err = interact.ShowCommentsMaybeInteractive(ctx, idx, issue.Comments)

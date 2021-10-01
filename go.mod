@@ -13,6 +13,7 @@ require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/charmbracelet/glamour v0.3.0
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/enescakir/emoji v1.0.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/hashicorp/go-version v1.3.0 // indirect
 	github.com/kevinburke/ssh_config v1.1.0 // indirect

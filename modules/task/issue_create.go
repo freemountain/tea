@@ -25,7 +25,7 @@ func CreateIssue(login *config.Login, repoOwner, repoName string, opts gitea.Cre
 		return fmt.Errorf("could not create issue: %s", err)
 	}
 
-	print.IssueDetails(issue)
+	print.IssueDetails(issue, nil)
 
 	fmt.Println(issue.HTMLURL)
 

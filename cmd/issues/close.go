@@ -47,6 +47,6 @@ func editIssueState(cmd *cli.Context, opts gitea.EditIssueOption) error {
 		return err
 	}
 
-	print.IssueDetails(issue)
+	print.IssueDetails(issue, nil)
 	return nil
 }

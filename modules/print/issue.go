@@ -9,11 +9,12 @@ import (
 	"strings"
 
 	"code.gitea.io/sdk/gitea"
+	"github.com/enescakir/emoji"
 )
 
 // IssueDetails print an issue rendered to stdout
-func IssueDetails(issue *gitea.Issue) {
-	outputMarkdown(fmt.Sprintf(
+func IssueDetails(issue *gitea.Issue, reactions []*gitea.Reaction) {
+	out := fmt.Sprintf(
 		"# #%d %s (%s)\n@%s created %s\n\n%s\n",
 		issue.Index,
 		issue.Title,
@@ -21,7 +22,27 @@ func IssueDetails(issue *gitea.Issue) {
 		issue.Poster.UserName,
 		FormatTime(issue.Created),
 		issue.Body,
-	), issue.HTMLURL)
+	)
+
+	if len(reactions) > 0 {
+		out += fmt.Sprintf("\n---\n\n%s\n", formatReactions(reactions))
+	}
+
+	outputMarkdown(out, issue.HTMLURL)
+}
+
+func formatReactions(reactions []*gitea.Reaction) string {
+	reactionCounts := make(map[string]uint16)
+	for _, r := range reactions {
+		reactionCounts[r.Reaction] += 1
+	}
+
+	reactionStrings := make([]string, 0, len(reactionCounts))
+	for reaction, count := range reactionCounts {
+		reactionStrings = append(reactionStrings, fmt.Sprintf("%dx :%s:", count, reaction))
+	}
+
+	return emoji.Parse(strings.Join(reactionStrings, "  |  "))
 }
 
 // IssuesPullsList prints a listing of issues & pulls
