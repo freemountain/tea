@@ -35,6 +35,7 @@ func main() {
 		&cmd.CmdLogin,
 		&cmd.CmdLogout,
 		&cmd.CmdAutocomplete,
+		&cmd.CmdWhoami,
 
 		&cmd.CmdIssues,
 		&cmd.CmdPulls,
