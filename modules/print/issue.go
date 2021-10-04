@@ -34,7 +34,7 @@ func IssueDetails(issue *gitea.Issue, reactions []*gitea.Reaction) {
 func formatReactions(reactions []*gitea.Reaction) string {
 	reactionCounts := make(map[string]uint16)
 	for _, r := range reactions {
-		reactionCounts[r.Reaction] += 1
+		reactionCounts[r.Reaction]++
 	}
 
 	reactionStrings := make([]string, 0, len(reactionCounts))
