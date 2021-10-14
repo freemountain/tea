@@ -17,9 +17,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Preferences that are stored in and read from the config file
+type Preferences struct {
+	// Prefer using an external text editor over inline multiline prompts
+	Editor bool `yaml:"editor"`
+}
+
 // LocalConfig represents local configurations
 type LocalConfig struct {
-	Logins []Login `yaml:"logins"`
+	Logins []Login     `yaml:"logins"`
+	Prefs  Preferences `yaml:"preferences"`
 }
 
 var (
@@ -53,6 +60,11 @@ func GetConfigPath() string {
 	}
 
 	return configFilePath
+}
+
+// GetPreferences returns preferences based on the config file
+func GetPreferences() Preferences {
+	return config.Prefs
 }
 
 // loadConfig load config from file

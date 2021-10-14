@@ -43,7 +43,12 @@ func promptIssueProperties(login *config.Login, owner, repo string, o *gitea.Cre
 	}
 
 	// description
-	promptD := &survey.Multiline{Message: "Issue description:", Default: o.Body}
+	promptD := NewMultiline(Multiline{
+		Message:   "Issue description:",
+		Default:   o.Body,
+		Syntax:    "md",
+		UseEditor: config.GetPreferences().Editor,
+	})
 	if err = survey.AskOne(promptD, &o.Body); err != nil {
 		return err
 	}

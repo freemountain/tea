@@ -11,6 +11,7 @@ import (
 	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/print"
+
 	"github.com/AlecAivazis/survey/v2"
 	"golang.org/x/crypto/ssh/terminal"
 )

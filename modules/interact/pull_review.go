@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/context"
 	"code.gitea.io/tea/modules/task"
 
@@ -55,7 +56,11 @@ func ReviewPull(ctx *context.TeaContext, idx int64) error {
 	if (state == gitea.ReviewStateComment && len(codeComments) == 0) || state == gitea.ReviewStateRequestChanges {
 		promptOpts = survey.WithValidator(survey.Required)
 	}
-	err = survey.AskOne(&survey.Multiline{Message: "Concluding comment:"}, &comment, promptOpts)
+	err = survey.AskOne(NewMultiline(Multiline{
+		Message:   "Concluding comment:",
+		Syntax:    "md",
+		UseEditor: config.GetPreferences().Editor,
+	}), &comment, promptOpts)
 	if err != nil {
 		return err
 	}
@@ -65,6 +70,7 @@ func ReviewPull(ctx *context.TeaContext, idx int64) error {
 
 // DoDiffReview (1) fetches & saves diff in tempfile, (2) starts $VISUAL or $EDITOR to comment on diff,
 // (3) parses resulting file into code comments.
+// It doesn't really make sense to use survey.Editor() here, as we'd read the file content at least twice.
 func DoDiffReview(ctx *context.TeaContext, idx int64) ([]gitea.CreatePullReviewComment, error) {
 	tmpFile, err := task.SavePullDiff(ctx, idx)
 	if err != nil {

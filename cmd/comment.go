@@ -9,13 +9,15 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"code.gitea.io/tea/modules/interact"
-
-	"code.gitea.io/sdk/gitea"
 	"code.gitea.io/tea/cmd/flags"
+	"code.gitea.io/tea/modules/config"
 	"code.gitea.io/tea/modules/context"
+	"code.gitea.io/tea/modules/interact"
 	"code.gitea.io/tea/modules/print"
 	"code.gitea.io/tea/modules/utils"
+
+	"code.gitea.io/sdk/gitea"
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/urfave/cli/v2"
 )
 
@@ -54,7 +56,11 @@ func runAddComment(cmd *cli.Context) error {
 			body = strings.Join([]string{body, string(bodyStdin)}, "\n\n")
 		}
 	} else if len(body) == 0 {
-		if body, err = interact.PromptMultiline("Content"); err != nil {
+		if err = survey.AskOne(interact.NewMultiline(interact.Multiline{
+			Message:   "Comment:",
+			Syntax:    "md",
+			UseEditor: config.GetPreferences().Editor,
+		}), &body); err != nil {
 			return err
 		}
 	}

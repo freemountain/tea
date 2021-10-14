@@ -33,7 +33,11 @@ func CreateMilestone(login *config.Login, owner, repo string) error {
 	}
 
 	// description
-	promptM := &survey.Multiline{Message: "Milestone description:"}
+	promptM := NewMultiline(Multiline{
+		Message:   "Milestone description:",
+		Syntax:    "md",
+		UseEditor: config.GetPreferences().Editor,
+	})
 	if err := survey.AskOne(promptM, &description); err != nil {
 		return err
 	}
