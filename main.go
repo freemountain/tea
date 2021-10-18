@@ -49,6 +49,7 @@ func main() {
 
 		&cmd.CmdOpen,
 		&cmd.CmdNotifications,
+		&cmd.CmdRepoClone,
 	}
 	app.EnableBashCompletion = true
 	err := app.Run(os.Args)

@@ -111,6 +111,25 @@ func GetLoginByToken(token string) *Login {
 	return nil
 }
 
+// GetLoginByHost finds a login by it's server URL
+func GetLoginByHost(host string) *Login {
+	err := loadConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, l := range config.Logins {
+		loginURL, err := url.Parse(l.URL)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if loginURL.Host == host {
+			return &l
+		}
+	}
+	return nil
+}
+
 // DeleteLogin delete a login by name from config
 func DeleteLogin(name string) error {
 	var idx = -1

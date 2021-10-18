@@ -108,7 +108,7 @@ func GetDefaultPRHead(localRepo *local_git.TeaRepo) (owner, branch string, err e
 	if err != nil {
 		return
 	}
-	owner, _ = utils.GetOwnerAndRepo(strings.TrimLeft(url.Path, "/"), "")
+	owner, _ = utils.GetOwnerAndRepo(url.Path, "")
 	return
 }
 

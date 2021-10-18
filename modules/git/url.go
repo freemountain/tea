@@ -22,13 +22,18 @@ type URLParser struct {
 func (p *URLParser) Parse(rawURL string) (u *url.URL, err error) {
 	rawURL = strings.TrimSpace(rawURL)
 
-	// convert the weird git ssh url format to a canonical url:
-	// git@gitea.com:gitea/tea -> ssh://git@gitea.com/gitea/tea
-	if !protocolRe.MatchString(rawURL) &&
-		strings.Contains(rawURL, ":") &&
-		// not a Windows path
-		!strings.Contains(rawURL, "\\") {
-		rawURL = "ssh://" + strings.Replace(rawURL, ":", "/", 1)
+	if !protocolRe.MatchString(rawURL) {
+		// convert the weird git ssh url format to a canonical url:
+		// git@gitea.com:gitea/tea -> ssh://git@gitea.com/gitea/tea
+		if strings.Contains(rawURL, ":") &&
+			// not a Windows path
+			!strings.Contains(rawURL, "\\") {
+			rawURL = "ssh://" + strings.Replace(rawURL, ":", "/", 1)
+		} else if !strings.Contains(rawURL, "@") &&
+			strings.Count(rawURL, "/") == 2 {
+			// match cases like gitea.com/gitea/tea
+			rawURL = "https://" + rawURL
+		}
 	}
 
 	u, err = url.Parse(rawURL)
