@@ -45,6 +45,7 @@ func main() {
 		&cmd.CmdTrackedTimes,
 		&cmd.CmdOrgs,
 		&cmd.CmdRepos,
+		&cmd.CmdUsers,
 		&cmd.CmdAddComment,
 
 		&cmd.CmdOpen,
